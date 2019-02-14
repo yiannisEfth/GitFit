@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "947658542721",
+    "firebase_url": "https://gitfit-b21f6.firebaseio.com",
+    "project_id": "gitfit-b21f6",
+    "storage_bucket": "gitfit-b21f6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947658542721:android:d632b3287ae09421",
+        "android_client_info": {
+          "package_name": "com2027.killaz.kalorie.gitfit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "947658542721-s5ascika7fe0dmdr6oqrfuunhk7ck323.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com2027.killaz.kalorie.gitfit",
+            "certificate_hash": "88ec777db05d629ab123ebee6dafb8fb673ac344"
+          }
+        },
+        {
+          "client_id": "947658542721-df0pc0argq1cakvibt1r3em0vg4nm5u6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhj5qqj2lsQtpb3P5uzO3CU9W3c0VvQSg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "947658542721-df0pc0argq1cakvibt1r3em0vg4nm5u6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
