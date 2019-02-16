@@ -110,10 +110,11 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         mProgressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
-                            //Intent mainMenu = new Intent(LoginActivity.this, MainMenu.class);
-                            //startActivity(MainMenu);
-                            //finish();
-                            Toast.makeText(LoginActivity.this, "SIGNED IN", Toast.LENGTH_SHORT).show();
+
+                            Intent mainMenu = new Intent(LoginActivity.this, MainMenu.class);
+                            startActivity(mainMenu);
+                            finish();
+
                         } else {
                             Toast.makeText(LoginActivity.this, "Invalid details or no connection. Please Try Again", Toast.LENGTH_SHORT).show();
                         }
