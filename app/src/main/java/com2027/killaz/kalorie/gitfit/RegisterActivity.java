@@ -1,9 +1,8 @@
 package com2027.killaz.kalorie.gitfit;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -24,11 +23,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -103,7 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 }
 
-                if (takenNames.contains(mEditTextNickname.getText().toString().trim())){
+                if (takenNames.contains(mEditTextNickname.getText().toString().trim())) {
                     mProgressBar.setVisibility(View.GONE);
                     Toast.makeText(RegisterActivity.this, "Nickname already exists. Try a different one.", Toast.LENGTH_SHORT).show();
                     return;
@@ -130,16 +127,16 @@ public class RegisterActivity extends AppCompatActivity {
                 });
 
 
-
             }
         });
     }
 
     /**
      * Method to create the user in the collection of Users found on the Firestore database.
+     *
      * @param username The nickname of the user.
      */
-    private void createFirestoreUser(String username){
+    private void createFirestoreUser(String username) {
         Map<String, Object> docData = new HashMap<>();
         docData.put("calories", 0);
         docData.put("challenges_completed", 0);
@@ -182,11 +179,11 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * Fetches all names from the database in order to make sure the nickname the user chooses is not a duplicate.
      */
-    private void fetchNames(){
+    private void fetchNames() {
         db.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
                     for (DocumentSnapshot document : task.getResult()) {
                         takenNames.add(document.getId());
                     }
