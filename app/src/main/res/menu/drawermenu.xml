@@ -4,11 +4,13 @@
     tools:showIn = "navigation_view">
 
 <group android:checkableBehavior="single">
-    <item android:id="@+id/dash" android:title="Dashbard" />
-    <item android:id="@+id/event" android:title="Events" />
-    <item android:id="@+id/search" android:title="Search" />
-    <item android:id="@+id/settings" android:title="Settings" />
-    <item android:id="@+id/activities" android:title="Activities" />
+    <item android:id="@+id/menu_home" android:title="Home" />
+    <item android:id="@+id/menu_tracker" android:title="Location Tracker" />
+    <item android:id="@+id/menu_friends" android:title="Friends" />
+    <item android:id="@+id/menu_challenges" android:title="Challenges" />
+    <item android:id="@+id/menu_bmicalc" android:title="BMI Calculator" />
+    <item android:id="@+id/menu_leaderboards" android:title="Leaderboards" />
+    <item android:id="@+id/menu_settings" android:title="User Settings" />
 
 </group>
 

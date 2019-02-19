@@ -3,10 +3,10 @@ package com2027.killaz.kalorie.gitfit;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.InputType;
 import android.util.Patterns;
 import android.view.View;
@@ -170,10 +170,11 @@ public class LoginActivity extends AppCompatActivity {
         });
 
     }
+
     /**
      * Send the user to the sign up activity to create an account.
      */
-    private void signUpActivity(){
+    private void signUpActivity() {
         mSignUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
