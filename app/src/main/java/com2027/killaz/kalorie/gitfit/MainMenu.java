@@ -33,7 +33,7 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
             //opens home_fragment on startup
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new HomeFragment()).commit();
-            navigationView.setCheckedItem(R.id.dash);
+            navigationView.setCheckedItem(R.id.menu_home);
         }
 
 
