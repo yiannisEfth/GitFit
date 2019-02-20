@@ -4,4 +4,10 @@
     <string name="shared_pref">com2027.killaz.kalorie.gitfit</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="test2">This is also a test</string>
+    <string name="circle_content_desc">A circle</string>
+    <string name="test1">Test</string>
+    <string name="button_1">Button 1</string>
+    <string name="button_2">Button 2</string>
+    <string name="button_3">Button 3</string>
 </resources>
