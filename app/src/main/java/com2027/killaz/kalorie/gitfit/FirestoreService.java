@@ -32,12 +32,15 @@ public class FirestoreService extends Service implements SensorEventListener {
     private DocumentReference userRef;
     private SensorManager sensorManager;
     private Sensor stepSensor;
+    private Intent stepIntent;
     private int stepCounter;
 
     /**
      * Fetch the current user and their tracked variables.
      */
     public FirestoreService() {
+        stepIntent = new Intent();
+        stepIntent.setAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
         data = new HashMap<>();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -84,10 +87,6 @@ public class FirestoreService extends Service implements SensorEventListener {
         stepCounter++;
         data.put("total_distance_covered", stepCounter);
         db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
-
-        // Send broadcast so home fragment UI can be updated with new value.
-        Intent stepIntent = new Intent();
-        stepIntent.setAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
         stepIntent.putExtra("steps", stepCounter);
         sendBroadcast(stepIntent);
     }
@@ -107,6 +106,9 @@ public class FirestoreService extends Service implements SensorEventListener {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     stepCounter = documentSnapshot.getLong("total_distance_covered").intValue();
+                    // Send broadcast so home fragment UI can be updated with new value.
+                    stepIntent.putExtra("steps", stepCounter);
+                    sendBroadcast(stepIntent);
                 }
             }
         });
