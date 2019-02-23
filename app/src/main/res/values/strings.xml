@@ -6,8 +6,8 @@
     <string name="close">Close</string>
     <string name="test2">This is also a test</string>
     <string name="circle_content_desc">A circle</string>
-    <string name="test1">Test</string>
-    <string name="button_1">Button 1</string>
-    <string name="button_2">Button 2</string>
-    <string name="button_3">Button 3</string>
+    <string name="steps_loading">Loading&#8230;</string>
+    <string name="button_1">Today</string>
+    <string name="button_2">This Week</string>
+    <string name="button_3">This Month</string>
 </resources>

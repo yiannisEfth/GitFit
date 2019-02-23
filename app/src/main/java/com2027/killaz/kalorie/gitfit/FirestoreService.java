@@ -84,6 +84,12 @@ public class FirestoreService extends Service implements SensorEventListener {
         stepCounter++;
         data.put("total_distance_covered", stepCounter);
         db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
+
+        // Send broadcast so home fragment UI can be updated with new value.
+        Intent stepIntent = new Intent();
+        stepIntent.setAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
+        stepIntent.putExtra("steps", stepCounter);
+        sendBroadcast(stepIntent);
     }
 
     @Override

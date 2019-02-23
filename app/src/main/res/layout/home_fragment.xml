@@ -26,7 +26,8 @@
         android:layout_alignTop="@+id/circle"
         android:layout_alignRight="@+id/circle"
         android:layout_alignBottom="@+id/circle"
-        android:text="@string/test1"
+        android:text="@string/steps_loading"
+        android:textSize="35sp"
         android:textColor="#000000" />
 
     <LinearLayout
