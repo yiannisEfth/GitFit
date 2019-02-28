@@ -19,9 +19,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 public class HomeFragment extends Fragment {
 
     private TextView stepText;
+    private TextView challengeStepsText;
     private ProgressBar challengeBar;
 
     @Nullable
@@ -37,7 +40,7 @@ public class HomeFragment extends Fragment {
         Button btn3 = (Button) getView().findViewById(R.id.homeBtn3);
         stepText = (TextView) getView().findViewById(R.id.stepTextView);
         challengeBar = (ProgressBar) getView().findViewById(R.id.challenge_bar);
-
+        challengeStepsText = (TextView) getView().findViewById(R.id.challengeStepsText);
     }
 
     /**
@@ -47,15 +50,28 @@ public class HomeFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("Broadcast Receiver", "Broadcast Received.");
-            stepText.setText(Integer.toString(intent.getIntExtra("steps", 0)));
 
-            // Progress bar testing. This will change later to depend on the current challenge
-            if (challengeBar.getProgress() < 100) {
-                challengeBar.incrementProgressBy(1);
-            } else {
-                challengeBar.setProgress(0);
-                Toast.makeText(getActivity(),"Challenge Complete!", Toast.LENGTH_LONG).show();
+            int steps = intent.getIntExtra("steps", 0);
+            int remaining = intent.getIntExtra("remaining", 0);
+            int total = intent.getIntExtra("challengeTotal", 0);
+
+            stepText.setText(Integer.toString(steps));
+
+            Log.d("Total", String.valueOf(total));
+            Log.d("Remaining", String.valueOf(remaining));
+
+            if (total != 0) {
+                int progress = (int) (((total-remaining)*100.0f) / total);
+                challengeStepsText.setText("Your progress: " + (total - remaining) + " / " + total);
+                Log.d("Challenge Progress", String.valueOf(progress));
+
+                if (progress > 100) {
+                    progress = 100;
+                }
+
+                challengeBar.setProgress(progress);
             }
+
         }
     }
 

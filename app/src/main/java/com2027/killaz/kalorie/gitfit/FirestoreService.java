@@ -96,7 +96,7 @@ public class FirestoreService extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         stepCounter++;
         remainingMyChallenge--;
-        if (remainingMyChallenge == 0) {
+        if (remainingMyChallenge <= 0) {
             Random random = new Random();
             int newChallenge = random.nextInt(10) + 1;
             getNewChallenge(newChallenge);
@@ -107,6 +107,8 @@ public class FirestoreService extends Service implements SensorEventListener {
         data.put("current_challenge_self", self_challenge_map);
         db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
         stepIntent.putExtra("steps", stepCounter);
+        stepIntent.putExtra("remaining", remainingMyChallenge);
+        stepIntent.putExtra("challengeTotal", totalMyChallenge);
         sendBroadcast(stepIntent);
     }
 
@@ -131,6 +133,7 @@ public class FirestoreService extends Service implements SensorEventListener {
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
                     // Send broadcast so home fragment UI can be updated with new value.
                     stepIntent.putExtra("steps", stepCounter);
+                    stepIntent.putExtra("remaining", remainingMyChallenge);
                     sendBroadcast(stepIntent);
                 }
             }
@@ -142,16 +145,18 @@ public class FirestoreService extends Service implements SensorEventListener {
      * TODO fetch friend challenge-will finish this week.
      */
     private void fetchUserChallenges() {
-        myChallengeReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    myChallengeType = documentSnapshot.getString("type");
-                    totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
+        if (myChallengeReference != null) {
+            myChallengeReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        myChallengeType = documentSnapshot.getString("type");
+                        totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
