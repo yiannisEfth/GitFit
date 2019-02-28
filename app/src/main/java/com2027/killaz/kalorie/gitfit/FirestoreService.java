@@ -102,7 +102,6 @@ public class FirestoreService extends Service implements SensorEventListener {
             Log.i("New Challenge ID", String.valueOf(newChallenge));
             getNewChallenge(newChallenge);
         }
-        self_challenge_map.put("challenge_ref", myChallengeReference);
         self_challenge_map.put("remaining", remainingMyChallenge);
         data.put("total_distance_covered", stepCounter);
         data.put("current_challenge_self", self_challenge_map);
@@ -179,9 +178,9 @@ public class FirestoreService extends Service implements SensorEventListener {
                 self_challenge_map.put("remaining", totalMyChallenge);
                 data.put("current_challenge_self", self_challenge_map);
                 db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
+                stepIntent.putExtra("challengeTotal", totalMyChallenge);
+                sendBroadcast(stepIntent);
             }
         });
-        stepIntent.putExtra("challengeTotal", totalMyChallenge);
-        sendBroadcast(stepIntent);
     }
 }
