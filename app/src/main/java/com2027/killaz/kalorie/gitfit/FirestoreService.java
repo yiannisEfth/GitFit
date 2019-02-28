@@ -99,6 +99,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         if (remainingMyChallenge <= 0) {
             Random random = new Random();
             int newChallenge = random.nextInt(10) + 1;
+            Log.i("New Challenge ID", String.valueOf(newChallenge));
             getNewChallenge(newChallenge);
         }
         self_challenge_map.put("challenge_ref", myChallengeReference);
@@ -108,7 +109,6 @@ public class FirestoreService extends Service implements SensorEventListener {
         db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
         stepIntent.putExtra("steps", stepCounter);
         stepIntent.putExtra("remaining", remainingMyChallenge);
-        stepIntent.putExtra("challengeTotal", totalMyChallenge);
         sendBroadcast(stepIntent);
     }
 
@@ -131,10 +131,6 @@ public class FirestoreService extends Service implements SensorEventListener {
                     myChallengeReference = (DocumentReference) my_challenge.get("challenge_ref");
                     fetchUserChallenges();
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
-                    // Send broadcast so home fragment UI can be updated with new value.
-                    stepIntent.putExtra("steps", stepCounter);
-                    stepIntent.putExtra("remaining", remainingMyChallenge);
-                    sendBroadcast(stepIntent);
                 }
             }
         });
@@ -153,6 +149,12 @@ public class FirestoreService extends Service implements SensorEventListener {
                         DocumentSnapshot documentSnapshot = task.getResult();
                         myChallengeType = documentSnapshot.getString("type");
                         totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
+
+                        // Send broadcast so home fragment UI can be updated with new value.
+                        stepIntent.putExtra("steps", stepCounter);
+                        stepIntent.putExtra("remaining", remainingMyChallenge);
+                        stepIntent.putExtra("challengeTotal", totalMyChallenge);
+                        sendBroadcast(stepIntent);
                     }
                 }
             });
@@ -179,5 +181,7 @@ public class FirestoreService extends Service implements SensorEventListener {
                 db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
             }
         });
+        stepIntent.putExtra("challengeTotal", totalMyChallenge);
+        sendBroadcast(stepIntent);
     }
 }

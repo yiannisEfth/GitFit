@@ -26,6 +26,7 @@ public class HomeFragment extends Fragment {
     private TextView stepText;
     private TextView challengeStepsText;
     private ProgressBar challengeBar;
+    private StepBroadcastReceiver br;
 
     @Nullable
     @Override
@@ -41,6 +42,7 @@ public class HomeFragment extends Fragment {
         stepText = (TextView) getView().findViewById(R.id.stepTextView);
         challengeBar = (ProgressBar) getView().findViewById(R.id.challenge_bar);
         challengeStepsText = (TextView) getView().findViewById(R.id.challengeStepsText);
+        br = new StepBroadcastReceiver();
     }
 
     /**
@@ -83,7 +85,14 @@ public class HomeFragment extends Fragment {
         super.onResume();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
-        getActivity().registerReceiver(new StepBroadcastReceiver(), intentFilter);
+        getActivity().registerReceiver(br, intentFilter);
         Log.d("Broadcast Receiver", "Receiver Registered.");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getActivity().unregisterReceiver(br);
+        Log.d("Broadcast Receiver", "Receiver Unregistered.");
     }
 }
