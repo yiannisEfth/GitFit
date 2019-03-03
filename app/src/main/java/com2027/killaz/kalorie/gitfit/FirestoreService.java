@@ -29,18 +29,24 @@ public class FirestoreService extends Service implements SensorEventListener {
      */
     private Map<String, Object> data;
     private Map<String, Object> self_challenge_map;
+    private Map<String, Object> friend_challenge_map;
     private FirebaseUser currentUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference userRef;
     private DocumentReference myChallengeReference;
+    private DocumentReference friendChallengeReference;
     private DocumentReference newChallenge;
     private SensorManager sensorManager;
     private Sensor stepSensor;
     private Intent stepIntent;
     private int stepCounter;
     private int remainingMyChallenge;
+    private int remainingFriendChallenge;
     private int totalMyChallenge;
+    private int totalFriendChallenge;
     private String myChallengeType;
+    private String friendChallengeType;
+    private String friendChallenger;
 
     /**
      * Fetch the current user and their tracked variables.
@@ -50,6 +56,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         stepIntent.setAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
         data = new HashMap<>();
         self_challenge_map = new HashMap<>();
+        friend_challenge_map = new HashMap<>();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         userRef = db.collection("Users").document(currentUser.getDisplayName());
@@ -96,13 +103,26 @@ public class FirestoreService extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         stepCounter++;
         remainingMyChallenge--;
+        remainingFriendChallenge--;
         if (remainingMyChallenge <= 0) {
             Random random = new Random();
             int newChallenge = random.nextInt(10) + 1;
             Log.i("New Challenge ID", String.valueOf(newChallenge));
             getNewChallenge(newChallenge);
         }
+
+        if (remainingFriendChallenge <= 0) {
+            friendChallengeReference = null;
+            //TODO Friend challenge finished...let user .
+        }
         self_challenge_map.put("remaining", remainingMyChallenge);
+
+        if (friendChallengeReference != null) {
+            friend_challenge_map.put("remaining", remainingFriendChallenge);
+            data.put("current_challenge_friend", friend_challenge_map);
+            stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
+        }
+
         data.put("total_distance_covered", stepCounter);
         data.put("current_challenge_self", self_challenge_map);
         db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
@@ -127,9 +147,15 @@ public class FirestoreService extends Service implements SensorEventListener {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     stepCounter = documentSnapshot.getLong("total_distance_covered").intValue();
                     Map<String, Object> my_challenge = (Map<String, Object>) documentSnapshot.get("current_challenge_self");
+                    Map<String, Object> friend_challenge = (Map<String, Object>) documentSnapshot.get("current_challenge_friend");
                     myChallengeReference = (DocumentReference) my_challenge.get("challenge_ref");
+                    friendChallengeReference = (DocumentReference) friend_challenge.get("challenge_ref");
                     fetchUserChallenges();
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
+                    if (friendChallengeReference != null) {
+                        remainingFriendChallenge = ((Long) friend_challenge.get("remaining")).intValue();
+                        friendChallenger = friend_challenge.get("user_ref").toString();
+                    }
                 }
             }
         });
@@ -154,6 +180,26 @@ public class FirestoreService extends Service implements SensorEventListener {
                         stepIntent.putExtra("remaining", remainingMyChallenge);
                         stepIntent.putExtra("challengeTotal", totalMyChallenge);
                         sendBroadcast(stepIntent);
+                    }
+                }
+            });
+        }
+
+        if (friendChallengeReference != null) {
+            friendChallengeReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        friendChallengeType = documentSnapshot.getString("type");
+                        totalFriendChallenge = documentSnapshot.getLong(friendChallengeType).intValue();
+
+                        // Send broadcast for friend's challenge to update the home fragment ui.
+                        stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
+                        stepIntent.putExtra("friend_challenge_total", totalFriendChallenge);
+                        stepIntent.putExtra("friend_challenger", friendChallenger);
+                        sendBroadcast(stepIntent);
+
                     }
                 }
             });
