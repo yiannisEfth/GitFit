@@ -1,6 +1,10 @@
 package com2027.killaz.kalorie.gitfit;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -19,6 +23,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -47,6 +52,8 @@ public class FirestoreService extends Service implements SensorEventListener {
     private String myChallengeType;
     private String friendChallengeType;
     private String friendChallenger;
+    private AlarmManager alarmManager;
+    private PendingIntent alarmIntent;
 
     /**
      * Fetch the current user and their tracked variables.
@@ -64,10 +71,11 @@ public class FirestoreService extends Service implements SensorEventListener {
     }
 
     /**
-     * Initialise the necessary sensors.
+     * Initialise the necessary sensors and alarm manager to reset steps each day.
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Context context = getApplicationContext();
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
@@ -76,9 +84,32 @@ public class FirestoreService extends Service implements SensorEventListener {
 
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL);
         Log.i("SERVICE STARTED-USER:", currentUser.getDisplayName());
+
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent innerIntent = new Intent(context, AlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, innerIntent, 0);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, alarmIntent);
+
         return START_NOT_STICKY;
     }
 
+    /**
+     * Private class
+     */
+    private class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO
+        }
+    }
 
     /**
      * Unregister the sensors when service ends
