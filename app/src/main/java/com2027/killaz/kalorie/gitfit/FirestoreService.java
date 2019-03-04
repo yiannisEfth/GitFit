@@ -49,6 +49,7 @@ public class FirestoreService extends Service implements SensorEventListener {
     private int remainingFriendChallenge;
     private int totalMyChallenge;
     private int totalFriendChallenge;
+    private int completedChallenges;
     private String myChallengeType;
     private String friendChallengeType;
     private String friendChallenger;
@@ -136,6 +137,8 @@ public class FirestoreService extends Service implements SensorEventListener {
         remainingMyChallenge--;
         remainingFriendChallenge--;
         if (remainingMyChallenge <= 0) {
+            completedChallenges++;
+            data.put("challenges_completed", completedChallenges);
             Random random = new Random();
             int newChallenge = random.nextInt(10) + 1;
             Log.i("New Challenge ID", String.valueOf(newChallenge));
@@ -143,7 +146,10 @@ public class FirestoreService extends Service implements SensorEventListener {
         }
 
         if (remainingFriendChallenge <= 0) {
+            completedChallenges++;
+            data.put("challenges_completed", completedChallenges);
             friendChallengeReference = null;
+
             //TODO Friend challenge finished...let user .
         }
         self_challenge_map.put("remaining", remainingMyChallenge);
@@ -153,7 +159,7 @@ public class FirestoreService extends Service implements SensorEventListener {
             data.put("current_challenge_friend", friend_challenge_map);
             stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
         }
-
+        data.put("points", stepCounter * 0.65 + 300);
         data.put("total_distance_covered", stepCounter);
         data.put("current_challenge_self", self_challenge_map);
         db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
@@ -181,6 +187,7 @@ public class FirestoreService extends Service implements SensorEventListener {
                     Map<String, Object> friend_challenge = (Map<String, Object>) documentSnapshot.get("current_challenge_friend");
                     myChallengeReference = (DocumentReference) my_challenge.get("challenge_ref");
                     friendChallengeReference = (DocumentReference) friend_challenge.get("challenge_ref");
+                    completedChallenges = documentSnapshot.getLong("challenges_completed").intValue();
                     fetchUserChallenges();
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
                     if (friendChallengeReference != null) {
