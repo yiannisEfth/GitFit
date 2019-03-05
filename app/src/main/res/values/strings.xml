@@ -11,4 +11,5 @@
     <string name="button_2">This Week</string>
     <string name="button_3">This Month</string>
     <string name="fetching_challenge_progress">Fetching challenge progress...</string>
+    <string name="today">Today</string>
 </resources>

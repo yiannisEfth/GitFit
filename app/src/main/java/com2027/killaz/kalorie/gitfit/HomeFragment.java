@@ -21,12 +21,20 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class HomeFragment extends Fragment {
 
     private TextView stepText;
+    private TextView timeText;
     private TextView challengeStepsText;
     private ProgressBar challengeBar;
     private StepBroadcastReceiver br;
+    private DatabaseHelper dbHelper;
 
     @Nullable
     @Override
@@ -36,13 +44,45 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Button btn1 = (Button) getView().findViewById(R.id.homeBtn1);
-        Button btn2 = (Button) getView().findViewById(R.id.homeBtn2);
-        Button btn3 = (Button) getView().findViewById(R.id.homeBtn3);
+        final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
+        final Button thisWeekBtn = (Button) getView().findViewById(R.id.homeBtn2);
+        final Button thisMonthBtn = (Button) getView().findViewById(R.id.homeBtn3);
         stepText = (TextView) getView().findViewById(R.id.stepTextView);
+        timeText = (TextView) getView().findViewById(R.id.timeTextView);
         challengeBar = (ProgressBar) getView().findViewById(R.id.challenge_bar);
         challengeStepsText = (TextView) getView().findViewById(R.id.challengeStepsText);
+
         br = new StepBroadcastReceiver();
+        dbHelper = DatabaseHelper.getInstance(getContext());
+        //todayBtn.setBackgroundColor(Color.GREEN);
+
+        todayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date currentDate = Calendar.getInstance().getTime();
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd", Locale.UK);
+                String dateString = dateFormat.format(currentDate);
+
+                int steps = dbHelper.getSteps(dateString);
+                stepText.setText(String.valueOf(steps));
+                timeText.setText(R.string.today);
+                //todayBtn.setBackgroundColor(Color.GREEN);
+            }
+        });
+
+        thisWeekBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
+            }
+        });
+
+        thisMonthBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
+            }
+        });
     }
 
     /**
