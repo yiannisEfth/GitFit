@@ -117,10 +117,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int getSteps(String date) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME +
-                "WHERE " + COLUMN_DATE + " = ?";
+                " WHERE " + COLUMN_DATE + " = ?";
 
+        int result;
         Cursor cursor = db.rawQuery(query, new String[]{date});
 
-        return cursor.getInt(cursor.getColumnIndex(COLUMN_STEPS));
+        if (!(cursor.moveToFirst()) || cursor.getCount() ==0){
+            // cursor is empty
+            result = 0;
+        } else {
+            result = cursor.getInt(cursor.getColumnIndex(COLUMN_STEPS));
+        }
+
+        cursor.close();
+        return result;
     }
 }

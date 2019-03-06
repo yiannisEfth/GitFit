@@ -23,8 +23,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -55,6 +58,7 @@ public class FirestoreService extends Service implements SensorEventListener {
     private String friendChallenger;
     private AlarmManager alarmManager;
     private PendingIntent alarmIntent;
+    private DatabaseHelper dbHelper;
 
     /**
      * Fetch the current user and their tracked variables.
@@ -108,7 +112,8 @@ public class FirestoreService extends Service implements SensorEventListener {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO
+            DateFormat df = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
+            dbHelper.newRecord(df.format(Calendar.getInstance().getTime()), stepCounter);
         }
     }
 

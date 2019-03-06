@@ -33,7 +33,7 @@
             android:layout_margin="1dp"
             android:paddingTop="15dp"
             android:layout_gravity="center"
-            android:text="@string/today"
+            android:text="@string/button_1"
             android:textSize="18sp"
             android:textColor="#000000" />
 

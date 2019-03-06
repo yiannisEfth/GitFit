@@ -35,6 +35,7 @@ public class HomeFragment extends Fragment {
     private ProgressBar challengeBar;
     private StepBroadcastReceiver br;
     private DatabaseHelper dbHelper;
+    private int steps;
 
     @Nullable
     @Override
@@ -56,16 +57,13 @@ public class HomeFragment extends Fragment {
         dbHelper = DatabaseHelper.getInstance(getContext());
         //todayBtn.setBackgroundColor(Color.GREEN);
 
+        final DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
+
         todayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date currentDate = Calendar.getInstance().getTime();
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd", Locale.UK);
-                String dateString = dateFormat.format(currentDate);
-
-                int steps = dbHelper.getSteps(dateString);
                 stepText.setText(String.valueOf(steps));
-                timeText.setText(R.string.today);
+                timeText.setText(R.string.button_1);
                 //todayBtn.setBackgroundColor(Color.GREEN);
             }
         });
@@ -73,7 +71,24 @@ public class HomeFragment extends Fragment {
         thisWeekBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(System.currentTimeMillis());
+
+                // Step backwards through the week until Monday.
+                // Add up each day's steps to get total value.
+                int total = steps;
+                while (cal.get(Calendar.DAY_OF_WEEK) != cal.getFirstDayOfWeek()) {
+                    cal.add(Calendar.DAY_OF_WEEK, -1);
+
+                    String dateString = dateFormat.format(cal.getTime());
+                    Log.v("Getting steps from", dateString);
+
+                    total += dbHelper.getSteps(dateString);
+                    Log.v("Updated total", String.valueOf(total));
+                }
+
+                stepText.setText(String.valueOf(total));
+                timeText.setText(R.string.button_2);
             }
         });
 
@@ -93,7 +108,7 @@ public class HomeFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             Log.d("Broadcast Receiver", "Broadcast Received.");
 
-            int steps = intent.getIntExtra("steps", 0);
+            steps = intent.getIntExtra("steps", 0);
             int remaining = intent.getIntExtra("remaining", 0);
             int total = intent.getIntExtra("challengeTotal", 0);
 
