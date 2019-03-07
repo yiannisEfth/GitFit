@@ -11,4 +11,8 @@
     <string name="button_2">This Week</string>
     <string name="button_3">This Month</string>
     <string name="fetching_challenge_progress">Fetching challenge progress...</string>
+    <string name="on_board_activity_next_btn">Next</string>
+    <string name="on_board_activity_back_btn">Back</string>
+    <string name="on_board_activity_finish_btn">Finish</string>
+    <string name="content_descr_onboardscrn">Fancy background for on board activity</string>
 </resources>

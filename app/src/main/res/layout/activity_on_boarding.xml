@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/on_boarding_act_background"
+    tools:context="com2027.killaz.kalorie.gitfit.OnBoardingActivity">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/onBoardingActPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="68dp" />
+
+    <LinearLayout
+        android:id="@+id/onBoardingActDots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="22dp"
+        android:orientation="horizontal" />
+
+    <Button
+        android:id="@+id/onBoardingBackBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="@android:color/transparent"
+        android:textColor="@color/onBoardingColorTransparentWhite"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/onBoardingNextBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/onBoardingBackBtn"
+        android:background="@android:color/transparent"
+        android:text="@string/on_board_activity_next_btn"
+        android:textColor="@color/onBoardingColorTransparentWhite"
+        android:visibility="visible" />
+
+</RelativeLayout>
