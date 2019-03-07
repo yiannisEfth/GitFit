@@ -150,20 +150,24 @@ public class FirestoreService extends Service implements SensorEventListener {
             getNewChallenge(newChallenge);
         }
 
-        if (remainingFriendChallenge <= 0) {
-            completedChallenges++;
-            data.put("challenges_completed", completedChallenges);
-            friendChallengeReference = null;
-
-            //TODO Friend challenge finished...let user .
-        }
-        self_challenge_map.put("remaining", remainingMyChallenge);
-
-        if (friendChallengeReference != null) {
+        if (friendChallengeReference != null && remainingFriendChallenge!=0) {
             friend_challenge_map.put("remaining", remainingFriendChallenge);
             data.put("current_challenge_friend", friend_challenge_map);
             stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
         }
+        if (remainingFriendChallenge == 0) {
+            completedChallenges++;
+            friend_challenge_map.put("remaining", null);
+            friend_challenge_map.put("challenge_ref", null);
+            friend_challenge_map.put("user_ref", null);
+            data.put("current_challenge_friend", friend_challenge_map);
+            data.put("challenges_completed", completedChallenges);
+            friendChallengeReference = null;
+
+            //TODO Friend challenge finished...let user know. Front end stuff.
+        }
+        self_challenge_map.put("remaining", remainingMyChallenge);
+
         data.put("points", stepCounter * 0.65 + 300);
         data.put("total_distance_covered", stepCounter);
         data.put("current_challenge_self", self_challenge_map);
