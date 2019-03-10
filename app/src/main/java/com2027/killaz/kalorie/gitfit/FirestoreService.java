@@ -53,6 +53,7 @@ public class FirestoreService extends Service implements SensorEventListener {
     private int totalMyChallenge;
     private int totalFriendChallenge;
     private int completedChallenges;
+    private int points;
     private String myChallengeType;
     private String friendChallengeType;
     private String friendChallenger;
@@ -167,8 +168,10 @@ public class FirestoreService extends Service implements SensorEventListener {
             //TODO Friend challenge finished...let user know. Front end stuff.
         }
         self_challenge_map.put("remaining", remainingMyChallenge);
-
-        data.put("points", stepCounter * 0.65 + 300);
+        points = (int) (stepCounter * 0.65 + 300 + (completedChallenges*1.35));
+        stepIntent.putExtra("challenges_completed", completedChallenges);
+        stepIntent.putExtra("points", points);
+        data.put("points", points);
         data.put("total_distance_covered", stepCounter);
         data.put("current_challenge_self", self_challenge_map);
         db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
@@ -197,6 +200,10 @@ public class FirestoreService extends Service implements SensorEventListener {
                     myChallengeReference = (DocumentReference) my_challenge.get("challenge_ref");
                     friendChallengeReference = (DocumentReference) friend_challenge.get("challenge_ref");
                     completedChallenges = documentSnapshot.getLong("challenges_completed").intValue();
+                    points = documentSnapshot.getLong("points").intValue();
+                    stepIntent.putExtra("challenges_completed", completedChallenges);
+                    stepIntent.putExtra("points", points);
+                    sendBroadcast(stepIntent);
                     fetchUserChallenges();
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
                     if (friendChallengeReference != null) {

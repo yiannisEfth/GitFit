@@ -15,4 +15,13 @@
     <string name="on_board_activity_back_btn">Back</string>
     <string name="on_board_activity_finish_btn">Finish</string>
     <string name="content_descr_onboardscrn">Fancy background for on board activity</string>
+    <string name="profile_profiletext">User Info and Settings</string>
+    <string name="profile_change_password">Change Password</string>
+    <string name="profile_delete_account">Delete Account</string>
+    <string name="profile_points">Points</string>
+    <string name="profile_nickname">Nickname</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_wins">Challenges Completed</string>
+    <string name="content_descr_aperson">aPerson</string>
+    <string name="content_descr">anImg</string>
 </resources>
