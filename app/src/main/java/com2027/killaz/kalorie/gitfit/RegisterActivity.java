@@ -143,6 +143,7 @@ public class RegisterActivity extends AppCompatActivity {
         docData.put("points", 0);
         //Blank friends list.
         docData.put("friends", Arrays.asList(true));
+        docData.put("friend_requests", Arrays.asList(true));
         docData.put("total_distance_covered", 0);
 
         //Creates the blank map of friend challenge.

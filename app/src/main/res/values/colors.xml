@@ -5,4 +5,10 @@
     <color name="colorAccent">#FF4081</color>
     <color name="darkgray">#6c6c6c</color>
     <color name="white">#ffffff</color>
+    <!--OnBoardingActivity Colors -->
+    <color name="onBoardingColorPrimary">#262938</color>
+    <color name="onBoardingColorPrimaryDark">#181A24</color>
+    <color name="onBoardingColorAccent">#FF4081</color>
+    <color name="onBoardingColorWhite">#ffffff</color>
+    <color name="onBoardingColorTransparentWhite">#cccccc</color>
 </resources>
