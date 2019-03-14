@@ -19,10 +19,23 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class HomeFragment extends Fragment {
 
     private TextView stepText;
+    private TextView timeText;
+    private TextView challengeStepsText;
     private ProgressBar challengeBar;
+    private StepBroadcastReceiver br;
+    private DatabaseHelper dbHelper;
+    private int steps;
 
     @Nullable
     @Override
@@ -32,12 +45,59 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Button btn1 = (Button) getView().findViewById(R.id.homeBtn1);
-        Button btn2 = (Button) getView().findViewById(R.id.homeBtn2);
-        Button btn3 = (Button) getView().findViewById(R.id.homeBtn3);
+        final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
+        final Button thisWeekBtn = (Button) getView().findViewById(R.id.homeBtn2);
+        final Button thisMonthBtn = (Button) getView().findViewById(R.id.homeBtn3);
         stepText = (TextView) getView().findViewById(R.id.stepTextView);
+        timeText = (TextView) getView().findViewById(R.id.timeTextView);
         challengeBar = (ProgressBar) getView().findViewById(R.id.challenge_bar);
+        challengeStepsText = (TextView) getView().findViewById(R.id.challengeStepsText);
 
+        br = new StepBroadcastReceiver();
+        dbHelper = DatabaseHelper.getInstance(getContext());
+        //todayBtn.setBackgroundColor(Color.GREEN);
+
+        final DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
+
+        todayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stepText.setText(String.valueOf(steps));
+                timeText.setText(R.string.button_1);
+                //todayBtn.setBackgroundColor(Color.GREEN);
+            }
+        });
+
+        thisWeekBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(System.currentTimeMillis());
+
+                // Step backwards through the week until Monday.
+                // Add up each day's steps to get total value.
+                int total = steps;
+                while (cal.get(Calendar.DAY_OF_WEEK) != cal.getFirstDayOfWeek()) {
+                    cal.add(Calendar.DAY_OF_WEEK, -1);
+
+                    String dateString = dateFormat.format(cal.getTime());
+                    Log.v("Getting steps from", dateString);
+
+                    total += dbHelper.getSteps(dateString);
+                    Log.v("Updated total", String.valueOf(total));
+                }
+
+                stepText.setText(String.valueOf(total));
+                timeText.setText(R.string.button_2);
+            }
+        });
+
+        thisMonthBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
+            }
+        });
     }
 
     /**
@@ -47,15 +107,28 @@ public class HomeFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("Broadcast Receiver", "Broadcast Received.");
-            stepText.setText(Integer.toString(intent.getIntExtra("steps", 0)));
 
-            // Progress bar testing. This will change later to depend on the current challenge
-            if (challengeBar.getProgress() < 100) {
-                challengeBar.incrementProgressBy(1);
-            } else {
-                challengeBar.setProgress(0);
-                Toast.makeText(getActivity(),"Challenge Complete!", Toast.LENGTH_LONG).show();
+            steps = intent.getIntExtra("steps", 0);
+            int remaining = intent.getIntExtra("remaining", 0);
+            int total = intent.getIntExtra("challengeTotal", 0);
+
+            stepText.setText(Integer.toString(steps));
+
+            Log.d("Total", String.valueOf(total));
+            Log.d("Remaining", String.valueOf(remaining));
+
+            if (total != 0) {
+                int progress = (int) (((total-remaining)*100.0f) / total);
+                challengeStepsText.setText("Your progress: " + (total - remaining) + " / " + total);
+                Log.d("Challenge Progress", String.valueOf(progress));
+
+                if (progress > 100) {
+                    progress = 100;
+                }
+
+                challengeBar.setProgress(progress);
             }
+
         }
     }
 
@@ -67,7 +140,14 @@ public class HomeFragment extends Fragment {
         super.onResume();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
-        getActivity().registerReceiver(new StepBroadcastReceiver(), intentFilter);
+        getActivity().registerReceiver(br, intentFilter);
         Log.d("Broadcast Receiver", "Receiver Registered.");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getActivity().unregisterReceiver(br);
+        Log.d("Broadcast Receiver", "Receiver Unregistered.");
     }
 }
