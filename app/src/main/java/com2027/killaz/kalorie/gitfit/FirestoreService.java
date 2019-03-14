@@ -77,7 +77,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         currentUser = mAuth.getCurrentUser();
         userRef = db.collection("Users").document(currentUser.getDisplayName());
         fetchUserData();
-
+        dbHelper = DatabaseHelper.getInstance(this);
 
         final DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
         calendar = Calendar.getInstance();
