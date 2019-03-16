@@ -59,7 +59,7 @@ public class HomeFragment extends Fragment {
 
         br = new StepBroadcastReceiver();
         dbHelper = DatabaseHelper.getInstance(getContext());
-        //todayBtn.setBackgroundColor(Color.GREEN);
+        todayBtn.setBackgroundColor(0xBBB2FF59);
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
@@ -69,7 +69,9 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 stepText.setText(String.valueOf(steps));
                 timeText.setText(R.string.button_1);
-                //todayBtn.setBackgroundColor(Color.GREEN);
+                todayBtn.setBackgroundColor(0xBBB2FF59);
+                thisWeekBtn.setBackgroundResource(android.R.drawable.btn_default);
+                thisMonthBtn.setBackgroundResource(android.R.drawable.btn_default);
             }
         });
 
@@ -93,13 +95,42 @@ public class HomeFragment extends Fragment {
 
                 stepText.setText(String.valueOf(total));
                 timeText.setText(R.string.button_2);
+
+                thisWeekBtn.setBackgroundColor(0xBBB2FF59);
+                todayBtn.setBackgroundResource(android.R.drawable.btn_default);
+                thisMonthBtn.setBackgroundResource(android.R.drawable.btn_default);
             }
         });
 
         thisMonthBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(System.currentTimeMillis());
+
+                // Step backwards through the month until the 1st.
+                // Add up each day's steps to get total value.
+                int total = steps;
+                while (cal.get(Calendar.DAY_OF_MONTH) != 1) {
+                    cal.add(Calendar.DAY_OF_WEEK, -1);
+                    Log.v("Getting steps from", cal.getTime().toString());
+
+                    total += dbHelper.getSteps(username, cal.getTime());
+                    Log.v("Updated total", String.valueOf(total));
+                }
+
+                // Once more for the 1st of the month.
+                cal.add(Calendar.DAY_OF_WEEK, -1);
+                Log.v("Getting steps from", cal.getTime().toString());
+                total += dbHelper.getSteps(username, cal.getTime());
+                Log.v("Updated total", String.valueOf(total));
+
+                stepText.setText(String.valueOf(total));
+                timeText.setText(R.string.button_3);
+
+                thisMonthBtn.setBackgroundColor(0xBBB2FF59);
+                todayBtn.setBackgroundResource(android.R.drawable.btn_default);
+                thisWeekBtn.setBackgroundResource(android.R.drawable.btn_default);
             }
         });
     }
