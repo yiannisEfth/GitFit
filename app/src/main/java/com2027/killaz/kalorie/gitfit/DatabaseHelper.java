@@ -6,6 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Created by Chris on 03/03/2019.
  */
@@ -16,9 +21,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "GitFitDB.db";
 
-    private static final String TABLE_NAME = "user_record";
-    private static final String COLUMN_DATE = "date";
-    private static final String COLUMN_STEPS = "steps";
+    private static final String USER_RECORDS = "user_record";
+    private static final String USER_NAME = "user_name";
+    private static final String USER_RECORD_DATE = "date";
+    private static final String USER_RECORD_STEPS = "steps";
 
     /**
      * Private constructor.
@@ -61,7 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + USER_RECORDS);
         createDatabase(db);
     }
 
@@ -71,9 +77,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param sqLiteDatabase
      */
     public void createDatabase(SQLiteDatabase sqLiteDatabase) {
-        String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
-                COLUMN_DATE + " VARCHAR(10) PRIMARY KEY, " +
-                COLUMN_STEPS + " INTEGER)";
+        String SQL_CREATE_TABLE = "CREATE TABLE " + USER_RECORDS + "(" +
+                USER_NAME + "VARCHAR(30) PRIMARY KEY, " +
+                USER_RECORD_DATE + " VARCHAR(10) UNIQUE NOT NULL, " +
+                USER_RECORD_STEPS + " INTEGER)";
 
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE);
     }
@@ -84,14 +91,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param date The record date.
      * @param steps The number of steps completed.
      */
-    public void newRecord(String date, int steps) {
+    public void newRecord(String user, Date date, int steps) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_DATE, date);
-        values.put(COLUMN_STEPS, steps);
+        // Convert date to string for insertion
+        String dateString = getDateString(date);
 
-        long newID = db.insert(TABLE_NAME, null, values);
+        ContentValues values = new ContentValues();
+        values.put(USER_NAME, user);
+        values.put(USER_RECORD_DATE, dateString);
+        values.put(USER_RECORD_STEPS, steps);
+
+        long newID = db.insert(USER_RECORDS, null, values);
     }
 
     /**
@@ -99,13 +110,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @param date The record date.
      */
-    public void deleteRecord(String date) {
+    public void deleteRecord(String user, Date date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String where = COLUMN_DATE + " = ?";
-        String[] dateArr = new String[]{date};
+        // Convert date to string for insertion
+        String dateString = getDateString(date);
 
-        db.delete(TABLE_NAME, where, dateArr);
+        String where = USER_NAME + " = ? AND " + " USER_RECORD_DATE = ?";
+        String[] values = new String[]{user, dateString};
+
+        db.delete(USER_RECORDS, where, values);
     }
 
     /**
@@ -114,22 +128,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param date The date to get the steps taken from.
      * @return The steps taken.
      */
-    public int getSteps(String date) {
+    public int getSteps(String user, Date date) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME +
-                " WHERE " + COLUMN_DATE + " = ?";
+        String query = "SELECT * FROM " + USER_RECORDS +
+                " WHERE " + USER_NAME + " = ? AND " +
+                USER_RECORD_DATE + " = ?";
+
+        // Convert date to string for insertion
+        String dateString = getDateString(date);
 
         int result;
-        Cursor cursor = db.rawQuery(query, new String[]{date});
+        Cursor cursor = db.rawQuery(query, new String[]{user, dateString});
 
         if (!(cursor.moveToFirst()) || cursor.getCount() ==0){
             // cursor is empty
             result = 0;
         } else {
-            result = cursor.getInt(cursor.getColumnIndex(COLUMN_STEPS));
+            // get steps
+            result = cursor.getInt(cursor.getColumnIndex(USER_RECORD_STEPS));
         }
 
         cursor.close();
         return result;
+    }
+
+    public String getDateString(Date date) {
+        DateFormat df = new SimpleDateFormat("yyyy-mm-DD", Locale.getDefault());
+        return df.format(date);
     }
 }

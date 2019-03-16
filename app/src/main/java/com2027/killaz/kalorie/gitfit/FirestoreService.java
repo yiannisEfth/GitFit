@@ -82,9 +82,9 @@ public class FirestoreService extends Service implements SensorEventListener {
         final DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
         calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        String dateString = dateFormat.format(calendar.getTime());
 
-        stepsTodayOffset = stepCounter - dbHelper.getSteps(dateString);
+        // stepsTodayOffset = steps all time - steps stored from any previous sessions today.
+        stepsTodayOffset = stepCounter - dbHelper.getSteps(currentUser.getDisplayName(), calendar.getTime());
         Log.i("STEPS_TODAY_OFFSET_INIT", String.valueOf(stepsTodayOffset));
     }
 
@@ -100,7 +100,7 @@ public class FirestoreService extends Service implements SensorEventListener {
             stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         }
 
-        sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
         Log.i("SERVICE STARTED-USER:", currentUser.getDisplayName());
 
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -125,8 +125,9 @@ public class FirestoreService extends Service implements SensorEventListener {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            DateFormat df = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
-            dbHelper.newRecord(df.format(Calendar.getInstance().getTime()), stepCounter);
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+            dbHelper.newRecord(currentUser.getDisplayName(), cal.getTime(), stepCounter);
             stepsTodayOffset = stepCounter;
         }
     }
@@ -136,15 +137,14 @@ public class FirestoreService extends Service implements SensorEventListener {
      */
     @Override
     public void onDestroy() {
+        // Stop tracking steps
         sensorManager.unregisterListener(this);
 
-        final DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
         calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        String dataString = dateFormat.format(calendar.getTime());
 
-        dbHelper.newRecord(dataString,stepCounter-stepsTodayOffset);
-
+        // Store users steps so far today in database
+        dbHelper.newRecord(currentUser.getDisplayName(), calendar.getTime(), stepCounter - stepsTodayOffset);
     }
 
     @Override

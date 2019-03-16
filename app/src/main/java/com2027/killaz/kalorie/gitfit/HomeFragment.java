@@ -19,6 +19,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import org.w3c.dom.Text;
 
 import java.text.DateFormat;
@@ -35,6 +38,7 @@ public class HomeFragment extends Fragment {
     private ProgressBar challengeBar;
     private StepBroadcastReceiver br;
     private DatabaseHelper dbHelper;
+    private String username;
     private int steps;
 
     @Nullable
@@ -57,7 +61,8 @@ public class HomeFragment extends Fragment {
         dbHelper = DatabaseHelper.getInstance(getContext());
         //todayBtn.setBackgroundColor(Color.GREEN);
 
-        final DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        username = mAuth.getCurrentUser().getDisplayName();
 
         todayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,10 +85,9 @@ public class HomeFragment extends Fragment {
                 while (cal.get(Calendar.DAY_OF_WEEK) != cal.getFirstDayOfWeek()) {
                     cal.add(Calendar.DAY_OF_WEEK, -1);
 
-                    String dateString = dateFormat.format(cal.getTime());
-                    Log.v("Getting steps from", dateString);
+                    Log.v("Getting steps from", cal.getTime().toString());
 
-                    total += dbHelper.getSteps(dateString);
+                    total += dbHelper.getSteps(username, cal.getTime());
                     Log.v("Updated total", String.valueOf(total));
                 }
 
