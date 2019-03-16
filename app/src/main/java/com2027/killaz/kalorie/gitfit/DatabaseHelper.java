@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Created by Chris on 03/03/2019.
+ * Developed by Christopher Dueck and David Devlin.
  */
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -21,7 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "GitFitDB.db";
 
-    private static final String USER_RECORDS = "user_record";
+    private static final String USER_RECORDS = "user_records";
     private static final String USER_NAME = "user_name";
     private static final String USER_RECORD_DATE = "date";
     private static final String USER_RECORD_STEPS = "steps";
@@ -55,7 +55,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        createDatabase(sqLiteDatabase);
+        String SQL_CREATE_TABLE1 = "CREATE TABLE " + USER_RECORDS + "(" +
+                USER_NAME + " VARCHAR(30) PRIMARY KEY, " +
+                USER_RECORD_DATE + " VARCHAR(10) UNIQUE NOT NULL, " +
+                USER_RECORD_STEPS + " INTEGER)";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE1);
     }
 
     /**
@@ -68,26 +73,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + USER_RECORDS);
-        createDatabase(db);
-    }
-
-    /**
-     * A method called to set up the database table(s).
-     *
-     * @param sqLiteDatabase
-     */
-    public void createDatabase(SQLiteDatabase sqLiteDatabase) {
-        String SQL_CREATE_TABLE = "CREATE TABLE " + USER_RECORDS + "(" +
-                USER_NAME + "VARCHAR(30) PRIMARY KEY, " +
-                USER_RECORD_DATE + " VARCHAR(10) UNIQUE NOT NULL, " +
-                USER_RECORD_STEPS + " INTEGER)";
-
-        sqLiteDatabase.execSQL(SQL_CREATE_TABLE);
+        onCreate(db);
     }
 
     /**
      * A method to insert a new daily record into the db.
      *
+     * @param user The user to be accessed.
      * @param date The record date.
      * @param steps The number of steps completed.
      */
@@ -103,6 +95,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(USER_RECORD_STEPS, steps);
 
         long newID = db.insert(USER_RECORDS, null, values);
+    }
+
+    /**
+     * A method to update the steps in a record.
+     *
+     * @param user The user to be accessed.
+     * @param date The date to be accessed.
+     * @param steps The steps to be updated.
+     */
+    public void updateRecordSteps(String user, Date date, int steps) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Convert date to string for insertion
+        String dateString = getDateString(date);
+
+        ContentValues values = new ContentValues();
+        values.put(USER_RECORD_STEPS, steps);
+
+        String where = USER_NAME + " = ? AND " + USER_RECORD_DATE + " = ?";
+        String[] whereArgs = new String[]{user, dateString};
+
+        int rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
+
+        // Just in case it didn't work
+        if (rowsAffected == 0) {
+            newRecord(user,date,steps);
+        }
     }
 
     /**
@@ -125,6 +144,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * A method to get the steps taken on a particular date.
      *
+     * @param user The user to access.
      * @param date The date to get the steps taken from.
      * @return The steps taken.
      */
@@ -140,7 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int result;
         Cursor cursor = db.rawQuery(query, new String[]{user, dateString});
 
-        if (!(cursor.moveToFirst()) || cursor.getCount() ==0){
+        if (!(cursor.moveToFirst()) || cursor.getCount() ==0) {
             // cursor is empty
             result = 0;
         } else {
@@ -153,7 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getDateString(Date date) {
-        DateFormat df = new SimpleDateFormat("yyyy-mm-DD", Locale.getDefault());
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return df.format(date);
     }
 }

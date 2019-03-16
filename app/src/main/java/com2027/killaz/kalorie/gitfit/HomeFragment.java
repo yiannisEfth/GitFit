@@ -153,5 +153,13 @@ public class HomeFragment extends Fragment {
         super.onStop();
         getActivity().unregisterReceiver(br);
         Log.d("Broadcast Receiver", "Receiver Unregistered.");
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+
+        // Store users steps so far today in database
+        dbHelper.updateRecordSteps(username, calendar.getTime(), steps);
     }
+
+
 }

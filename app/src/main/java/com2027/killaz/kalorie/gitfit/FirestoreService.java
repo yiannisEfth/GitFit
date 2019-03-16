@@ -48,8 +48,7 @@ public class FirestoreService extends Service implements SensorEventListener {
     private Sensor stepSensor;
     private Intent stepIntent;
     private int stepCounter;
-    /* saves difference between steps taken overall and steps taken on the current day*/
-    private int stepsTodayOffset;
+    private int stepsToday;
     private int remainingMyChallenge;
     private int remainingFriendChallenge;
     private int totalMyChallenge;
@@ -76,16 +75,22 @@ public class FirestoreService extends Service implements SensorEventListener {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         userRef = db.collection("Users").document(currentUser.getDisplayName());
-        fetchUserData();
         dbHelper = DatabaseHelper.getInstance(this);
+        fetchUserData();
 
-        final DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd", Locale.UK);
+        // Get today's date.
         calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
 
-        // stepsTodayOffset = steps all time - steps stored from any previous sessions today.
-        stepsTodayOffset = stepCounter - dbHelper.getSteps(currentUser.getDisplayName(), calendar.getTime());
-        Log.i("STEPS_TODAY_OFFSET_INIT", String.valueOf(stepsTodayOffset));
+        // Get saved steps so far today from local database.
+        try {
+            stepsToday = dbHelper.getSteps(currentUser.getDisplayName(), calendar.getTime());
+            Log.i("STEPS_TODAY_INIT", String.valueOf(stepsToday));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            stepsToday = 0;
+        }
     }
 
     /**
@@ -119,7 +124,7 @@ public class FirestoreService extends Service implements SensorEventListener {
     }
 
     /**
-     * Private class
+     * Triggers the on receive method  at midnight (See above).
      */
     private class AlarmReceiver extends BroadcastReceiver {
 
@@ -127,8 +132,16 @@ public class FirestoreService extends Service implements SensorEventListener {
         public void onReceive(Context context, Intent intent) {
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(System.currentTimeMillis());
-            dbHelper.newRecord(currentUser.getDisplayName(), cal.getTime(), stepCounter);
-            stepsTodayOffset = stepCounter;
+
+            // Initialise new daily step record.
+            dbHelper.newRecord(currentUser.getDisplayName(), cal.getTime(), 0);
+
+            // Save steps from yesterday into database.
+            cal.add(Calendar.DATE, -1);
+            dbHelper.updateRecordSteps(currentUser.getDisplayName(), cal.getTime(), stepsToday);
+
+            // Reset variable.
+            stepsToday = 0;
         }
     }
 
@@ -139,12 +152,6 @@ public class FirestoreService extends Service implements SensorEventListener {
     public void onDestroy() {
         // Stop tracking steps
         sensorManager.unregisterListener(this);
-
-        calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-
-        // Store users steps so far today in database
-        dbHelper.newRecord(currentUser.getDisplayName(), calendar.getTime(), stepCounter - stepsTodayOffset);
     }
 
     @Override
@@ -161,8 +168,10 @@ public class FirestoreService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         stepCounter++;
+        stepsToday++;
         remainingMyChallenge--;
         remainingFriendChallenge--;
+
         if (remainingMyChallenge <= 0) {
             completedChallenges++;
             data.put("challenges_completed", completedChallenges);
@@ -199,7 +208,7 @@ public class FirestoreService extends Service implements SensorEventListener {
 
         //TODO Change steps data sent to change depending on option selected in homeFragment (daily/weekly/monthly)
         // currently send daily for testing purposes
-        stepIntent.putExtra("steps", stepCounter-stepsTodayOffset);
+        stepIntent.putExtra("steps", stepsToday);
         stepIntent.putExtra("remaining", remainingMyChallenge);
         sendBroadcast(stepIntent);
     }
@@ -254,7 +263,7 @@ public class FirestoreService extends Service implements SensorEventListener {
                         totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
 
                         // Send broadcast so home fragment UI can be updated with new value.
-                        stepIntent.putExtra("steps", stepCounter);
+                        stepIntent.putExtra("steps", stepsToday);
                         stepIntent.putExtra("remaining", remainingMyChallenge);
                         stepIntent.putExtra("challengeTotal", totalMyChallenge);
                         sendBroadcast(stepIntent);
