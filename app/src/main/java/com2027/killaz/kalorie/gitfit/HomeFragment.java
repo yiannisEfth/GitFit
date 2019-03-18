@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        setRetainInstance(true);
         final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
         final Button thisWeekBtn = (Button) getView().findViewById(R.id.homeBtn2);
         final Button thisMonthBtn = (Button) getView().findViewById(R.id.homeBtn3);
@@ -191,6 +193,5 @@ public class HomeFragment extends Fragment {
         // Store users steps so far today in database
         dbHelper.updateRecordSteps(username, calendar.getTime(), steps);
     }
-
 
 }

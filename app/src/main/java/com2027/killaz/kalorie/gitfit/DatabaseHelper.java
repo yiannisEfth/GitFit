@@ -26,6 +26,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String USER_RECORD_DATE = "date";
     private static final String USER_RECORD_STEPS = "steps";
 
+    private static final String GET_USER_ROWS = "SELECT count(*) FROM " + USER_RECORDS +
+            " WHERE " + USER_NAME + " = ? ORDER BY " + USER_RECORD_DATE;
+
     /**
      * Private constructor.
      *
@@ -95,6 +98,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(USER_RECORD_STEPS, steps);
 
         long newID = db.insert(USER_RECORDS, null, values);
+
+        // Check if there are more than 31 days stored.
+        Cursor cursor = db.rawQuery(GET_USER_ROWS, new String[]{user});
+
+        // If there are more than 31 days stored, delete the oldest record.
+        if (cursor.getCount() > 31) {
+            cursor.moveToFirst();
+            String oldDateString = cursor.getString(cursor.getColumnIndex(USER_RECORD_DATE));
+            Date oldDate = null;
+            try {
+                oldDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(oldDateString);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            deleteRecord(user, oldDate);
+        }
     }
 
     /**
@@ -116,13 +137,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String where = USER_NAME + " = ? AND " + USER_RECORD_DATE + " = ?";
         String[] whereArgs = new String[]{user, dateString};
 
-//Commented stuff below crashed the app when changing fragments :( --Yiannis
-//        int rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
-//
-//        // Just in case it didn't work
-//        if (rowsAffected == 0) {
-//            newRecord(user,date,steps);
-//        }
+        //Commented stuff below crashed the app when changing fragments :( --Yiannis
+        int rowsAffected = -1;
+        try {
+            rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Just in case it didn't work
+        if (rowsAffected == 0) {
+           newRecord(user,date,steps);
+        }
     }
 
     /**

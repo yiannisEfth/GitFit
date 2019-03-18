@@ -1,5 +1,6 @@
 package com2027.killaz.kalorie.gitfit;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,11 +35,11 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
         //extra security for  rotation
         if (savedInstanceState == null) {
             //opens home_fragment on startup
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new HomeFragment()).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment(), "HOME")
+                    .commit();
             navigationView.setCheckedItem(R.id.menu_home);
         }
-
 
     }
 
@@ -48,40 +49,49 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
             // lets you go to the fragment
             // what it is called in the drawmenu.xml
             case R.id.menu_home:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new HomeFragment()).commit();
+                android.support.v4.app.Fragment fragment = getSupportFragmentManager().findFragmentByTag("HOME");
+                if (fragment != null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, fragment, "HOME")
+                            .commit();
+                } else {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new HomeFragment(), "HOME")
+                            .commit();
+                }
+
                 break;
 
             case R.id.menu_tracker:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new TrackerFragment()).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new TrackerFragment()).commit();
                 break;
 
             case R.id.menu_friends:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new FriendsFragment()).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new FriendsFragment()).commit();
                 break;
 
 
             case R.id.menu_challenges:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new ChallengesFragment()).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new ChallengesFragment()).commit();
                 break;
 
 
             case R.id.menu_bmicalc:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new BmiFragment()).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new BmiFragment()).commit();
                 break;
 
             case R.id.menu_leaderboards:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new LeaderboardsFragment()).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new LeaderboardsFragment()).commit();
                 break;
 
             case R.id.menu_settings:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new SettingsFragment()).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new SettingsFragment()).commit();
                 break;
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);
