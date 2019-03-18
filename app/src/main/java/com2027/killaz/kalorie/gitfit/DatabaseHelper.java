@@ -116,12 +116,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String where = USER_NAME + " = ? AND " + USER_RECORD_DATE + " = ?";
         String[] whereArgs = new String[]{user, dateString};
 
-        int rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
-
-        // Just in case it didn't work
-        if (rowsAffected == 0) {
-            newRecord(user,date,steps);
-        }
+//Commented stuff below crashed the app when changing fragments :( --Yiannis
+//        int rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
+//
+//        // Just in case it didn't work
+//        if (rowsAffected == 0) {
+//            newRecord(user,date,steps);
+//        }
     }
 
     /**
