@@ -114,6 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
                             mAuth.getCurrentUser().updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mEditTextNickname.getText().toString().trim()).build());
                             createFirestoreUser(mEditTextNickname.getText().toString().trim());
                             mProgressBar.setVisibility(View.GONE);
+                            mAuth.getCurrentUser().sendEmailVerification();
                         } else {
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                                 mProgressBar.setVisibility(View.GONE);
@@ -142,8 +143,8 @@ public class RegisterActivity extends AppCompatActivity {
         docData.put("challenges_completed", 0);
         docData.put("points", 0);
         //Blank friends list.
-        docData.put("friends", Arrays.asList(true));
-        docData.put("friend_requests", Arrays.asList(true));
+        docData.put("friends", Arrays.asList());
+        docData.put("friend_requests", Arrays.asList());
         docData.put("total_distance_covered", 0);
 
         //Creates the blank map of friend challenge.
@@ -165,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(RegisterActivity.this, "Account created successfully. You can now login.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, "Account created successfully. Please check your email for the authentication email.", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 })

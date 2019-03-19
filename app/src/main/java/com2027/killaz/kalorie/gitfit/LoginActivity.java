@@ -110,10 +110,13 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         mProgressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
-
-                            Intent mainMenu = new Intent(LoginActivity.this, MainMenu.class);
-                            startActivity(mainMenu);
-                            finish();
+                            if (mAuth.getCurrentUser().isEmailVerified()) {
+                                Intent mainMenu = new Intent(LoginActivity.this, MainMenu.class);
+                                startActivity(mainMenu);
+                                finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Your email is not verified. Please go to your email to verify it.", Toast.LENGTH_SHORT).show();
+                            }
 
                         } else {
                             Toast.makeText(LoginActivity.this, "Invalid details or no connection. Please Try Again", Toast.LENGTH_SHORT).show();
