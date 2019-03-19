@@ -138,17 +138,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String where = USER_NAME + " = ? AND " + USER_RECORD_DATE + " = ?";
         String[] whereArgs = new String[]{user, dateString};
 
-        int rowsAffected = 0;
-        try {
-            rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        int rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
 
         // Just in case it didn't work
-        if (rowsAffected == 0) {
-           newRecord(user,date,steps);
+        // I should change this later so it checks first
+        if (rowsAffected == 0 || rowsAffected == -1) {
+           newRecord(user, date, steps);
         }
     }
 

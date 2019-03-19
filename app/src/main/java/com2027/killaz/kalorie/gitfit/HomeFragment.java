@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,9 +17,17 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -55,6 +64,8 @@ public class HomeFragment extends Fragment {
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
+
+        drawGraph();
 
         todayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,6 +168,37 @@ public class HomeFragment extends Fragment {
             }
 
         }
+    }
+
+    /**
+     * This method adds data to the chart view and displays it on the home page.
+     */
+    public void drawGraph() {
+        BarChart chart = (BarChart) getView().findViewById(R.id.chart);
+
+        List<BarEntry> entries = new ArrayList<>();
+
+        // Show 1 week of data
+        // This is only for testing
+        entries.add(new BarEntry(1,1));
+        entries.add(new BarEntry(2,2));
+        entries.add(new BarEntry(3,3));
+        entries.add(new BarEntry(4,4));
+        entries.add(new BarEntry(5,0));
+        entries.add(new BarEntry(6,0));
+        entries.add(new BarEntry(7,0));
+
+        BarDataSet dataSet = new BarDataSet(entries, "Steps");
+        dataSet.setColor(0xFFA2FF59);
+        BarData data = new BarData(dataSet);
+
+        chart.setData(data);
+        chart.setBackgroundColor(0x88FFFFFF);
+        Description desc = new Description();
+        desc.setText("Walk more and track your activity!");
+        chart.setDescription(desc);
+        chart.setNoDataText("No step data saved, come back tomorrow to see your activity log!");
+        chart.invalidate();
     }
 
     /**
