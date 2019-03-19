@@ -250,7 +250,6 @@ public class FirestoreService extends Service implements SensorEventListener {
 
     /**
      * Fetch the user's challenges along with what type of challenges they are and their remaining steps/distance to travel.
-     * TODO fetch friend challenge-will finish this week.
      */
     private void fetchUserChallenges() {
         if (myChallengeReference != null) {

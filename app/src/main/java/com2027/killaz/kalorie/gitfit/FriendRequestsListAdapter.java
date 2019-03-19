@@ -7,15 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
@@ -51,39 +43,13 @@ public class FriendRequestsListAdapter extends RecyclerView.Adapter<FriendReques
 
     class FriendRequestsViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView userName;
-        private ImageView acceptFriend;
-        private ImageView rejectFriend;
-        private FirebaseFirestore db = FirebaseFirestore.getInstance();
-        private FirebaseUser currentUser;
-        private DocumentReference userRef;
+        TextView userName;
 
 
-        public FriendRequestsViewHolder(View itemView) {
+        FriendRequestsViewHolder(View itemView) {
             super(itemView);
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            currentUser = mAuth.getCurrentUser();
-            userRef = db.collection("Users").document(currentUser.getDisplayName());
             userName = itemView.findViewById(R.id.friend_req_user_name);
-            acceptFriend = itemView.findViewById(R.id.accept_friend);
-            rejectFriend = itemView.findViewById(R.id.decline_friend);
-            setButtons();
         }
 
-        public void setButtons() {
-            acceptFriend.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View view) {
-                    userRef.update("friend_requests", FieldValue.arrayRemove(userName.getText().toString()));
-                }
-            });
-
-            rejectFriend.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(view.getContext(), "Friend request declined", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
     }
 }
