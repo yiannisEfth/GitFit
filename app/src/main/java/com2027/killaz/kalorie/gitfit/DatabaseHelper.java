@@ -59,9 +59,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String SQL_CREATE_TABLE1 = "CREATE TABLE " + USER_RECORDS + "(" +
-                USER_NAME + " VARCHAR(30) PRIMARY KEY, " +
+                USER_NAME + " VARCHAR(30) UNIQUE NOT NULL, " +
                 USER_RECORD_DATE + " VARCHAR(10) UNIQUE NOT NULL, " +
-                USER_RECORD_STEPS + " INTEGER)";
+                USER_RECORD_STEPS + " INTEGER, " +
+                "PRIMARY KEY (" + USER_NAME + ", " + USER_RECORD_DATE + "))";
 
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE1);
     }
@@ -137,7 +138,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String where = USER_NAME + " = ? AND " + USER_RECORD_DATE + " = ?";
         String[] whereArgs = new String[]{user, dateString};
 
-        int rowsAffected = -1;
+        int rowsAffected = 0;
         try {
             rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
         }
