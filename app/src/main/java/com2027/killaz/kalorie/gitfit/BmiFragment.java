@@ -65,8 +65,8 @@ public class BmiFragment extends Fragment {
         mBMI = (TextView) getView().findViewById(R.id.bmi_value);
         mMessage = (TextView) getView().findViewById(R.id.bmi_message);
         //D
-
-        //mBMI.setText("0.0");
+        mBMI.setVisibility(View.GONE);
+        mBMI.setText("0.0");
 
         list1 = new ArrayList<String>();
         list1.add("cm");
@@ -125,7 +125,7 @@ public class BmiFragment extends Fragment {
             weight = Double.parseDouble(mWeightInput.getText().toString()) * 0.45;
 
         bmi = Math.round(weight / ((height / 100) * (height / 100)) * 10) / 10.0;
-
+        mBMI.setVisibility(View.VISIBLE);
         startCountAnimation(bmi);
 
         Handler handler = new Handler();
