@@ -18,11 +18,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -155,18 +158,24 @@ public class HomeFragment extends Fragment {
             Log.d("Total", String.valueOf(total));
             Log.d("Remaining", String.valueOf(remaining));
 
-            if (total != 0) {
-                int progress = (int) (((total - remaining) * 100.0f) / total);
-                challengeStepsText.setText("Your progress: " + (total - remaining) + " / " + total);
-                Log.d("Challenge Progress", String.valueOf(progress));
+            // Show challenge progress.
+            if (total > 0) {
+                int stepsSoFar = total - remaining;
+                if (stepsSoFar < 0) {
+                    stepsSoFar = 0;
+                    // Just wait for the service to realise a new challenge is needed?
+                }
+
+                int progress = (int) ((stepsSoFar * 100.0f) / total);
+                challengeStepsText.setText("Your progress: " + stepsSoFar + " / " + total);
 
                 if (progress > 100) {
                     progress = 100;
                 }
+                Log.d("CHALLENGE_PROGRESS", String.valueOf(progress));
 
                 challengeBar.setProgress(progress);
             }
-
         }
     }
 
@@ -180,23 +189,38 @@ public class HomeFragment extends Fragment {
 
         // Show 1 week of data
         // This is only for testing
-        entries.add(new BarEntry(1,1));
-        entries.add(new BarEntry(2,2));
-        entries.add(new BarEntry(3,3));
-        entries.add(new BarEntry(4,4));
-        entries.add(new BarEntry(5,0));
-        entries.add(new BarEntry(6,0));
-        entries.add(new BarEntry(7,0));
+        entries.add(new BarEntry(0,50));
+        entries.add(new BarEntry(1,120));
+        entries.add(new BarEntry(2,75));
+        entries.add(new BarEntry(3,245));
+        entries.add(new BarEntry(4,180));
+        entries.add(new BarEntry(5,82));
+        entries.add(new BarEntry(6,125));
 
         BarDataSet dataSet = new BarDataSet(entries, "Steps");
         dataSet.setColor(0xFFA2FF59);
         BarData data = new BarData(dataSet);
-
         chart.setData(data);
+
+        // Set X axis labels
+        final List<String> xAxisLabels = new ArrayList<>();
+        xAxisLabels.add("Mon");
+        xAxisLabels.add("Tue");
+        xAxisLabels.add("Wed");
+        xAxisLabels.add("Thu");
+        xAxisLabels.add("Fri");
+        xAxisLabels.add("Sat");
+        xAxisLabels.add("Sun");
+
+        final XAxis xAxis = chart.getXAxis();
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return xAxisLabels.get((int) value);
+            }
+        });
+
         chart.setBackgroundColor(0x88FFFFFF);
-        Description desc = new Description();
-        desc.setText("Walk more and track your activity!");
-        chart.setDescription(desc);
         chart.setNoDataText("No step data saved, come back tomorrow to see your activity log!");
         chart.invalidate();
     }
@@ -211,6 +235,9 @@ public class HomeFragment extends Fragment {
         intentFilter.addAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
         getActivity().registerReceiver(br, intentFilter);
         Log.d("Broadcast Receiver", "Receiver Registered.");
+
+        // Fragment resumes - need to retrieve steps again.
+        // TODO get data from firebase
     }
 
     @Override
@@ -221,7 +248,6 @@ public class HomeFragment extends Fragment {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-
         // Store users steps so far today in database
         dbHelper.updateRecordSteps(username, calendar.getTime(), steps);
     }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -59,8 +60,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String SQL_CREATE_TABLE1 = "CREATE TABLE " + USER_RECORDS + "(" +
-                USER_NAME + " VARCHAR(30) UNIQUE NOT NULL, " +
-                USER_RECORD_DATE + " VARCHAR(10) UNIQUE NOT NULL, " +
+                USER_NAME + " VARCHAR(30) NOT NULL, " +
+                USER_RECORD_DATE + " VARCHAR(10) NOT NULL, " +
                 USER_RECORD_STEPS + " INTEGER, " +
                 "PRIMARY KEY (" + USER_NAME + ", " + USER_RECORD_DATE + "))";
 
@@ -138,12 +139,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String where = USER_NAME + " = ? AND " + USER_RECORD_DATE + " = ?";
         String[] whereArgs = new String[]{user, dateString};
 
-        int rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
+        int rowsAffected = -1;
+        try {
+            rowsAffected = db.update(USER_RECORDS, values, where, whereArgs);
+            Log.i("ROWS_UPDATED", String.valueOf(rowsAffected));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        // Just in case it didn't work
         // I should change this later so it checks first
-        if (rowsAffected == 0 || rowsAffected == -1) {
-           newRecord(user, date, steps);
+        if (rowsAffected == 0) {
+            newRecord(user, date, steps);
         }
     }
 

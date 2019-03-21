@@ -67,6 +67,7 @@ public class FirestoreService extends Service implements SensorEventListener {
      * Fetch the current user and their tracked variables.
      */
     public FirestoreService() {
+        dbHelper = DatabaseHelper.getInstance(this);
         stepIntent = new Intent();
         stepIntent.setAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
         data = new HashMap<>();
@@ -75,22 +76,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         userRef = db.collection("Users").document(currentUser.getDisplayName());
-        dbHelper = DatabaseHelper.getInstance(this);
         fetchUserData();
-
-        // Get today's date.
-        calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-
-        // Get saved steps so far today from local database.
-        try {
-            stepsToday = dbHelper.getSteps(currentUser.getDisplayName(), calendar.getTime());
-            Log.i("STEPS_TODAY_INIT", String.valueOf(stepsToday));
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            stepsToday = 0;
-        }
     }
 
     /**
@@ -106,7 +92,21 @@ public class FirestoreService extends Service implements SensorEventListener {
         }
 
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
-        Log.i("SERVICE STARTED-USER:", currentUser.getDisplayName());
+        Log.i("SERVICE STARTED - USER:", currentUser.getDisplayName());
+
+        // Get today's date.
+        calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+
+        // Get saved steps so far today from local database.
+        try {
+            stepsToday = dbHelper.getSteps(currentUser.getDisplayName(), calendar.getTime());
+        }
+        catch (Exception e) {
+            stepsToday = 0;
+            e.printStackTrace();
+        }
+        Log.i("STEPS_TODAY_INIT", String.valueOf(stepsToday));
 
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent innerIntent = new Intent(context, AlarmReceiver.class);
@@ -151,7 +151,12 @@ public class FirestoreService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() {
         // Stop tracking steps
-        sensorManager.unregisterListener(this);
+        try {
+            sensorManager.unregisterListener(this);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -234,9 +239,11 @@ public class FirestoreService extends Service implements SensorEventListener {
                     friendChallengeReference = (DocumentReference) friend_challenge.get("challenge_ref");
                     completedChallenges = documentSnapshot.getLong("challenges_completed").intValue();
                     points = documentSnapshot.getLong("points").intValue();
+
                     stepIntent.putExtra("challenges_completed", completedChallenges);
                     stepIntent.putExtra("points", points);
                     sendBroadcast(stepIntent);
+
                     fetchUserChallenges();
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
                     if (friendChallengeReference != null) {
