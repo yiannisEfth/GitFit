@@ -43,6 +43,7 @@ public class HomeFragment extends Fragment {
     private String username;
     private int steps;
     private FirebaseAuth mAuth;
+    private BarChart chart;
 
     @Nullable
     @Override
@@ -68,6 +69,7 @@ public class HomeFragment extends Fragment {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
 
+        graphInit();
         drawGraph();
 
         todayBtn.setOnClickListener(new View.OnClickListener() {
@@ -182,25 +184,8 @@ public class HomeFragment extends Fragment {
     /**
      * This method adds data to the chart view and displays it on the home page.
      */
-    public void drawGraph() {
-        BarChart chart = (BarChart) getView().findViewById(R.id.chart);
-
-        List<BarEntry> entries = new ArrayList<>();
-
-        // Show 1 week of data
-        // This is only for testing
-        entries.add(new BarEntry(0,50));
-        entries.add(new BarEntry(1,120));
-        entries.add(new BarEntry(2,75));
-        entries.add(new BarEntry(3,245));
-        entries.add(new BarEntry(4,180));
-        entries.add(new BarEntry(5,82));
-        entries.add(new BarEntry(6,125));
-
-        BarDataSet dataSet = new BarDataSet(entries, "Steps");
-        dataSet.setColor(0xFFA2FF59);
-        BarData data = new BarData(dataSet);
-        chart.setData(data);
+    public void graphInit() {
+        chart = (BarChart) getView().findViewById(R.id.chart);
 
         // Set X axis labels
         final List<String> xAxisLabels = new ArrayList<>();
@@ -221,7 +206,33 @@ public class HomeFragment extends Fragment {
         });
 
         chart.setBackgroundColor(0x88FFFFFF);
-        chart.setNoDataText("No step data saved, come back tomorrow to see your activity log!");
+        chart.setNoDataText("No step data saved, try again later.");
+        chart.getDescription().setEnabled(false);
+        chart.invalidate();
+    }
+
+    public void drawGraph() {
+        List<BarEntry> entries = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
+
+        // Move the calendar back to monday.
+        while (cal.get(Calendar.DAY_OF_WEEK) != cal.getFirstDayOfWeek()) {
+            cal.add(Calendar.DAY_OF_WEEK, -1);
+        }
+
+        // Step through the week, adding each day's steps
+        for (int i = 1; i <= 7; i++) {
+            entries.add(new BarEntry(cal.get(Calendar.DAY_OF_WEEK) - 1, dbHelper.getSteps(username, cal.getTime())));
+            cal.add(Calendar.DAY_OF_WEEK, 1);
+        }
+
+        BarDataSet dataSet = new BarDataSet(entries, "Steps");
+        dataSet.setColor(0xFFA2FF59);
+        BarData data = new BarData(dataSet);
+        data.setBarWidth(0.5f);
+        chart.setData(data);
         chart.invalidate();
     }
 
