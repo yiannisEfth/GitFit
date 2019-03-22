@@ -33,8 +33,16 @@
         android:id="@+id/friend_req_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/textView"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="175dp"
         android:text="Friend Requests" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/friends_req_recycler_view"
+        android:layout_centerHorizontal="true"
+        android:text="@string/friends_swipe_instruction_req"
+        android:textAlignment="center" />
 </RelativeLayout>

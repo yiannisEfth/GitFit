@@ -1,6 +1,5 @@
 package com2027.killaz.kalorie.gitfit;
 
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,9 +7,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,13 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FriendsFragment extends Fragment {
-//TODO: FIX THE FRONT END AND SWIPE VIEWS AND ITEM ROW DESIGN. BACKEND WORKS AS IT SHOULD :D -Yiannis
+    //TODO: FIX THE FRONT END AND SWIPE VIEWS AND ITEM ROW DESIGN. BACKEND WORKS AS IT SHOULD :D -Yiannis
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseUser currentUser;
     private DocumentReference userRef;
     private RecyclerView friendReqsRecycler;
     private List<String> friendReqsList;
-    private SwipeController swipeControllerReqs;
     private FriendRequestsListAdapter friendReqsAdapter;
     private FriendRequestsListAdapter friendsAdapter;
     private RecyclerView friendsRecycler;
@@ -90,33 +90,38 @@ public class FriendsFragment extends Fragment {
     }
 
     private void setupRecyclerActions() {
-        swipeControllerReqs = new SwipeController(new FriendRequestSwipeActions() {
+
+        ItemTouchHelper.SimpleCallback callBackReqs = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public void onLeftClicked(int position) {
-                userRef.update("friend_requests", FieldValue.arrayRemove(friendReqsList.get(position)));
-                friendReqsList.remove(position);
-                friendReqsAdapter.notifyItemRemoved(position);
-                friendReqsAdapter.notifyItemRangeChanged(position, friendReqsAdapter.getItemCount());
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
             }
 
             @Override
-            public void onRightClicked(int position) {
-                userRef.update("friends", FieldValue.arrayUnion(friendReqsList.get(position)));
-                userRef.update("friend_requests", FieldValue.arrayRemove(friendReqsList.get(position)));
-                friendReqsList.remove(position);
-                friendReqsAdapter.notifyItemRemoved(position);
-                friendReqsAdapter.notifyItemRangeChanged(position, friendReqsAdapter.getItemCount());
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
+                Log.i("POSITIONNN", String.valueOf(direction));
+                int position = viewHolder.getAdapterPosition();
+                if (direction == ItemTouchHelper.LEFT) {
+                    userRef.update("friends", FieldValue.arrayUnion(friendReqsList.get(position)));
+                    userRef.update("friend_requests", FieldValue.arrayRemove(friendReqsList.get(position)));
+                    friendReqsList.remove(position);
+                    friendReqsAdapter.notifyItemRemoved(position);
+                    friendReqsAdapter.notifyItemRangeChanged(position, friendReqsAdapter.getItemCount());
+                    Toast.makeText(getContext(), "Friend Request Accepted", Toast.LENGTH_SHORT).show();
+                } else if (direction == ItemTouchHelper.RIGHT) {
+                    userRef.update("friends", FieldValue.arrayUnion(friendReqsList.get(position)));
+                    userRef.update("friend_requests", FieldValue.arrayRemove(friendReqsList.get(position)));
+                    friendReqsList.remove(position);
+                    friendReqsAdapter.notifyItemRemoved(position);
+                    friendReqsAdapter.notifyItemRangeChanged(position, friendReqsAdapter.getItemCount());
+                    Toast.makeText(getContext(), "Friend Request Declined", Toast.LENGTH_SHORT).show();
+                }
             }
-        });
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callBackReqs);
+        itemTouchHelper.attachToRecyclerView(friendReqsRecycler);
 
-        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeControllerReqs);
-        itemTouchhelper.attachToRecyclerView(friendReqsRecycler);
-
-        friendReqsRecycler.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-                swipeControllerReqs.onDraw(c);
-            }
-        });
     }
+
+
 }
