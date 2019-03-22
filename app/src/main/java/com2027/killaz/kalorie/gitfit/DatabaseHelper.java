@@ -187,18 +187,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Convert date to string for insertion
         String dateString = getDateString(date);
 
-        int result;
-        Cursor cursor = db.rawQuery(query, new String[]{user, dateString});
+        int result = 0;
+        try {
+            Cursor cursor = db.rawQuery(query, new String[]{user, dateString});
 
-        if (!(cursor.moveToFirst()) || cursor.getCount() ==0) {
-            // cursor is empty
-            result = 0;
-        } else {
-            // get steps
-            result = cursor.getInt(cursor.getColumnIndex(USER_RECORD_STEPS));
+            // Check cursor is not empty
+            if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                result = cursor.getInt(cursor.getColumnIndex(USER_RECORD_STEPS));
+            }
+
+            cursor.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
 
-        cursor.close();
+
         return result;
     }
 
