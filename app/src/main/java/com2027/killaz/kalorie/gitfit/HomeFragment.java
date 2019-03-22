@@ -1,7 +1,9 @@
 package com2027.killaz.kalorie.gitfit;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -14,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -30,6 +34,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
@@ -44,6 +49,7 @@ public class HomeFragment extends Fragment {
     private int steps;
     private FirebaseAuth mAuth;
     private BarChart chart;
+    private boolean viewingToday = true;
 
     @Nullable
     @Override
@@ -72,6 +78,15 @@ public class HomeFragment extends Fragment {
         graphInit();
         drawGraph();
 
+        // For testing
+        stepText.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                showInsertStepDialog();
+                return true;
+            }
+        });
+
         todayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,6 +95,7 @@ public class HomeFragment extends Fragment {
                 todayBtn.setBackgroundColor(0xBBB2FF59);
                 thisWeekBtn.setBackgroundResource(android.R.drawable.btn_default);
                 thisMonthBtn.setBackgroundResource(android.R.drawable.btn_default);
+                viewingToday = true;
             }
         });
 
@@ -107,6 +123,7 @@ public class HomeFragment extends Fragment {
                 thisWeekBtn.setBackgroundColor(0xBBB2FF59);
                 todayBtn.setBackgroundResource(android.R.drawable.btn_default);
                 thisMonthBtn.setBackgroundResource(android.R.drawable.btn_default);
+                viewingToday = false;
             }
         });
 
@@ -139,6 +156,7 @@ public class HomeFragment extends Fragment {
                 thisMonthBtn.setBackgroundColor(0xBBB2FF59);
                 todayBtn.setBackgroundResource(android.R.drawable.btn_default);
                 thisWeekBtn.setBackgroundResource(android.R.drawable.btn_default);
+                viewingToday = false;
             }
         });
     }
@@ -151,11 +169,19 @@ public class HomeFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             Log.d("Broadcast Receiver", "Broadcast Received.");
 
+            // Get extras
             steps = intent.getIntExtra("steps", 0);
             int remaining = intent.getIntExtra("remaining", 0);
             int total = intent.getIntExtra("challengeTotal", 0);
 
-            stepText.setText(Integer.toString(steps));
+            // Increment the step display separately to the variables
+            // This stops errors when taking steps while looking at weekly/monthly values
+            if (viewingToday) {
+                stepText.setText(String.valueOf(steps));
+            }
+            else if (!stepText.getText().toString().equals(getString(R.string.steps_loading))) {
+                stepText.setText(String.valueOf(Integer.parseInt(stepText.getText().toString()) + 1));
+            }
 
             Log.d("Total", String.valueOf(total));
             Log.d("Remaining", String.valueOf(remaining));
@@ -168,9 +194,9 @@ public class HomeFragment extends Fragment {
                     // Just wait for the service to realise a new challenge is needed?
                 }
 
-                int progress = (int) ((stepsSoFar * 100.0f) / total);
                 challengeStepsText.setText("Your progress: " + stepsSoFar + " / " + total);
 
+                int progress = (int) ((stepsSoFar * 100.0f) / total);
                 if (progress > 100) {
                     progress = 100;
                 }
@@ -224,7 +250,7 @@ public class HomeFragment extends Fragment {
 
         // Step through the week, adding each day's steps
         for (int i = 1; i <= 7; i++) {
-            entries.add(new BarEntry(cal.get(Calendar.DAY_OF_WEEK) - 1, dbHelper.getSteps(username, cal.getTime())));
+            entries.add(new BarEntry(i - 1, dbHelper.getSteps(username, cal.getTime())));
             cal.add(Calendar.DAY_OF_WEEK, 1);
         }
 
@@ -261,6 +287,38 @@ public class HomeFragment extends Fragment {
         calendar.setTimeInMillis(System.currentTimeMillis());
         // Store users steps so far today in database
         dbHelper.updateRecordSteps(username, calendar.getTime(), steps);
+    }
+
+    // A method to manually insert steps into the database
+    // For testing purposes only
+    private void showInsertStepDialog() {
+        LayoutInflater inflater = (LayoutInflater) getLayoutInflater();
+        View customView = inflater.inflate(R.layout.insert_steps_dialog, null);
+        final DatePicker datePicker = (DatePicker) customView.findViewById(R.id.datepicker);
+        final EditText editText = (EditText) customView.findViewById(R.id.stepsEditText);
+
+        // Build the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(customView); // Set the view of the dialog to your custom layout
+        builder.setTitle("Add steps");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int year = datePicker.getYear();
+                int month = datePicker.getMonth();
+                int dayOfMonth = datePicker.getDayOfMonth();
+                Calendar cal = new GregorianCalendar(year, month, dayOfMonth);
+
+                int steps = Integer.parseInt(editText.getText().toString());
+
+                // Insert it into the database
+                dbHelper.updateRecordSteps(username, cal.getTime(), steps);
+                drawGraph();
+                dialog.dismiss();
+            }});
+
+        // Create and show the dialog
+        builder.create().show();
     }
 
 }

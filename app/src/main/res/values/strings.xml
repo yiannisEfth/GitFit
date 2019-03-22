@@ -25,4 +25,5 @@
     <string name="content_descr_aperson">aPerson</string>
     <string name="content_descr">anImg</string>
     <string name="friends_swipe_instruction_req"><![CDATA[Swipe <- left to accept | Swipe right -> to decline]]></string>
+    <string name="enter_steps">Enter Steps</string>
 </resources>
