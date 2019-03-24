@@ -5,6 +5,9 @@
     <color name="colorAccent">#FF4081</color>
     <color name="darkgray">#6c6c6c</color>
     <color name="white">#ffffff</color>
+    <color name="bluelight">#49acd5</color>
+    <color name="orange">#eaad43</color>
+    <color name="green">#45bc62</color>
     <!--OnBoardingActivity Colors -->
     <color name="onBoardingColorPrimary">#262938</color>
     <color name="onBoardingColorPrimaryDark">#181A24</color>

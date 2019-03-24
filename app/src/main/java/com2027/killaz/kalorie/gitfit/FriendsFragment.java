@@ -1,7 +1,10 @@
 package com2027.killaz.kalorie.gitfit;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,9 +12,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,12 +29,12 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FriendsFragment extends Fragment {
-    //TODO: FIX THE FRONT END AND SWIPE VIEWS AND ITEM ROW DESIGN. BACKEND WORKS AS IT SHOULD :D -Yiannis
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseUser currentUser;
     private DocumentReference userRef;
@@ -37,6 +44,9 @@ public class FriendsFragment extends Fragment {
     private FriendRequestsListAdapter friendsAdapter;
     private RecyclerView friendsRecycler;
     private List<String> friendsList;
+    private List<String> userList;
+    private Button friendReqBtn;
+    private String friendToAdd;
 
     @Nullable
     @Override
@@ -52,14 +62,20 @@ public class FriendsFragment extends Fragment {
         friendsRecycler = getView().findViewById(R.id.friends_recycler_view);
         friendsRecycler.setHasFixedSize(true);
         friendsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        friendsRecycler.setVerticalScrollBarEnabled(true);
+        friendReqsRecycler.setVerticalScrollBarEnabled(true);
         friendReqsList = new ArrayList<>();
         friendsList = new ArrayList<>();
+        userList = new ArrayList<>();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         userRef = db.collection("Users").document(currentUser.getDisplayName());
+        friendReqBtn = getView().findViewById(R.id.send_friend_req);
         fetchFriendReqs();
         fetchFriends();
+        fetchUsers();
         setupRecyclerActions();
+        setupFriendReqs();
     }
 
     private void fetchFriendReqs() {
@@ -119,6 +135,8 @@ public class FriendsFragment extends Fragment {
                 }
             }
         };
+
+
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callBackReqs);
         itemTouchHelper.attachToRecyclerView(friendReqsRecycler);
 
@@ -154,6 +172,7 @@ public class FriendsFragment extends Fragment {
                             "No",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    friendsAdapter.notifyDataSetChanged();
                                     dialog.cancel();
                                 }
                             });
@@ -161,7 +180,7 @@ public class FriendsFragment extends Fragment {
                     AlertDialog friendAlert = builder1.create();
                     friendAlert.show();
                 } else if (direction == ItemTouchHelper.RIGHT) {
-                    Toast.makeText(getContext(), "Will show friend info....TODO", Toast.LENGTH_SHORT).show();
+                    showUserInfoPopup(friendsList.get(position));
                     friendsAdapter.notifyDataSetChanged();
                 }
             }
@@ -173,5 +192,91 @@ public class FriendsFragment extends Fragment {
 
     }
 
+    private void showUserInfoPopup(final String theFriend) {
+        DocumentReference friendRef = db.collection("Users").document(theFriend);
+        final Dialog infoDialog;
+        TextView txtClose;
+        final TextView friendName;
+        final TextView challenges;
+        final TextView points;
+        final TextView steps;
+        infoDialog = new Dialog(getActivity());
+        infoDialog.setContentView(R.layout.friend_info_popup);
+        txtClose = infoDialog.findViewById(R.id.popup_close);
+        friendName = infoDialog.findViewById(R.id.popup_name);
+        challenges = infoDialog.findViewById(R.id.popup_challenges);
+        points = infoDialog.findViewById(R.id.popup_points);
+        steps = infoDialog.findViewById(R.id.popup_steps);
+
+        friendRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (documentSnapshot != null) {
+                    friendName.setText(theFriend);
+                    challenges.setText(String.valueOf(documentSnapshot.get("challenges_completed")));
+                    points.setText(String.valueOf(documentSnapshot.get("points")));
+                    steps.setText(String.valueOf(documentSnapshot.get("total_distance_covered")));
+                }
+            }
+        });
+
+        txtClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                infoDialog.dismiss();
+            }
+        });
+
+        infoDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        infoDialog.show();
+    }
+
+    private void setupFriendReqs() {
+        friendReqBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Send Friend Request");
+                final EditText input = new EditText(getContext());
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("Enter name of user");
+                builder.setView(input);
+                builder.setPositiveButton("Send Request", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        addFriend(input.getText().toString());
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+    }
+
+    private void fetchUsers() {
+        db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                    userList.add(document.getId());
+                }
+            }
+        });
+    }
+
+    private void addFriend(String friendToAdd) {
+        if (userList.contains(friendToAdd)) {
+            db.collection("Users").document(friendToAdd).update("friend_requests", FieldValue.arrayUnion(currentUser.getDisplayName()));
+            Toast.makeText(getContext(), "Friend request sent to " + friendToAdd, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Can't add friend. This user does not exist", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 }
