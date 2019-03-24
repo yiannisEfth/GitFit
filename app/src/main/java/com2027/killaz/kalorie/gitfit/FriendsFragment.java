@@ -1,5 +1,7 @@
 package com2027.killaz.kalorie.gitfit;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,7 +92,7 @@ public class FriendsFragment extends Fragment {
 
     private void setupRecyclerActions() {
 
-        ItemTouchHelper.SimpleCallback callBackReqs = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        ItemTouchHelper.SimpleCallback callBackReqs = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
@@ -99,9 +100,9 @@ public class FriendsFragment extends Fragment {
 
             @Override
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
-                Log.i("POSITIONNN", String.valueOf(direction));
                 int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.LEFT) {
+                    db.collection("Users").document(friendReqsList.get(position)).update("friends", FieldValue.arrayUnion(currentUser.getDisplayName()));
                     userRef.update("friends", FieldValue.arrayUnion(friendReqsList.get(position)));
                     userRef.update("friend_requests", FieldValue.arrayRemove(friendReqsList.get(position)));
                     friendReqsList.remove(position);
@@ -120,6 +121,55 @@ public class FriendsFragment extends Fragment {
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callBackReqs);
         itemTouchHelper.attachToRecyclerView(friendReqsRecycler);
+
+        ItemTouchHelper.SimpleCallback callBackFriends = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                final int position = viewHolder.getAdapterPosition();
+                if (direction == ItemTouchHelper.LEFT) {
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
+                    builder1.setTitle("Delete Friend");
+                    builder1.setMessage("Are you sure you wish to delete " + friendsList.get(position) + " from your friends list?");
+                    builder1.setCancelable(true);
+
+                    builder1.setPositiveButton(
+                            "Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Toast.makeText(getContext(), "Removed " + friendsList.get(position) + " from friends", Toast.LENGTH_SHORT).show();
+                                    userRef.update("friends", FieldValue.arrayRemove(friendsList.get(position)));
+                                    db.collection("Users").document(friendsList.get(position)).update("friends", FieldValue.arrayRemove(currentUser.getDisplayName()));
+                                    friendsList.remove(position);
+                                    friendsAdapter.notifyItemRemoved(position);
+                                    friendsAdapter.notifyItemRangeChanged(position, friendsAdapter.getItemCount());
+                                }
+                            });
+
+                    builder1.setNegativeButton(
+                            "No",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                    AlertDialog friendAlert = builder1.create();
+                    friendAlert.show();
+                } else if (direction == ItemTouchHelper.RIGHT) {
+                    Toast.makeText(getContext(), "Will show friend info....TODO", Toast.LENGTH_SHORT).show();
+                    friendsAdapter.notifyDataSetChanged();
+                }
+            }
+        };
+
+
+        ItemTouchHelper itemTouchHelperFriends = new ItemTouchHelper(callBackFriends);
+        itemTouchHelperFriends.attachToRecyclerView(friendsRecycler);
 
     }
 
