@@ -20,6 +20,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -42,6 +43,7 @@ public class HomeFragment extends Fragment {
     private TextView stepText;
     private TextView timeText;
     private TextView challengeStepsText;
+    private TextView challengeDesc;
     private ProgressBar challengeBar;
     private StepBroadcastReceiver br;
     private DatabaseHelper dbHelper;
@@ -67,6 +69,7 @@ public class HomeFragment extends Fragment {
         timeText = (TextView) getView().findViewById(R.id.timeTextView);
         challengeBar = (ProgressBar) getView().findViewById(R.id.challenge_bar);
         challengeStepsText = (TextView) getView().findViewById(R.id.challengeStepsText);
+        challengeDesc = (TextView) getView().findViewById(R.id.challenge_desc);
         mAuth = FirebaseAuth.getInstance();
         br = new StepBroadcastReceiver();
         dbHelper = DatabaseHelper.getInstance(getContext());
@@ -171,8 +174,8 @@ public class HomeFragment extends Fragment {
 
             // Get extras
             steps = intent.getIntExtra("steps", 0);
-            int remaining = intent.getIntExtra("remaining", 0);
             int total = intent.getIntExtra("challengeTotal", 0);
+            int remaining = intent.getIntExtra("remaining", total);
 
             // Increment the step display separately to the variables
             // This stops errors when taking steps while looking at weekly/monthly values
@@ -194,12 +197,20 @@ public class HomeFragment extends Fragment {
                     // Just wait for the service to realise a new challenge is needed?
                 }
 
-                challengeStepsText.setText("Your progress: " + stepsSoFar + " / " + total);
+                challengeDesc.setText(getResources().getString(R.string.challenge_desc, total));
+                challengeStepsText.setText(getResources().getString(R.string.your_progress, stepsSoFar, total));
 
                 int progress = (int) ((stepsSoFar * 100.0f) / total);
-                if (progress > 100) {
+
+                if (progress >= 100) {
                     progress = 100;
+                    Toast.makeText(getContext(), "Challenge complete!", Toast.LENGTH_LONG).show();
+                } else {
+                    ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, challengeBar.getProgress(), progress);
+                    animate.setDuration(1000);
+                    challengeBar.startAnimation(animate);
                 }
+
                 Log.d("CHALLENGE_PROGRESS", String.valueOf(progress));
 
                 challengeBar.setProgress(progress);
