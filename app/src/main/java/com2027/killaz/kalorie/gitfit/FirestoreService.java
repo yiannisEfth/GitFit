@@ -12,6 +12,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -59,7 +61,8 @@ public class FirestoreService extends Service implements SensorEventListener {
     private String friendChallengeType;
     private String friendChallenger;
     private AlarmManager alarmManager;
-    private PendingIntent alarmIntent;
+    private PendingIntent alarmIntentDaily;
+    private PendingIntent alarmIntentWeekly;
     private DatabaseHelper dbHelper;
     private Calendar calendar;
 
@@ -108,9 +111,17 @@ public class FirestoreService extends Service implements SensorEventListener {
         }
         Log.i("STEPS_TODAY_INIT", String.valueOf(stepsToday));
 
+
+        /**
+         * Sets up the alarm manager that trigers the data base to update daily and send
+         * Notifications weekly
+         */
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent innerIntent = new Intent(context, AlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 0, innerIntent, 0);
+        Intent innerIntentDaily = new Intent(context, AlarmReceiverDaily.class);
+        alarmIntentDaily = PendingIntent.getBroadcast(context, 0, innerIntentDaily, 0);
+
+        Intent innerIntentWeekly = new Intent(context, AlarmReceiverWeekly.class);
+        alarmIntentWeekly = PendingIntent.getBroadcast(context, 0, innerIntentWeekly, 0);
 
         calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -118,7 +129,10 @@ public class FirestoreService extends Service implements SensorEventListener {
         calendar.set(Calendar.MINUTE, 0);
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, alarmIntent);
+                AlarmManager.INTERVAL_DAY, alarmIntentDaily);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY *7, alarmIntentWeekly);
 
         return START_NOT_STICKY;
     }
@@ -126,7 +140,7 @@ public class FirestoreService extends Service implements SensorEventListener {
     /**
      * Triggers the on receive method  at midnight (See above).
      */
-    private class AlarmReceiver extends BroadcastReceiver {
+    private class AlarmReceiverDaily extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -142,6 +156,26 @@ public class FirestoreService extends Service implements SensorEventListener {
 
             // Reset variable.
             stepsToday = 0;
+        }
+    }
+
+    /**
+     * Triggers the on receive method  at midnight each week.
+     */
+    private class AlarmReceiverWeekly extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
+            builder.setSmallIcon(R.drawable.login_logo);
+            builder.setContentText(getResources().getString(R.string.challenge));
+            builder.setContentTitle(getResources().getString(R.string.app_name));
+            builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+            notificationManager.notify(123, builder.build());
         }
     }
 
