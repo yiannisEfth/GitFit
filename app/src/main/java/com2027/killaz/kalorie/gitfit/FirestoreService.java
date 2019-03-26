@@ -113,7 +113,7 @@ public class FirestoreService extends Service implements SensorEventListener {
 
 
         /**
-         * Sets up the alarm manager that trigers the data base to update daily and send
+         * Sets up the alarm manager that triggers the data base to update daily and send
          * Notifications weekly
          */
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -123,6 +123,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         Intent innerIntentWeekly = new Intent(context, AlarmReceiverWeekly.class);
         alarmIntentWeekly = PendingIntent.getBroadcast(context, 0, innerIntentWeekly, 0);
 
+        // Daily at midnight
         calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -131,8 +132,12 @@ public class FirestoreService extends Service implements SensorEventListener {
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, alarmIntentDaily);
 
+        // Weekly at 4pm on an unspecified day
+        calendar.set(Calendar.HOUR_OF_DAY, 16);
+        calendar.set(Calendar.MINUTE, 0);
+
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY *7, alarmIntentWeekly);
+                AlarmManager.INTERVAL_DAY / 72, alarmIntentWeekly); // Roughly every 15 minutes just for testing
 
         return START_NOT_STICKY;
     }
@@ -167,12 +172,11 @@ public class FirestoreService extends Service implements SensorEventListener {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "GITFIT_NOTIFICATION");
             builder.setSmallIcon(R.drawable.login_logo);
-            builder.setContentText(getResources().getString(R.string.challenge));
+            builder.setContentText("Test Notification! You're doing great!");
             builder.setContentTitle(getResources().getString(R.string.app_name));
             builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
             notificationManager.notify(123, builder.build());
