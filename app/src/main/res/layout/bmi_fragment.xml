@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:background="@drawable/bmi_fragment_bg"
     tools:context=".BmiFragment">
 
 
@@ -102,7 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="90sp"
         android:textSize="25sp"
-        android:text="show bmi"
+        android:text="Your BMI is: "
         android:textAlignment="center" />
 
     <TextView

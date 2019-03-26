@@ -115,9 +115,9 @@ public class BmiFragment extends Fragment {
         final double bmi;
 
         if (mHeightMeasure.getSelectedItem() == "cm")
-            height = Integer.parseInt(mHeightInput.getText().toString());
+            height = Double.parseDouble(mHeightInput.getText().toString());
         else
-            height = Integer.parseInt(mHeightInput.getText().toString()) * 2.54;
+            height = Double.parseDouble(mHeightInput.getText().toString()) * 2.54;
 
         if (mWeightMeasure.getSelectedItem() == "kg")
             weight = Double.parseDouble(mWeightInput.getText().toString());
@@ -132,10 +132,10 @@ public class BmiFragment extends Fragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (bmi == 0.0)
-                    mMessage.setText("Do you even exist?");
+                if (bmi < 15.0)
+                    mMessage.setText("You are alarmingly underweight.");
                 else if (bmi < 18.5)
-                    mMessage.setText("You are severely underweight.");
+                    mMessage.setText("You are underweight.");
                 else if (bmi < 25.0)
                     mMessage.setText("You are healthy. Keep it up.");
                 else if (bmi < 30.0)
