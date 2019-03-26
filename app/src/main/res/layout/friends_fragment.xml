@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:background="@drawable/friends_fragment_bg"
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/friends_fragment_bg">
 
+
+    <TextView
+        android:id="@+id/friends_info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/friend_title_text_view"
+        android:layout_centerHorizontal="true"
+        android:text="@string/friends_swipe_instruction_req"
+        android:textAlignment="center" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/friends_req_recycler_view"
-        android:layout_width="match_parent"
+        android:layout_width="362dp"
         android:layout_height="157dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/friendsreqs_info_text"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/recycler_view_border"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/friends_recycler_view"
-        android:layout_width="match_parent"
+        android:layout_width="353dp"
         android:layout_height="224dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="82dp" />
+        android:layout_below="@+id/friends_info_text"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/recycler_view_border"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" />
 
     <TextView
         android:id="@+id/friend_title_text_view"
@@ -26,15 +40,42 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="52dp"
-        android:text="Friends" />
+        android:layout_marginTop="12dp"
+        android:fontFamily="sans-serif"
+        android:text="Friends"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/friend_req_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/friends_recycler_view"
+        android:layout_centerHorizontal="true"
+        android:text="Friend Requests"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/friendsreqs_info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/friend_req_text_view"
+        android:layout_centerHorizontal="true"
+        android:text="@string/friends_swipe_instruction_req"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/send_friend_req"
+        android:layout_width="380dp"
+        android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="175dp"
-        android:text="Friend Requests" />
+        android:layout_marginBottom="31dp"
+        android:background="@drawable/friend_req_btn_shape"
+        android:text="Add Friend"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
 </RelativeLayout>
