@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -66,6 +67,14 @@ public class FirestoreService extends Service implements SensorEventListener {
     private DatabaseHelper dbHelper;
     private Calendar calendar;
 
+    private String RESET_ACTION = "RESET_ACTION";
+    private IntentFilter resetFilter = new IntentFilter(RESET_ACTION);
+    private String NOTIF_ACTION = "NOTIF_ACTION";
+    private IntentFilter notifFilter = new IntentFilter(NOTIF_ACTION);
+
+    private static final int DAILY_RESET = 0;
+    private static final int WEEKLY_NOTIFY = 1;
+
     /**
      * Fetch the current user and their tracked variables.
      */
@@ -116,12 +125,8 @@ public class FirestoreService extends Service implements SensorEventListener {
          * Sets up the alarm manager that triggers the data base to update daily and send
          * Notifications weekly
          */
-        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent innerIntentDaily = new Intent(context, AlarmReceiverDaily.class);
-        alarmIntentDaily = PendingIntent.getBroadcast(context, 0, innerIntentDaily, 0);
 
-        Intent innerIntentWeekly = new Intent(context, AlarmReceiverWeekly.class);
-        alarmIntentWeekly = PendingIntent.getBroadcast(context, 0, innerIntentWeekly, 0);
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         // Daily at midnight
         calendar = Calendar.getInstance();
@@ -129,15 +134,20 @@ public class FirestoreService extends Service implements SensorEventListener {
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
 
+        Intent innerIntentDaily = new Intent(context, AlarmReceiverDaily.class);
+        alarmIntentDaily = PendingIntent.getBroadcast(context, DAILY_RESET, innerIntentDaily, 0);
+
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, alarmIntentDaily);
 
-        // Weekly at 4pm on an unspecified day
-        calendar.set(Calendar.HOUR_OF_DAY, 16);
-        calendar.set(Calendar.MINUTE, 0);
+        // Weekly on an unspecified day
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 5);
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY / 72, alarmIntentWeekly); // Roughly every 15 minutes just for testing
+        Intent notifyIntent = new Intent(this, NotificationAlarmReceiver.class);
+        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, WEEKLY_NOTIFY, notifyIntent, 0);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                1000 * 60, notifyPendingIntent); // Should trigger every minute.
 
         return START_NOT_STICKY;
     }
@@ -161,25 +171,7 @@ public class FirestoreService extends Service implements SensorEventListener {
 
             // Reset variable.
             stepsToday = 0;
-        }
-    }
-
-    /**
-     * Triggers the on receive method  at midnight each week.
-     */
-    private class AlarmReceiverWeekly extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "GITFIT_NOTIFICATION");
-            builder.setSmallIcon(R.drawable.login_logo);
-            builder.setContentText("Test Notification! You're doing great!");
-            builder.setContentTitle(getResources().getString(R.string.app_name));
-            builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-            notificationManager.notify(123, builder.build());
+            Log.i("RESET", "COMPLETE");
         }
     }
 

@@ -35,6 +35,12 @@
             android:enabled="true"
             android:exported="true" />
 
+        <receiver android:name=".NotificationAlarmReceiver">
+            <intent-filter>
+                <action android:name="com2027.killaz.kalorie.gitfit.NOTIFICATION"/>
+            </intent-filter>
+        </receiver>
+
 
     </application>
 

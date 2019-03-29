@@ -1,8 +1,11 @@
 package com2027.killaz.kalorie.gitfit;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -37,6 +40,8 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences mPrefs = null;
     private ProgressBar mProgressBar;
 
+    private static final String CHANNEL_ID = "NOTIFICATION_CHANNEL_ID";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             mEditTextPassword.setText(rememberedPassword);
             mRememberCheckBox.setChecked(true);
         }
+        createNotificationChannel();
         userLogin();
         forgotPasswordDialog();
         signUpActivity();
@@ -185,6 +191,20 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(registerActivity);
             }
         });
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, for API 26+ only
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
 }
