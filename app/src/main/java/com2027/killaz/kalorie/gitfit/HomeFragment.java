@@ -283,7 +283,7 @@ public class HomeFragment extends Fragment {
         Log.d("Broadcast Receiver", "Receiver Registered.");
 
         // Fragment resumes - need to retrieve steps again.
-        // TODO get data from firebase
+
     }
 
     @Override
