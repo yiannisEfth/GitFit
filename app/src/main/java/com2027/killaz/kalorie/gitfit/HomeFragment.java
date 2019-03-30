@@ -74,8 +74,6 @@ public class HomeFragment extends Fragment {
         br = new StepBroadcastReceiver();
         dbHelper = DatabaseHelper.getInstance(getContext());
         todayBtn.setBackgroundColor(0xBBB2FF59);
-
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
 
         graphInit();

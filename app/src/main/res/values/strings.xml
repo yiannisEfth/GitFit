@@ -26,6 +26,7 @@
     <string name="content_descr_aperson">aPerson</string>
     <string name="content_descr">anImg</string>
     <string name="friends_swipe_instruction_req"><![CDATA[Swipe <- left to delete | Swipe right -> to accept]]></string>
+    <string name="friends_swipe_instruction_list"><![CDATA[Swipe <- left to delete | Swipe right -> for information]]></string>
     <string name="enter_steps">Enter Steps</string>
     <string name="your_progress">Your progress: %1$d / %2$d</string>
     <string name="channel_name">NOTIFICATION_CHANNEL</string>

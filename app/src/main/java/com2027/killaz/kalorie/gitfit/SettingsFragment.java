@@ -1,11 +1,8 @@
 package com2027.killaz.kalorie.gitfit;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,14 +20,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class SettingsFragment extends Fragment {
 
     private FirebaseUser currentUser;
     private TextView mPoints, mEmail, mNickname, mChallengesCompleted;
     private Button mChangePass, mDeleteAccount;
-    private StepBroadcastReceiver br;
     private FirebaseFirestore db;
 
     @Nullable
@@ -52,28 +51,24 @@ public class SettingsFragment extends Fragment {
         mChangePass = (Button) getView().findViewById(R.id.change_password_btn);
         mDeleteAccount = (Button) getView().findViewById(R.id.delete_acc_btn);
         db = FirebaseFirestore.getInstance();
-        br = new StepBroadcastReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
-        getActivity().registerReceiver(br, intentFilter);
         mEmail.setText(currentUser.getEmail());
         mNickname.setText(currentUser.getDisplayName());
         setupButtons();
+        setValues();
     }
 
-    /**
-     * Broadcast Receiver to update the UI when a broadcast is sent from FirestoreService.
-     */
-    private class StepBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            int points = intent.getIntExtra("points", 0);
-            int challengesCompleted = intent.getIntExtra("challenges_completed", 0);
-            mPoints.setText(String.valueOf(points));
-            mChallengesCompleted.setText(String.valueOf(challengesCompleted));
-
-        }
+    private void setValues() {
+        db.collection("Users").document(currentUser.getDisplayName()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (documentSnapshot != null) {
+                    int points = documentSnapshot.getLong("points").intValue();
+                    int challengesCompleted = documentSnapshot.getLong("challenges_completed").intValue();
+                    mPoints.setText(String.valueOf(points));
+                    mChallengesCompleted.setText(String.valueOf(challengesCompleted));
+                }
+            }
+        });
     }
 
     private void setupButtons() {

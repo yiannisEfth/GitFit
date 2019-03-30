@@ -6,24 +6,23 @@
     android:layout_height="match_parent"
     android:background="@drawable/friends_fragment_bg">
 
-    <fragment
-        android:id="@+id/mapView"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:map="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/mapView"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="334dp"
+        android:layout_height="419dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="73dp"
+        android:visibility="visible"
         map:mapType="hybrid"
         map:uiCompass="true"
         map:uiRotateGestures="true"
         map:uiScrollGestures="true"
         map:uiTiltGestures="true"
         map:uiZoomControls="true"
-        map:uiZoomGestures="true"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="73dp"
-        android:visibility="visible" />
+        map:uiZoomGestures="true" />
 
     <TextView
         android:id="@+id/textView2"
@@ -37,12 +36,12 @@
         android:textAlignment="center" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/tracker_distance_traveled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView2"
         android:layout_toEndOf="@+id/textView2"
-        android:text="1350m" />
+        android:text="0 km" />
 
     <TextView
         android:id="@+id/textView4"
@@ -79,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView6"
         android:layout_toEndOf="@+id/textView6"
-        android:text="423" />
+        android:text="0" />
 
     <TextView
         android:id="@+id/textView8"
@@ -97,7 +96,7 @@
         android:layout_alignTop="@+id/textView6"
         android:layout_marginStart="-63dp"
         android:layout_toEndOf="@+id/textView8"
-        android:text="TextView"
+        android:text="a lot"
         tools:text="130" />
 
     <TextView
@@ -109,12 +108,12 @@
         android:text="Steps Taken:" />
 
     <TextView
-        android:id="@+id/textView11"
+        android:id="@+id/tracker_steps_counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView2"
         android:layout_toEndOf="@+id/textView10"
-        android:text="400" />
+        android:text="0" />
 
     <Button
         android:id="@+id/tracker_start_stop"

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/friend_title_text_view"
         android:layout_centerHorizontal="true"
-        android:text="@string/friends_swipe_instruction_req"
+        android:text="@string/friends_swipe_instruction_list"
         android:textAlignment="center" />
 
     <android.support.v7.widget.RecyclerView
