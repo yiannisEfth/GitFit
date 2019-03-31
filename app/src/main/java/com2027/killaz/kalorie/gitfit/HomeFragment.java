@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -50,6 +51,8 @@ public class HomeFragment extends Fragment {
     private BarChart chart;
     private boolean viewingToday = true;
     private DailyAlarmReceiver alarmReceiver;
+    int challengeTotal;
+    int challengeRemaining;
 
     @Nullable
     @Override
@@ -57,9 +60,32 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.home_fragment, container, false);
     }
 
+    // This is the best solution I could come up with for the navigation bug.
+    // Using shared preferences may seem stupid but I promise there was no other easy fix.
+    // This works well enough, so I probably won't touch it again until much later.
+    // - Chris
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        steps = dbHelper.getSteps(username, Calendar.getInstance().getTime());
+        stepText.setText(String.valueOf(steps));
+
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        challengeTotal = sharedPref.getInt(username + "total", 0);
+        challengeRemaining = sharedPref.getInt(username + "remaining", 0);
+        int soFar = challengeTotal - challengeRemaining;
+
+        challengeDesc.setText(getResources().getString(R.string.challenge_desc, challengeTotal));
+        challengeStepsText.setText(getResources().getString(R.string.your_progress, soFar, challengeTotal));
+        int progress = (int) ((soFar * 100.0f) / challengeTotal);
+
+        ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, 0, progress);
+        animate.setDuration(1000);
+        challengeBar.startAnimation(animate);
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        setRetainInstance(true);
         final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
         final Button thisWeekBtn = (Button) getView().findViewById(R.id.homeBtn2);
         final Button thisMonthBtn = (Button) getView().findViewById(R.id.homeBtn3);
@@ -213,7 +239,9 @@ public class HomeFragment extends Fragment {
 
                 Log.d("CHALLENGE_PROGRESS", String.valueOf(progress));
 
-                challengeBar.setProgress(progress);
+                //challengeBar.setProgress(progress);
+                challengeTotal = total;
+                challengeRemaining = remaining;
             }
         }
     }
@@ -299,7 +327,8 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Function called when application resumes. Registers StepBroadcastReceiver to update UI.
+     * Function called when fragment resumes.
+     * Registers receivers for steps and alarms.
      */
     @Override
     public void onResume() {
@@ -313,10 +342,11 @@ public class HomeFragment extends Fragment {
         intentFilter.addAction("com2027.killaz.kalorie.gitfit.DAILY_RESET");
         getActivity().registerReceiver(alarmReceiver, intentFilter);
         Log.d("DailyAlarmReceiver", "Receiver Registered.");
-
-        // TODO Fragment resumes - need to retrieve steps again.
     }
 
+    /**
+     * Triggers when the fragment stops being visible.
+     */
     @Override
     public void onStop() {
         super.onStop();
@@ -326,10 +356,16 @@ public class HomeFragment extends Fragment {
         getActivity().unregisterReceiver(alarmReceiver);
         Log.d("AlarmReceiver", "Receiver Unregistered.");
 
+        // Store users steps so far today in database
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        // Store users steps so far today in database
         dbHelper.updateRecordSteps(username, calendar.getTime(), steps);
+
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(username + "total", challengeTotal);
+        editor.putInt(username + "remaining", challengeRemaining);
+        editor.apply();
     }
 
     // A method to manually insert steps into the database

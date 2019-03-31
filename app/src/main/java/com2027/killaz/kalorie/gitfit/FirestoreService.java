@@ -128,13 +128,13 @@ public class FirestoreService extends Service implements SensorEventListener {
         // Daily at midnight
         calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
 
-        Intent dailyIntent = new Intent(RESET_ACTION); // Set up reset intent
-        alarmIntentDaily = PendingIntent.getBroadcast(context, DAILY_RESET, dailyIntent, 0); // Set up pending intent
+        Intent dailyIntent = new Intent(RESET_ACTION);
+        alarmIntentDaily = PendingIntent.getBroadcast(context, DAILY_RESET, dailyIntent, 0);
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), // Schedule the pending intent
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, alarmIntentDaily);
 
         // Weekly on an unspecified day at noon

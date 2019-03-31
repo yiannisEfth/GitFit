@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +22,7 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle;
     private FirebaseAuth mAuth;
+    private Fragment homeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,8 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
                     .replace(R.id.fragment_container, new HomeFragment(), "HOME")
                     .commit();
             navigationView.setCheckedItem(R.id.menu_home);
+        } else {
+            homeFragment = getSupportFragmentManager().getFragment(savedInstanceState, "HOME");
         }
 
     }
@@ -56,17 +60,15 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
             // lets you go to the fragment
             // what it is called in the drawmenu.xml
             case R.id.menu_home:
-                android.support.v4.app.Fragment fragment = getSupportFragmentManager().findFragmentByTag("HOME");
-                if (fragment != null) {
+                if (homeFragment != null) {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, fragment, "HOME")
+                            .replace(R.id.fragment_container, homeFragment, "HOME")
                             .commit();
                 } else {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, new HomeFragment(), "HOME")
                             .commit();
                 }
-
                 break;
 
             case R.id.menu_tracker:
@@ -137,6 +139,15 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Fragment homeFragment = (Fragment) getSupportFragmentManager().findFragmentByTag("HOME");
+        if (homeFragment != null && homeFragment.isVisible()) {
+            getSupportFragmentManager().putFragment(outState, "HOME", homeFragment);
+        }
     }
 }
 
