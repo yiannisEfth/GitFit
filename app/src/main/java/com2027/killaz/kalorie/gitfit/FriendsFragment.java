@@ -46,7 +46,6 @@ public class FriendsFragment extends Fragment {
     private List<String> friendsList;
     private List<String> userList;
     private Button friendReqBtn;
-    private String friendToAdd;
 
     @Nullable
     @Override

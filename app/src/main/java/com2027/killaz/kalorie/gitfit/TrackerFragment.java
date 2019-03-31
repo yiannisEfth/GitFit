@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -33,6 +34,8 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -54,17 +57,19 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private Sensor stepSensor;
     private long steps;
     private float distanceRan;
-    private TextView stepsTakenText, distanceTraveledText, pointsText;
+    private TextView stepsTakenText, distanceTraveledText, pointsText, paceText, caloriesText;
     private SupportMapFragment mapFragment;
     private DecimalFormat roundKms;
     private LocationManager locManager;
     private LocationListener locListener;
     private Criteria locCriteria;
     private String locProvider;
-    private FirebaseUser firebaseUser;
-    private FirebaseFirestore db;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser currentUser;
     private DocumentReference userRef;
     private int collectedPoints;
+    private float averagePace;
+    private int burnedCalories;
     private int completedChallenges;
 
 
@@ -82,15 +87,16 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        firebaseUser = mAuth.getCurrentUser();
-        userRef = db.collection("Users").document(firebaseUser.getDisplayName());
-
+        currentUser = mAuth.getCurrentUser();
+        userRef = db.collection("Users").document(currentUser.getDisplayName());
         startStop = getView().findViewById(R.id.tracker_start_stop);
         reset = getView().findViewById(R.id.tracker_reset);
         timer = getView().findViewById(R.id.tracker_timer);
         stepsTakenText = getView().findViewById(R.id.tracker_steps_counter);
         distanceTraveledText = getView().findViewById(R.id.tracker_distance_traveled);
         pointsText = getView().findViewById(R.id.tracker_points);
+        paceText = getView().findViewById(R.id.tracker_pace);
+        caloriesText = getView().findViewById(R.id.tracker_calories);
 
         roundKms = new DecimalFormat("#.###");
         timer.setBase(SystemClock.elapsedRealtime());
@@ -137,6 +143,10 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             collectedPoints = (int) (steps * 0.65 + 300 + (completedChallenges * 1.35));
             distanceRan = (float) (steps * 74) / (float) 100000;
             distanceRan = Float.valueOf(roundKms.format(distanceRan));
+            averagePace = distanceRan / Integer.parseInt(timer.getText().toString());
+            burnedCalories += (int) Math.round(0.0175 * averagePace * 70);
+            String setPaceText = String.valueOf(averagePace) + " km/h";
+            paceText.setText(setPaceText);
             pointsText.setText(String.valueOf(collectedPoints));
             stepsTakenText.setText(String.valueOf(steps));
             distanceTraveledText.setText(String.valueOf(distanceRan));
@@ -188,7 +198,10 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             public void onLocationChanged(Location location) {
                 double lat = location.getLatitude();
                 double lon = location.getLongitude();
-                Toast.makeText(getContext(), "LAT LON IS: " + String.valueOf(lat) + ", " + String.valueOf(lon), Toast.LENGTH_SHORT).show();
+                PolylineOptions polyOptions = new PolylineOptions().width(3).color(Color.RED);
+                LatLng latLng = new LatLng(lat, lon);
+                polyOptions.add(latLng);
+                mGoogleMap.addPolyline(polyOptions);
             }
 
             @Override

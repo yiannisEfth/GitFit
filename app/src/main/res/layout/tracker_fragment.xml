@@ -53,7 +53,7 @@
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/tracker_pace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView4"
@@ -71,7 +71,7 @@
         android:text="Calories Burned:" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/tracker_calories"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView6"
