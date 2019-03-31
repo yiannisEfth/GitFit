@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -63,17 +64,13 @@ public class FirestoreService extends Service implements SensorEventListener {
     private String friendChallenger;
     private AlarmManager alarmManager;
     private PendingIntent alarmIntentDaily;
-    private PendingIntent alarmIntentWeekly;
     private DatabaseHelper dbHelper;
-    private Calendar calendar;
 
-    private String RESET_ACTION = "RESET_ACTION";
-    private IntentFilter resetFilter = new IntentFilter(RESET_ACTION);
-    private String NOTIF_ACTION = "NOTIF_ACTION";
-    private IntentFilter notifFilter = new IntentFilter(NOTIF_ACTION);
+    private Calendar calendar;
 
     private static final int DAILY_RESET = 0;
     private static final int WEEKLY_NOTIFY = 1;
+    private static final String RESET_ACTION = "com2027.killaz.kalorie.gitfit.DAILY_RESET";
 
     /**
      * Fetch the current user and their tracked variables.
@@ -104,7 +101,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         }
 
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
-        Log.i("SERVICE STARTED - USER:", currentUser.getDisplayName());
+        Log.i("SERVICE STARTED - USER", currentUser.getDisplayName());
 
         // Get today's date.
         calendar = Calendar.getInstance();
@@ -134,45 +131,23 @@ public class FirestoreService extends Service implements SensorEventListener {
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
 
-        Intent innerIntentDaily = new Intent(context, AlarmReceiverDaily.class);
-        alarmIntentDaily = PendingIntent.getBroadcast(context, DAILY_RESET, innerIntentDaily, 0);
+        Intent dailyIntent = new Intent(RESET_ACTION); // Set up reset intent
+        alarmIntentDaily = PendingIntent.getBroadcast(context, DAILY_RESET, dailyIntent, 0); // Set up pending intent
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), // Schedule the pending intent
                 AlarmManager.INTERVAL_DAY, alarmIntentDaily);
 
-        // Weekly on an unspecified day
+        // Weekly on an unspecified day at noon
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 5);
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 0);
 
         Intent notifyIntent = new Intent(this, NotificationAlarmReceiver.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, WEEKLY_NOTIFY, notifyIntent, 0);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000 * 60, notifyPendingIntent); // Should trigger every minute.
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY * 7, notifyPendingIntent);
 
         return START_NOT_STICKY;
-    }
-
-    /**
-     * Triggers the on receive method  at midnight (See above).
-     */
-    private class AlarmReceiverDaily extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(System.currentTimeMillis());
-
-            // Initialise new daily step record.
-            dbHelper.newRecord(currentUser.getDisplayName(), cal.getTime(), 0);
-
-            // Save steps from yesterday into database.
-            cal.add(Calendar.DATE, -1);
-            dbHelper.updateRecordSteps(currentUser.getDisplayName(), cal.getTime(), stepsToday);
-
-            // Reset variable.
-            stepsToday = 0;
-            Log.i("RESET", "COMPLETE");
-        }
     }
 
     /**

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,12 +23,10 @@ import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -45,13 +42,14 @@ public class HomeFragment extends Fragment {
     private TextView challengeStepsText;
     private TextView challengeDesc;
     private ProgressBar challengeBar;
-    private StepBroadcastReceiver br;
+    private StepBroadcastReceiver stepBroadcastReceiver;
     private DatabaseHelper dbHelper;
     private String username;
     private int steps;
     private FirebaseAuth mAuth;
     private BarChart chart;
     private boolean viewingToday = true;
+    private DailyAlarmReceiver alarmReceiver;
 
     @Nullable
     @Override
@@ -65,16 +63,20 @@ public class HomeFragment extends Fragment {
         final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
         final Button thisWeekBtn = (Button) getView().findViewById(R.id.homeBtn2);
         final Button thisMonthBtn = (Button) getView().findViewById(R.id.homeBtn3);
+        todayBtn.setBackgroundColor(0xBBB2FF59);
+
         stepText = (TextView) getView().findViewById(R.id.stepTextView);
         timeText = (TextView) getView().findViewById(R.id.timeTextView);
         challengeBar = (ProgressBar) getView().findViewById(R.id.challenge_bar);
         challengeStepsText = (TextView) getView().findViewById(R.id.challengeStepsText);
         challengeDesc = (TextView) getView().findViewById(R.id.challenge_desc);
+
         mAuth = FirebaseAuth.getInstance();
-        br = new StepBroadcastReceiver();
-        dbHelper = DatabaseHelper.getInstance(getContext());
-        todayBtn.setBackgroundColor(0xBBB2FF59);
         username = mAuth.getCurrentUser().getDisplayName();
+        dbHelper = DatabaseHelper.getInstance(getContext());
+
+        stepBroadcastReceiver = new StepBroadcastReceiver();
+        alarmReceiver = new DailyAlarmReceiver();
 
         graphInit();
         drawGraph();
@@ -272,6 +274,31 @@ public class HomeFragment extends Fragment {
     }
 
     /**
+     * Triggers the on receive method at midnight.
+     */
+    private class DailyAlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+
+            // Initialise new daily step record.
+            dbHelper.newRecord(username, cal.getTime(), 0);
+
+            // Save steps from yesterday into database.
+            cal.add(Calendar.DATE, -1);
+            dbHelper.updateRecordSteps(username, cal.getTime(), steps);
+
+            // Reset variables.
+            steps = 0;
+            stepText.setText(String.valueOf(0));
+            Toast.makeText(context, "It's midnight! Your daily step count has been reset.", Toast.LENGTH_LONG).show();
+            Log.i("RESET", "COMPLETE");
+        }
+    }
+
+    /**
      * Function called when application resumes. Registers StepBroadcastReceiver to update UI.
      */
     @Override
@@ -279,18 +306,25 @@ public class HomeFragment extends Fragment {
         super.onResume();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
-        getActivity().registerReceiver(br, intentFilter);
-        Log.d("Broadcast Receiver", "Receiver Registered.");
+        getActivity().registerReceiver(stepBroadcastReceiver, intentFilter);
+        Log.d("StepBroadcastReceiver", "Receiver Registered.");
 
-        // Fragment resumes - need to retrieve steps again.
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("com2027.killaz.kalorie.gitfit.DAILY_RESET");
+        getActivity().registerReceiver(alarmReceiver, intentFilter);
+        Log.d("DailyAlarmReceiver", "Receiver Registered.");
 
+        // TODO Fragment resumes - need to retrieve steps again.
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        getActivity().unregisterReceiver(br);
-        Log.d("Broadcast Receiver", "Receiver Unregistered.");
+        getActivity().unregisterReceiver(stepBroadcastReceiver);
+        Log.d("StepBroadcastReceiver", "Receiver Unregistered.");
+
+        getActivity().unregisterReceiver(alarmReceiver);
+        Log.d("AlarmReceiver", "Receiver Unregistered.");
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());

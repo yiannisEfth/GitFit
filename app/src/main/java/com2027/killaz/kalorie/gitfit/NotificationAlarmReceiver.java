@@ -3,6 +3,7 @@ package com2027.killaz.kalorie.gitfit;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -43,10 +44,12 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
                     if (!notifText.equals("") || notifText == null) {
 
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(finalContext, "NOTIFICATION_CHANNEL_ID");
-                        builder.setSmallIcon(R.drawable.login_logo);
-                        builder.setContentText(notifText);
-                        builder.setContentTitle("GitFit");
-                        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                        builder.setSmallIcon(R.drawable.login_logo)
+                                .setContentTitle("Weekly Motivation")
+                                .setContentText(notifText)
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText(notifText))
+                                .setColor(Color.GREEN)
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
                         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(finalContext);
                         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
