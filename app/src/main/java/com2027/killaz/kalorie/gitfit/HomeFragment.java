@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -75,13 +77,15 @@ public class HomeFragment extends Fragment {
         challengeRemaining = sharedPref.getInt(username + "remaining", 0);
         int soFar = challengeTotal - challengeRemaining;
 
-        challengeDesc.setText(getResources().getString(R.string.challenge_desc, challengeTotal));
-        challengeStepsText.setText(getResources().getString(R.string.your_progress, soFar, challengeTotal));
-        int progress = (int) ((soFar * 100.0f) / challengeTotal);
+        if (challengeTotal > 0 && challengeRemaining < challengeTotal) {
+            challengeDesc.setText(getResources().getString(R.string.challenge_desc, challengeTotal));
+            challengeStepsText.setText(getResources().getString(R.string.your_progress, soFar, challengeTotal));
+            int progress = (int) ((soFar * 100.0f) / challengeTotal);
 
-        ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, 0, progress);
-        animate.setDuration(1000);
-        challengeBar.startAnimation(animate);
+            ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, 0, progress);
+            animate.setDuration(1000);
+            challengeBar.startAnimation(animate);
+        }
     }
 
     @Override
@@ -121,9 +125,9 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 stepText.setText(String.valueOf(steps));
                 timeText.setText(R.string.button_1);
-                todayBtn.setBackgroundColor(0xBBB2FF59);
-                thisWeekBtn.setBackgroundResource(android.R.drawable.btn_default);
-                thisMonthBtn.setBackgroundResource(android.R.drawable.btn_default);
+                todayBtn.setBackgroundResource(R.drawable.home_btn_pressed);
+                thisWeekBtn.setBackgroundResource(R.drawable.home_btn_default);
+                thisMonthBtn.setBackgroundResource(R.drawable.home_btn_default);
                 viewingToday = true;
             }
         });
@@ -149,9 +153,9 @@ public class HomeFragment extends Fragment {
                 stepText.setText(String.valueOf(total));
                 timeText.setText(R.string.button_2);
 
-                thisWeekBtn.setBackgroundColor(0xBBB2FF59);
-                todayBtn.setBackgroundResource(android.R.drawable.btn_default);
-                thisMonthBtn.setBackgroundResource(android.R.drawable.btn_default);
+                thisWeekBtn.setBackgroundResource(R.drawable.home_btn_pressed);
+                todayBtn.setBackgroundResource(R.drawable.home_btn_default);
+                thisMonthBtn.setBackgroundResource(R.drawable.home_btn_default);
                 viewingToday = false;
             }
         });
@@ -182,9 +186,9 @@ public class HomeFragment extends Fragment {
                 stepText.setText(String.valueOf(total));
                 timeText.setText(R.string.button_3);
 
-                thisMonthBtn.setBackgroundColor(0xBBB2FF59);
-                todayBtn.setBackgroundResource(android.R.drawable.btn_default);
-                thisWeekBtn.setBackgroundResource(android.R.drawable.btn_default);
+                thisMonthBtn.setBackgroundResource(R.drawable.home_btn_pressed);
+                todayBtn.setBackgroundResource(R.drawable.home_btn_default);
+                thisWeekBtn.setBackgroundResource(R.drawable.home_btn_default);
                 viewingToday = false;
             }
         });
@@ -211,6 +215,8 @@ public class HomeFragment extends Fragment {
             else if (!stepText.getText().toString().equals(getString(R.string.steps_loading))) {
                 stepText.setText(String.valueOf(Integer.parseInt(stepText.getText().toString()) + 1));
             }
+
+            stepAnim();
 
             Log.d("Total", String.valueOf(total));
             Log.d("Remaining", String.valueOf(remaining));
@@ -398,6 +404,35 @@ public class HomeFragment extends Fragment {
 
         // Create and show the dialog
         builder.create().show();
+    }
+
+    public void stepAnim() {
+        float pivotX = stepText.getMeasuredWidth() / 2f;
+        float pivotY = stepText.getMeasuredHeight() / 2f;
+        final ScaleAnimation growAnim = new ScaleAnimation(1.0f, 1.15f, 1.0f, 1.15f, pivotX, pivotY);
+        final ScaleAnimation shrinkAnim = new ScaleAnimation(1.15f, 1.0f, 1.15f, 1.0f, pivotX, pivotY);
+
+        growAnim.setDuration(225);
+        shrinkAnim.setDuration(225);
+
+        stepText.setAnimation(growAnim);
+        growAnim.start();
+
+        growAnim.setAnimationListener(new Animation.AnimationListener()
+        {
+            @Override
+            public void onAnimationStart(Animation animation){}
+
+            @Override
+            public void onAnimationRepeat(Animation animation){}
+
+            @Override
+            public void onAnimationEnd(Animation animation)
+            {
+                stepText.setAnimation(shrinkAnim);
+                shrinkAnim.start();
+            }
+        });
     }
 
 }
