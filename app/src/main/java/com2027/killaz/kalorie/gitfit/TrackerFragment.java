@@ -70,7 +70,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private DocumentReference userRef;
     private int collectedPoints;
     private float averagePace;
-    private int burnedCalories;
+    private double burnedCalories;
     private int completedChallenges;
 
 
@@ -148,7 +148,8 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             distanceRan = (float) (steps * 74) / (float) 100000;
             distanceRan = Float.valueOf(roundKms.format(distanceRan));
             averagePace = Float.valueOf(roundPace.format(distanceRan / elapsesHours));
-            burnedCalories += (int) Math.round(0.0175 * averagePace * 70);
+            //burnedCalories += (int) Math.round(0.0175 * averagePace * 70);This is calories burned per minute with current pace
+            burnedCalories += ((25 * 0.2017) + (70 * 0.09036) + (170 * 0.6309) - 55.0969) * (elapsedSeconds/60) / 4.184; // This uses the formula: [(Age x 0.2017) + (Weight x 0.09036) + (Heart Rate x 0.6309) - 55.0969] x Time / 4.184
             String setPaceText = String.valueOf(averagePace) + " km/h";
             paceText.setText(setPaceText);
             caloriesText.setText(String.valueOf(burnedCalories));
