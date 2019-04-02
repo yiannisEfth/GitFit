@@ -60,6 +60,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private TextView stepsTakenText, distanceTraveledText, pointsText, paceText, caloriesText;
     private SupportMapFragment mapFragment;
     private DecimalFormat roundKms;
+    private DecimalFormat roundPace;
     private LocationManager locManager;
     private LocationListener locListener;
     private Criteria locCriteria;
@@ -99,6 +100,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         caloriesText = getView().findViewById(R.id.tracker_calories);
 
         roundKms = new DecimalFormat("#.###");
+        roundPace = new DecimalFormat("#.##");
         timer.setBase(SystemClock.elapsedRealtime());
         sManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         stepSensor = sManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
@@ -140,13 +142,16 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
 
         if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
             steps++;
+            float elapsedSeconds = (int) ((SystemClock.elapsedRealtime() - timer.getBase()) / 1000);
+            float elapsesHours = elapsedSeconds / 3600;
             collectedPoints = (int) (steps * 0.65 + 300 + (completedChallenges * 1.35));
             distanceRan = (float) (steps * 74) / (float) 100000;
             distanceRan = Float.valueOf(roundKms.format(distanceRan));
-            averagePace = distanceRan / Integer.parseInt(timer.getText().toString());
+            averagePace = Float.valueOf(roundPace.format(distanceRan / elapsesHours));
             burnedCalories += (int) Math.round(0.0175 * averagePace * 70);
             String setPaceText = String.valueOf(averagePace) + " km/h";
             paceText.setText(setPaceText);
+            caloriesText.setText(String.valueOf(burnedCalories));
             pointsText.setText(String.valueOf(collectedPoints));
             stepsTakenText.setText(String.valueOf(steps));
             distanceTraveledText.setText(String.valueOf(distanceRan));

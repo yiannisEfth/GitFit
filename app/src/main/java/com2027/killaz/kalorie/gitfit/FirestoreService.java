@@ -3,20 +3,15 @@ package com2027.killaz.kalorie.gitfit;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,11 +22,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -110,8 +102,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         // Get saved steps so far today from local database.
         try {
             stepsToday = dbHelper.getSteps(currentUser.getDisplayName(), calendar.getTime());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             stepsToday = 0;
             e.printStackTrace();
         }
@@ -158,8 +149,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         // Stop tracking steps
         try {
             sensorManager.unregisterListener(this);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -191,7 +181,7 @@ public class FirestoreService extends Service implements SensorEventListener {
             getNewChallenge(newChallenge);
         }
 
-        if (friendChallengeReference != null && remainingFriendChallenge!=0) {
+        if (friendChallengeReference != null && remainingFriendChallenge != 0) {
             friend_challenge_map.put("remaining", remainingFriendChallenge);
             data.put("current_challenge_friend", friend_challenge_map);
             stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
@@ -208,7 +198,7 @@ public class FirestoreService extends Service implements SensorEventListener {
             //TODO Friend challenge finished...let user know. Front end stuff.
         }
         self_challenge_map.put("remaining", remainingMyChallenge);
-        points = (int) (stepCounter * 0.65 + 300 + (completedChallenges*1.35));
+        points = (int) (stepCounter * 0.65 + 300 + (completedChallenges * 1.35));
         stepIntent.putExtra("challenges_completed", completedChallenges);
         stepIntent.putExtra("points", points);
         data.put("points", points);
@@ -314,16 +304,18 @@ public class FirestoreService extends Service implements SensorEventListener {
         newChallenge.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot documentSnapshot = task.getResult();
-                myChallengeType = documentSnapshot.getString("type");
-                totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
-                remainingMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
-                self_challenge_map.put("challenge_ref", newChallenge);
-                self_challenge_map.put("remaining", totalMyChallenge);
-                data.put("current_challenge_self", self_challenge_map);
-                db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
-                stepIntent.putExtra("challengeTotal", totalMyChallenge);
-                sendBroadcast(stepIntent);
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    myChallengeType = documentSnapshot.getString("type");
+                    totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
+                    remainingMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
+                    self_challenge_map.put("challenge_ref", newChallenge);
+                    self_challenge_map.put("remaining", totalMyChallenge);
+                    data.put("current_challenge_self", self_challenge_map);
+                    db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
+                    stepIntent.putExtra("challengeTotal", totalMyChallenge);
+                    sendBroadcast(stepIntent);
+                }
             }
         });
     }
