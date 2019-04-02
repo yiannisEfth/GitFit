@@ -62,9 +62,10 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.home_fragment, container, false);
     }
 
-    // This is the best solution I could come up with for the navigation bug.
-    // Using shared preferences may seem stupid but I promise there was no other easy fix.
-    // This works well enough, so I probably won't touch it again until much later.
+    // Save steps in main menu. (Might want to remove db call on stop from this class.)
+    // As for challenge progress...
+    // Save steps in shared prefs, when it comes back you add the difference between the two steps values to challenge progress.
+    // Or just save the challenge progress in main menu based on the previous progress.
     // - Chris
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -93,7 +94,7 @@ public class HomeFragment extends Fragment {
         final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
         final Button thisWeekBtn = (Button) getView().findViewById(R.id.homeBtn2);
         final Button thisMonthBtn = (Button) getView().findViewById(R.id.homeBtn3);
-        todayBtn.setBackgroundColor(0xBBB2FF59);
+        todayBtn.setBackgroundResource(R.drawable.home_btn_pressed);
 
         stepText = (TextView) getView().findViewById(R.id.stepTextView);
         timeText = (TextView) getView().findViewById(R.id.timeTextView);
