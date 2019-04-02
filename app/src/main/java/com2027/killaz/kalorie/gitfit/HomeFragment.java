@@ -62,10 +62,7 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.home_fragment, container, false);
     }
 
-    // This is the best solution I could come up with for the navigation bug.
-    // Using shared preferences may seem stupid but I promise there was no other easy fix.
-    // This works well enough, so I probably won't touch it again until much later.
-    // - Chris
+    // Fetch stuff to update UI if returning from other fragment.
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -93,7 +90,7 @@ public class HomeFragment extends Fragment {
         final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
         final Button thisWeekBtn = (Button) getView().findViewById(R.id.homeBtn2);
         final Button thisMonthBtn = (Button) getView().findViewById(R.id.homeBtn3);
-        todayBtn.setBackgroundColor(0xBBB2FF59);
+        todayBtn.setBackgroundResource(R.drawable.home_btn_pressed);
 
         stepText = (TextView) getView().findViewById(R.id.stepTextView);
         timeText = (TextView) getView().findViewById(R.id.timeTextView);
@@ -226,7 +223,6 @@ public class HomeFragment extends Fragment {
                 int stepsSoFar = total - remaining;
                 if (stepsSoFar < 0) {
                     stepsSoFar = 0;
-                    // Just wait for the service to realise a new challenge is needed?
                 }
 
                 challengeDesc.setText(getResources().getString(R.string.challenge_desc, total));

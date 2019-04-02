@@ -102,12 +102,12 @@ public class FirestoreService extends Service implements SensorEventListener {
         // Get saved steps so far today from local database.
         try {
             stepsToday = dbHelper.getSteps(currentUser.getDisplayName(), calendar.getTime());
+            stepIntent.putExtra("steps", stepsToday);
         } catch (Exception e) {
             stepsToday = 0;
             e.printStackTrace();
         }
         Log.i("STEPS_TODAY_INIT", String.valueOf(stepsToday));
-
 
         /**
          * Sets up the alarm manager that triggers the data base to update daily and send
@@ -237,7 +237,6 @@ public class FirestoreService extends Service implements SensorEventListener {
 
                     stepIntent.putExtra("challenges_completed", completedChallenges);
                     stepIntent.putExtra("points", points);
-                    sendBroadcast(stepIntent);
 
                     fetchUserChallenges();
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
@@ -245,6 +244,7 @@ public class FirestoreService extends Service implements SensorEventListener {
                         remainingFriendChallenge = ((Long) friend_challenge.get("remaining")).intValue();
                         friendChallenger = friend_challenge.get("user_ref").toString();
                     }
+                    sendBroadcast(stepIntent);
                 }
             }
         });
@@ -267,7 +267,6 @@ public class FirestoreService extends Service implements SensorEventListener {
                         stepIntent.putExtra("steps", stepsToday);
                         stepIntent.putExtra("remaining", remainingMyChallenge);
                         stepIntent.putExtra("challengeTotal", totalMyChallenge);
-                        sendBroadcast(stepIntent);
                     }
                 }
             });
@@ -286,8 +285,6 @@ public class FirestoreService extends Service implements SensorEventListener {
                         stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
                         stepIntent.putExtra("friend_challenge_total", totalFriendChallenge);
                         stepIntent.putExtra("friend_challenger", friendChallenger);
-                        sendBroadcast(stepIntent);
-
                     }
                 }
             });
@@ -306,14 +303,19 @@ public class FirestoreService extends Service implements SensorEventListener {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
+
                     myChallengeType = documentSnapshot.getString("type");
                     totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
                     remainingMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
+
                     self_challenge_map.put("challenge_ref", newChallenge);
                     self_challenge_map.put("remaining", totalMyChallenge);
+
                     data.put("current_challenge_self", self_challenge_map);
                     db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
+
                     stepIntent.putExtra("challengeTotal", totalMyChallenge);
+                    stepIntent.putExtra("remaining", remainingMyChallenge);
                     sendBroadcast(stepIntent);
                 }
             }
