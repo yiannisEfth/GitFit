@@ -27,6 +27,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String USER_RECORD_DATE = "date";
     private static final String USER_RECORD_STEPS = "steps";
 
+    private static final String USER_RECORDS_BMI = "user_records_bmi";
+    private static final String USER_RECORD_WEIGHT = "user_record_weight";
+    private static final String USER_RECORD_HEIGHT = "user_record_height";
+
     private static final String GET_USER_ROWS = "SELECT count(*) FROM " + USER_RECORDS +
             " WHERE " + USER_NAME + " = ? ORDER BY " + USER_RECORD_DATE;
 
@@ -65,7 +69,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 USER_RECORD_STEPS + " INTEGER, " +
                 "PRIMARY KEY (" + USER_NAME + ", " + USER_RECORD_DATE + "))";
 
+        String SQL_CREATE_TABLE_BMI = "CREATE TABLE " + USER_RECORDS_BMI + "(" +
+                USER_NAME + " VARCHAR(30) NOT NULL, " +
+                USER_RECORD_WEIGHT + " REAL, " +
+                USER_RECORD_HEIGHT + " REAL, " +
+                "PRIMARY KEY (" + USER_NAME + "))";
+
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE1);
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE_BMI);
     }
 
     /**
@@ -78,6 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + USER_RECORDS);
+        db.execSQL("DROP TABLE IF EXISTS " + USER_RECORDS_BMI);
         onCreate(db);
     }
 
@@ -209,5 +221,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String getDateString(Date date) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return df.format(date);
+    }
+
+    /** BMI TABLE METHODS **/
+
+    /**
+     *
+     * This method saves a users weight and height to the database.
+     * This method edits an existing entry if the user is already in the table,
+     * so a new entry is only created if it has to be
+     * @param user The user to access.
+     * @param weight The input weight of the user
+     * @param height The input height of the user
+     */
+    public void saveRecordsBMI(String user, float weight, float height){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + USER_NAME + " FROM " + USER_RECORDS_BMI + " WHERE " + USER_NAME + " =?";
+        Cursor cursor = db.rawQuery(query, new String[]{user});
+        ContentValues values = new ContentValues();
+
+        //edit existing row if user is already in table
+        if (cursor.getCount() > 0){
+            values.put(USER_RECORD_WEIGHT, weight);
+            values.put(USER_RECORD_HEIGHT, height);
+
+            int rowsAffected = -1;
+            try {
+                rowsAffected = db.update(USER_RECORDS_BMI, values, USER_NAME + " = " + user, null);
+                Log.i("ROWS_UPDATED", String.valueOf(rowsAffected));
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // Add brand new row
+        else{
+            values.put(USER_NAME, user);
+            values.put(USER_RECORD_WEIGHT, weight);
+            values.put(USER_RECORD_HEIGHT, height);
+            long newID = db.insert(USER_RECORDS_BMI, null, values);
+        }
+        cursor.close();
     }
 }
