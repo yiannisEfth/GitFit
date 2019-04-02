@@ -226,7 +226,6 @@ public class HomeFragment extends Fragment {
                 int stepsSoFar = total - remaining;
                 if (stepsSoFar < 0) {
                     stepsSoFar = 0;
-                    // Just wait for the service to realise a new challenge is needed?
                 }
 
                 challengeDesc.setText(getResources().getString(R.string.challenge_desc, total));
