@@ -62,11 +62,7 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.home_fragment, container, false);
     }
 
-    // Save steps in main menu. (Might want to remove db call on stop from this class.)
-    // As for challenge progress...
-    // Save steps in shared prefs, when it comes back you add the difference between the two steps values to challenge progress.
-    // Or just save the challenge progress in main menu based on the previous progress.
-    // - Chris
+    // Fetch stuff to update UI if returning from other fragment.
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
