@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,10 +113,11 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         locCriteria = new Criteria();
         locCriteria.setAccuracy(Criteria.ACCURACY_FINE);
         locCriteria.setPowerRequirement(Criteria.POWER_HIGH);
+
         setupLocationListener();
         locManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         locProvider = locManager.getBestProvider(locCriteria, false);
-        locManager.requestLocationUpdates(locProvider, 2000, 10, locListener);
+        locManager.requestLocationUpdates(locProvider, 1000, 0, locListener);
 
         setButtonListeners();
         isLocationEnabled();
@@ -150,13 +152,13 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             float elapsedSeconds = (int) ((SystemClock.elapsedRealtime() - timer.getBase()) / 1000);
             float elapsesHours = elapsedSeconds / 3600;
             collectedPoints = (int) (steps * 0.65 + 300 + (completedChallenges * 1.35));
-            distanceRan = (float) (steps * 74) / (float) 100000;
-            distanceRan = Float.valueOf(roundKms.format(distanceRan));
-            averagePace = Float.valueOf(roundPace.format(distanceRan / elapsesHours));
             //burnedCalories += (int) Math.round(0.0175 * averagePace * 70);This is calories burned per minute with current pace
-            burnedCalories += ((25 * 0.2017) + (70 * 0.09036) + (160 * 0.6309) - 55.0969) * (elapsedSeconds / 60) / 6.184; // This uses the formula: [(Age x 0.2017) + (Weight x 0.09036) + (Heart Rate x 0.6309) - 55.0969] x Time / 4.184
-            String setPaceText = String.valueOf(averagePace) + " km/h";
-            paceText.setText(setPaceText);
+            // This uses the formula: [(Age x 0.2017) + (Weight x 0.09036) + (Heart Rate x 0.6309) - 55.0969] x Time / 4.184
+            //burnedCalories += ((25 * 0.2017) + (70 * 0.09036) + (160 * 0.6309) - 55.0969) * (elapsedSeconds / 60) / 6.184;
+            float paceInMs = averagePace / 3.6f;
+            // My weight and height for testing: 70kg, 1.7m tall
+            // formula = 0.035 * weight[kg] + (pace^2 / height[m]) * 0.29 * weight[kg]
+            burnedCalories += (0.035 * 70) + ((paceInMs * paceInMs) / 1.7f) * 0.029 * 70;
             caloriesText.setText(String.valueOf(burnedCalories));
             pointsText.setText(String.valueOf(collectedPoints));
             stepsTakenText.setText(String.valueOf(steps));
@@ -208,6 +210,10 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
 
     private void setupLocationListener() {
         locListener = new LocationListener() {
+
+            private Location lastLocation;
+            private float calculatedSpeed;
+
             @Override
             public void onLocationChanged(Location location) {
                 if (runningTimer) {
@@ -219,7 +225,22 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                         routePolyline.remove();
                     }
                     routePolyline = mGoogleMap.addPolyline(polylineOptions);
+
+                    // Manually calculate speed in case getSpeed() fails.
+                    if (lastLocation != null) {
+                        float addedDistance = lastLocation.distanceTo(location);
+                        float elapsedTime = (location.getTime() - lastLocation.getTime()) / 1_000f; // Convert milliseconds to seconds
+                        calculatedSpeed = addedDistance / elapsedTime;
+                        distanceRan += addedDistance;
+                        distanceTraveledText.setText(distanceRan + "m");
+                    }
+                    this.lastLocation = location;
+
+                    averagePace = location.hasSpeed() ? location.getSpeed() : calculatedSpeed;
+                    averagePace *= 3.6; // Convert to km/h
+                    paceText.setText(String.valueOf(averagePace) + " km/h");
                 }
+
             }
 
             @Override
