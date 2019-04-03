@@ -63,6 +63,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private SupportMapFragment mapFragment;
     private DecimalFormat roundKms;
     private DecimalFormat roundPace;
+    private DecimalFormat roundCal;
     private LocationManager locManager;
     private LocationListener locListener;
     private Criteria locCriteria;
@@ -106,6 +107,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         polylineOptions = new PolylineOptions().width(3).color(Color.RED);
         roundKms = new DecimalFormat("#.###");
         roundPace = new DecimalFormat("#.##");
+        roundCal = new DecimalFormat("#.#");
         timer.setBase(SystemClock.elapsedRealtime());
         sManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         stepSensor = sManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
@@ -117,7 +119,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         setupLocationListener();
         locManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         locProvider = locManager.getBestProvider(locCriteria, false);
-        locManager.requestLocationUpdates(locProvider, 1000, 0, locListener);
+        locManager.requestLocationUpdates(locProvider, 1000, 5, locListener);
 
         setButtonListeners();
         isLocationEnabled();
@@ -150,16 +152,21 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             isLocationEnabled();
             steps++;
             float elapsedSeconds = (int) ((SystemClock.elapsedRealtime() - timer.getBase()) / 1000);
-            float elapsesHours = elapsedSeconds / 3600;
+            float elapsedHours = elapsedSeconds / 3600;
             collectedPoints = (int) (steps * 0.65 + 300 + (completedChallenges * 1.35));
+
             //burnedCalories += (int) Math.round(0.0175 * averagePace * 70);This is calories burned per minute with current pace
-            // This uses the formula: [(Age x 0.2017) + (Weight x 0.09036) + (Heart Rate x 0.6309) - 55.0969] x Time / 4.184
+            //This uses the formula: [(Age x 0.2017) + (Weight x 0.09036) + (Heart Rate x 0.6309) - 55.0969] x Time / 4.184
             //burnedCalories += ((25 * 0.2017) + (70 * 0.09036) + (160 * 0.6309) - 55.0969) * (elapsedSeconds / 60) / 6.184;
+
             float paceInMs = averagePace / 3.6f;
+
             // My weight and height for testing: 70kg, 1.7m tall
             // formula = 0.035 * weight[kg] + (pace^2 / height[m]) * 0.29 * weight[kg]
-            burnedCalories += (0.035 * 70) + ((paceInMs * paceInMs) / 1.7f) * 0.029 * 70;
-            caloriesText.setText(String.valueOf(burnedCalories));
+            // formula is for per minute so needs to multiple by fraction of minute elapsed.
+
+            burnedCalories += ((0.035 * 70) + ((paceInMs * paceInMs) / 1.7f) * 0.029 * 70) * (elapsedSeconds / 60);
+            caloriesText.setText(String.valueOf(roundCal.format(burnedCalories)));
             pointsText.setText(String.valueOf(collectedPoints));
             stepsTakenText.setText(String.valueOf(steps));
             distanceTraveledText.setText(String.valueOf(distanceRan));
@@ -226,37 +233,31 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                     }
                     routePolyline = mGoogleMap.addPolyline(polylineOptions);
 
-                    // Manually calculate speed in case getSpeed() fails.
+                    // Manually calculate speed as a back up in case getSpeed() fails.
                     if (lastLocation != null) {
                         float addedDistance = lastLocation.distanceTo(location);
                         float elapsedTime = (location.getTime() - lastLocation.getTime()) / 1_000f; // Convert milliseconds to seconds
                         calculatedSpeed = addedDistance / elapsedTime;
-                        distanceRan += addedDistance;
-                        distanceTraveledText.setText(distanceRan + "m");
+                        distanceRan += (addedDistance / 1000); // Convert metres to km
+                        distanceTraveledText.setText(String.valueOf(roundKms.format(distanceRan)) + "km");
                     }
                     this.lastLocation = location;
 
                     averagePace = location.hasSpeed() ? location.getSpeed() : calculatedSpeed;
                     averagePace *= 3.6; // Convert to km/h
-                    paceText.setText(String.valueOf(averagePace) + " km/h");
+                    paceText.setText(String.valueOf(roundPace.format(averagePace)) + " km/h");
                 }
 
             }
 
             @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
+            public void onStatusChanged(String s, int i, Bundle bundle) {}
 
             @Override
-            public void onProviderEnabled(String s) {
-
-            }
+            public void onProviderEnabled(String s) {}
 
             @Override
-            public void onProviderDisabled(String s) {
-
-            }
+            public void onProviderDisabled(String s) {}
         };
     }
 
