@@ -30,13 +30,20 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -275,6 +282,37 @@ public class HomeFragment extends Fragment {
         chart.setBackgroundColor(0x88FFFFFF);
         chart.setNoDataText("No step data saved, try again later.");
         chart.getDescription().setEnabled(false);
+
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int dayOfWeek = (int) e.getX();
+                Calendar cal = Calendar.getInstance();
+                cal.setFirstDayOfWeek(Calendar.MONDAY);
+                cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+                cal.add(Calendar.DATE, dayOfWeek);
+                Date date = cal.getTime();
+                DateFormat df = new SimpleDateFormat("EEEE, dd MMM yyyy", Locale.getDefault());
+                String dateString = df.format(date);
+
+                // Build the dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(dateString);
+                builder.setMessage("You walked " + dbHelper.getSteps(username, date) + " steps! Keep it up!");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                // Create and show the dialog
+                builder.create().show();
+            }
+
+            @Override
+            public void onNothingSelected() {}
+        });
+
         chart.invalidate();
     }
 

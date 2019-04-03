@@ -27,9 +27,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String USER_RECORD_DATE = "date";
     private static final String USER_RECORD_STEPS = "steps";
 
-    private static final String USER_RECORDS_BMI = "user_records_bmi";
-    private static final String USER_RECORD_WEIGHT = "user_record_weight";
-    private static final String USER_RECORD_HEIGHT = "user_record_height";
+    private static final String USER_BMI = "user_bmi";
+    private static final String USER_WEIGHT = "user_weight";
+    private static final String USER_HEIGHT = "user_height";
 
     private static final String GET_USER_ROWS = "SELECT count(*) FROM " + USER_RECORDS +
             " WHERE " + USER_NAME + " = ? ORDER BY " + USER_RECORD_DATE;
@@ -69,10 +69,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 USER_RECORD_STEPS + " INTEGER, " +
                 "PRIMARY KEY (" + USER_NAME + ", " + USER_RECORD_DATE + "))";
 
-        String SQL_CREATE_TABLE_BMI = "CREATE TABLE " + USER_RECORDS_BMI + "(" +
+        String SQL_CREATE_TABLE_BMI = "CREATE TABLE " + USER_BMI + "(" +
                 USER_NAME + " VARCHAR(30) NOT NULL, " +
-                USER_RECORD_WEIGHT + " REAL, " +
-                USER_RECORD_HEIGHT + " REAL, " +
+                USER_WEIGHT + " REAL, " +
+                USER_HEIGHT + " REAL, " +
                 "PRIMARY KEY (" + USER_NAME + "))";
 
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE1);
@@ -89,7 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + USER_RECORDS);
-        db.execSQL("DROP TABLE IF EXISTS " + USER_RECORDS_BMI);
+        db.execSQL("DROP TABLE IF EXISTS " + USER_BMI);
         onCreate(db);
     }
 
@@ -177,7 +177,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Convert date to string for insertion
         String dateString = getDateString(date);
 
-        String where = USER_NAME + " = ? AND " + " USER_RECORD_DATE = ?";
+        String where = USER_NAME + " = ? AND " + USER_RECORD_DATE + " = ?";
         String[] values = new String[]{user, dateString};
 
         db.delete(USER_RECORDS, where, values);
@@ -237,18 +237,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void saveRecordsBMI(String user, float weight, float height){
 
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT " + USER_NAME + " FROM " + USER_RECORDS_BMI + " WHERE " + USER_NAME + " =?";
+        String query = "SELECT " + USER_NAME + " FROM " + USER_BMI + " WHERE " + USER_NAME + " =?";
         Cursor cursor = db.rawQuery(query, new String[]{user});
         ContentValues values = new ContentValues();
 
         //edit existing row if user is already in table
         if (cursor.getCount() > 0){
-            values.put(USER_RECORD_WEIGHT, weight);
-            values.put(USER_RECORD_HEIGHT, height);
+            values.put(USER_WEIGHT, weight);
+            values.put(USER_HEIGHT, height);
 
             int rowsAffected = -1;
             try {
-                rowsAffected = db.update(USER_RECORDS_BMI, values, USER_NAME + " = " + user, null);
+                rowsAffected = db.update(USER_BMI, values, USER_NAME + " = " + user, null);
                 Log.i("ROWS_UPDATED", String.valueOf(rowsAffected));
             }
             catch (Exception e) {
@@ -258,9 +258,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Add brand new row
         else{
             values.put(USER_NAME, user);
-            values.put(USER_RECORD_WEIGHT, weight);
-            values.put(USER_RECORD_HEIGHT, height);
-            long newID = db.insert(USER_RECORDS_BMI, null, values);
+            values.put(USER_WEIGHT, weight);
+            values.put(USER_HEIGHT, height);
+            long newID = db.insert(USER_BMI, null, values);
         }
         cursor.close();
     }
