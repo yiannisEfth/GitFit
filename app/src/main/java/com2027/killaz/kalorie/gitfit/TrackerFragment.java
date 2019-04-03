@@ -35,6 +35,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -72,6 +73,8 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private float averagePace;
     private double burnedCalories;
     private int completedChallenges;
+    private PolylineOptions polylineOptions;
+    private Polyline routePolyline;
 
 
     @Nullable
@@ -99,6 +102,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         paceText = getView().findViewById(R.id.tracker_pace);
         caloriesText = getView().findViewById(R.id.tracker_calories);
 
+        polylineOptions = new PolylineOptions().width(3).color(Color.RED);
         roundKms = new DecimalFormat("#.###");
         roundPace = new DecimalFormat("#.##");
         timer.setBase(SystemClock.elapsedRealtime());
@@ -141,6 +145,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         }
 
         if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+            isLocationEnabled();
             steps++;
             float elapsedSeconds = (int) ((SystemClock.elapsedRealtime() - timer.getBase()) / 1000);
             float elapsesHours = elapsedSeconds / 3600;
@@ -149,7 +154,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             distanceRan = Float.valueOf(roundKms.format(distanceRan));
             averagePace = Float.valueOf(roundPace.format(distanceRan / elapsesHours));
             //burnedCalories += (int) Math.round(0.0175 * averagePace * 70);This is calories burned per minute with current pace
-            burnedCalories += ((25 * 0.2017) + (70 * 0.09036) + (170 * 0.6309) - 55.0969) * (elapsedSeconds/60) / 4.184; // This uses the formula: [(Age x 0.2017) + (Weight x 0.09036) + (Heart Rate x 0.6309) - 55.0969] x Time / 4.184
+            burnedCalories += ((25 * 0.2017) + (70 * 0.09036) + (160 * 0.6309) - 55.0969) * (elapsedSeconds / 60) / 6.184; // This uses the formula: [(Age x 0.2017) + (Weight x 0.09036) + (Heart Rate x 0.6309) - 55.0969] x Time / 4.184
             String setPaceText = String.valueOf(averagePace) + " km/h";
             paceText.setText(setPaceText);
             caloriesText.setText(String.valueOf(burnedCalories));
@@ -190,10 +195,13 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                 steps = 0;
                 collectedPoints = 0;
                 distanceRan = 0;
+                caloriesText.setText("0");
                 stepsTakenText.setText("0");
                 pointsText.setText("0");
                 String set0km = "0 km";
                 distanceTraveledText.setText(set0km);
+                polylineOptions.getPoints().clear();
+                routePolyline.remove();
             }
         });
     }
@@ -202,12 +210,16 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         locListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                double lat = location.getLatitude();
-                double lon = location.getLongitude();
-                PolylineOptions polyOptions = new PolylineOptions().width(3).color(Color.RED);
-                LatLng latLng = new LatLng(lat, lon);
-                polyOptions.add(latLng);
-                mGoogleMap.addPolyline(polyOptions);
+                if (runningTimer) {
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    LatLng latLng = new LatLng(lat, lon);
+                    polylineOptions.getPoints().add(latLng);
+                    if (routePolyline != null) {
+                        routePolyline.remove();
+                    }
+                    routePolyline = mGoogleMap.addPolyline(polylineOptions);
+                }
             }
 
             @Override
