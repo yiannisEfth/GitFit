@@ -78,6 +78,8 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private PolylineOptions polylineOptions;
     private Polyline routePolyline;
 
+    private int userWeightKg;
+    private int userHeightM;
 
     @Nullable
     @Override
@@ -154,22 +156,8 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             float elapsedSeconds = (int) ((SystemClock.elapsedRealtime() - timer.getBase()) / 1000);
             float elapsedHours = elapsedSeconds / 3600;
             collectedPoints = (int) (steps * 0.65 + 300 + (completedChallenges * 1.35));
-
-            //burnedCalories += (int) Math.round(0.0175 * averagePace * 70);This is calories burned per minute with current pace
-            //This uses the formula: [(Age x 0.2017) + (Weight x 0.09036) + (Heart Rate x 0.6309) - 55.0969] x Time / 4.184
-            //burnedCalories += ((25 * 0.2017) + (70 * 0.09036) + (160 * 0.6309) - 55.0969) * (elapsedSeconds / 60) / 6.184;
-
-            float paceInMs = averagePace / 3.6f;
-
-            // My weight and height for testing: 70kg, 1.7m tall
-            // formula = 0.035 * weight[kg] + (pace^2 / height[m]) * 0.29 * weight[kg]
-            // formula is for per minute so needs to multiple by fraction of minute elapsed.
-
-            burnedCalories += ((0.035 * 70) + ((paceInMs * paceInMs) / 1.7f) * 0.029 * 70) * (elapsedSeconds / 60);
-            caloriesText.setText(String.valueOf(roundCal.format(burnedCalories)));
             pointsText.setText(String.valueOf(collectedPoints));
             stepsTakenText.setText(String.valueOf(steps));
-            distanceTraveledText.setText(String.valueOf(distanceRan));
         }
     }
 
@@ -233,10 +221,12 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                     }
                     routePolyline = mGoogleMap.addPolyline(polylineOptions);
 
+                    float elapsedTime = 0;
+
                     // Manually calculate speed as a back up in case getSpeed() fails.
                     if (lastLocation != null) {
                         float addedDistance = lastLocation.distanceTo(location);
-                        float elapsedTime = (location.getTime() - lastLocation.getTime()) / 1_000f; // Convert milliseconds to seconds
+                        elapsedTime = (location.getTime() - lastLocation.getTime()) / 1_000f; // Convert milliseconds to seconds
                         calculatedSpeed = addedDistance / elapsedTime;
                         distanceRan += (addedDistance / 1000); // Convert metres to km
                         distanceTraveledText.setText(String.valueOf(roundKms.format(distanceRan)) + "km");
@@ -246,6 +236,15 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                     averagePace = location.hasSpeed() ? location.getSpeed() : calculatedSpeed;
                     averagePace *= 3.6; // Convert to km/h
                     paceText.setText(String.valueOf(roundPace.format(averagePace)) + " km/h");
+
+                    float paceInMs = averagePace / 3.6f;
+
+                    // My weight and height for testing: 70kg, 1.7m tall
+                    // formula = 0.035 * weight[kg] + (pace^2 / height[m]) * 0.29 * weight[kg]
+                    // formula is for per minute so needs to multiply by fraction of minute elapsed since last update
+
+                    burnedCalories += ((0.035 * 70) + ((paceInMs * paceInMs) / 1.7f) * 0.029 * 70) * (elapsedTime / 60);
+                    caloriesText.setText(String.valueOf(roundCal.format(burnedCalories)));
                 }
 
             }
