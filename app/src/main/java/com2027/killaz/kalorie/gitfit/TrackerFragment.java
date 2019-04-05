@@ -237,16 +237,19 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                     averagePace *= 3.6; // Convert to km/h
                     paceText.setText(String.valueOf(roundPace.format(averagePace)) + " km/h");
 
-                    float paceInMs = averagePace / 3.6f;
+                    if (averagePace < 20) {
+                        float paceInMps = averagePace / 3.6f;
 
-                    // My weight and height for testing: 70kg, 1.7m tall
-                    // formula = 0.035 * weight[kg] + (pace^2 / height[m]) * 0.29 * weight[kg]
-                    // formula is for per minute so needs to multiply by fraction of minute elapsed since last update
+                        // My weight and height for testing: 70kg, 1.7m tall
+                        // formula = 0.035 * weight[kg] + (pace^2 / height[m]) * 0.29 * weight[kg]
+                        // formula is for per minute so needs to multiply by fraction of minute elapsed since last update
 
-                    burnedCalories += ((0.035 * 70) + ((paceInMs * paceInMs) / 1.7f) * 0.029 * 70) * (elapsedTime / 60);
-                    caloriesText.setText(String.valueOf(roundCal.format(burnedCalories)));
+                        burnedCalories += ((0.035 * 70) + ((paceInMps * paceInMps) / 1.7f) * 0.029 * 70) * (elapsedTime / 60);
+                        caloriesText.setText(String.valueOf(roundCal.format(burnedCalories)));
+                    } else {
+                        Toast.makeText(getContext(), "Too fast - calories will not be counted.", Toast.LENGTH_LONG).show();
+                    }
                 }
-
             }
 
             @Override
