@@ -32,6 +32,11 @@ public class LeaderboardsFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     ArrayList<LeaderboardsData> users = new ArrayList<>();
 
+    public static LeaderboardsFragment newInstance(){
+        LeaderboardsFragment leaderboardsFragment = new LeaderboardsFragment();
+        return leaderboardsFragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,7 +63,7 @@ public class LeaderboardsFragment extends Fragment {
         ListView leaderboardsList = view.findViewById(R.id.leaderboards_list);
         LeaderboardsAdapter leaderboardsAdapter = new LeaderboardsAdapter(this.getContext(), users);
         leaderboardsList.setAdapter(leaderboardsAdapter);
-        11
+
         return view;
     }
 
