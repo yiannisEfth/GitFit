@@ -18,17 +18,21 @@ public class ChallengesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.achievements, container, false);
+    }
 
-        mViewPager = (ViewPager)  inflater.inflate(R.layout.achievements, container, false);
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
 
+        super.onActivityCreated(savedInstanceState);
         mSectionsPageAdapter = new SectionsPageAdapter(getFragmentManager());
+        mViewPager = (ViewPager) getView().findViewById(R.id.container);
         setupViewPager(mViewPager);
 
         TabLayout tabLayout = (TabLayout) getView().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
 
-        return mViewPager;
     }
 
 
