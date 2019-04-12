@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/friend_title_text_view"
         android:layout_centerHorizontal="true"
-        android:text="@string/friends_swipe_instruction_req"
+        android:text="@string/friends_swipe_instruction_list"
         android:textAlignment="center" />
 
     <android.support.v7.widget.RecyclerView
@@ -71,9 +71,9 @@
         android:id="@+id/send_friend_req"
         android:layout_width="380dp"
         android:layout_height="70dp"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/friends_req_recycler_view"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="31dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/friend_req_btn_shape"
         android:text="Add Friend"
         android:textColor="#FFFFFF"

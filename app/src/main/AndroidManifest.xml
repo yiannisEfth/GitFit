@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com2027.killaz.kalorie.gitfit">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -14,8 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainMenu"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".MainMenu"
+            android:screenOrientation="portrait" />
         <activity android:name=".RegisterActivity" />
         <activity
             android:name=".LoginActivity"
@@ -30,11 +33,24 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAj7f0IUHE5GkJf5bn2JK95p1fzNIXDGG8" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <service
             android:name=".FirestoreService"
             android:enabled="true"
             android:exported="true" />
 
+        <receiver android:name=".NotificationAlarmReceiver">
+            <intent-filter>
+                <action android:name="com2027.killaz.kalorie.gitfit.NOTIFICATION"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

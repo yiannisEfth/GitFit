@@ -11,6 +11,7 @@
     <item android:id="@+id/menu_bmicalc" android:title="BMI Calculator" />
     <item android:id="@+id/menu_leaderboards" android:title="Leaderboards" />
     <item android:id="@+id/menu_settings" android:title="User Settings" />
+    <item android:id="@+id/menu_logout" android:title="Log Out" />
 
 </group>
 

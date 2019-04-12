@@ -3,7 +3,6 @@ package com2027.killaz.kalorie.gitfit;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -12,8 +11,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,11 +22,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -62,9 +56,13 @@ public class FirestoreService extends Service implements SensorEventListener {
     private String friendChallenger;
     private AlarmManager alarmManager;
     private PendingIntent alarmIntentDaily;
-    private PendingIntent alarmIntentWeekly;
     private DatabaseHelper dbHelper;
+
     private Calendar calendar;
+
+    private static final int DAILY_RESET = 0;
+    private static final int WEEKLY_NOTIFY = 1;
+    private static final String RESET_ACTION = "com2027.killaz.kalorie.gitfit.DAILY_RESET";
 
     /**
      * Fetch the current user and their tracked variables.
@@ -95,7 +93,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         }
 
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
-        Log.i("SERVICE STARTED - USER:", currentUser.getDisplayName());
+        Log.i("SERVICE STARTED - USER", currentUser.getDisplayName());
 
         // Get today's date.
         calendar = Calendar.getInstance();
@@ -104,83 +102,43 @@ public class FirestoreService extends Service implements SensorEventListener {
         // Get saved steps so far today from local database.
         try {
             stepsToday = dbHelper.getSteps(currentUser.getDisplayName(), calendar.getTime());
-        }
-        catch (Exception e) {
+            stepIntent.putExtra("steps", stepsToday);
+        } catch (Exception e) {
             stepsToday = 0;
             e.printStackTrace();
         }
         Log.i("STEPS_TODAY_INIT", String.valueOf(stepsToday));
 
-
         /**
          * Sets up the alarm manager that triggers the data base to update daily and send
          * Notifications weekly
          */
-        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent innerIntentDaily = new Intent(context, AlarmReceiverDaily.class);
-        alarmIntentDaily = PendingIntent.getBroadcast(context, 0, innerIntentDaily, 0);
 
-        Intent innerIntentWeekly = new Intent(context, AlarmReceiverWeekly.class);
-        alarmIntentWeekly = PendingIntent.getBroadcast(context, 0, innerIntentWeekly, 0);
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         // Daily at midnight
         calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+
+        Intent dailyIntent = new Intent(RESET_ACTION);
+        alarmIntentDaily = PendingIntent.getBroadcast(context, DAILY_RESET, dailyIntent, 0);
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, alarmIntentDaily);
 
-        // Weekly at 4pm on an unspecified day
-        calendar.set(Calendar.HOUR_OF_DAY, 16);
+        // Weekly on an unspecified day at noon
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
         calendar.set(Calendar.MINUTE, 0);
 
+        Intent notifyIntent = new Intent(this, NotificationAlarmReceiver.class);
+        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, WEEKLY_NOTIFY, notifyIntent, 0);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY / 72, alarmIntentWeekly); // Roughly every 15 minutes just for testing
+                AlarmManager.INTERVAL_DAY * 7, notifyPendingIntent);
 
         return START_NOT_STICKY;
-    }
-
-    /**
-     * Triggers the on receive method  at midnight (See above).
-     */
-    private class AlarmReceiverDaily extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(System.currentTimeMillis());
-
-            // Initialise new daily step record.
-            dbHelper.newRecord(currentUser.getDisplayName(), cal.getTime(), 0);
-
-            // Save steps from yesterday into database.
-            cal.add(Calendar.DATE, -1);
-            dbHelper.updateRecordSteps(currentUser.getDisplayName(), cal.getTime(), stepsToday);
-
-            // Reset variable.
-            stepsToday = 0;
-        }
-    }
-
-    /**
-     * Triggers the on receive method  at midnight each week.
-     */
-    private class AlarmReceiverWeekly extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "GITFIT_NOTIFICATION");
-            builder.setSmallIcon(R.drawable.login_logo);
-            builder.setContentText("Test Notification! You're doing great!");
-            builder.setContentTitle(getResources().getString(R.string.app_name));
-            builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-            notificationManager.notify(123, builder.build());
-        }
     }
 
     /**
@@ -191,8 +149,7 @@ public class FirestoreService extends Service implements SensorEventListener {
         // Stop tracking steps
         try {
             sensorManager.unregisterListener(this);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -224,7 +181,7 @@ public class FirestoreService extends Service implements SensorEventListener {
             getNewChallenge(newChallenge);
         }
 
-        if (friendChallengeReference != null && remainingFriendChallenge!=0) {
+        if (friendChallengeReference != null && remainingFriendChallenge != 0) {
             friend_challenge_map.put("remaining", remainingFriendChallenge);
             data.put("current_challenge_friend", friend_challenge_map);
             stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
@@ -241,7 +198,7 @@ public class FirestoreService extends Service implements SensorEventListener {
             //TODO Friend challenge finished...let user know. Front end stuff.
         }
         self_challenge_map.put("remaining", remainingMyChallenge);
-        points = (int) (stepCounter * 0.65 + 300 + (completedChallenges*1.35));
+        points = (int) (stepCounter * 0.65 + 300 + (completedChallenges * 1.35));
         stepIntent.putExtra("challenges_completed", completedChallenges);
         stepIntent.putExtra("points", points);
         data.put("points", points);
@@ -280,7 +237,6 @@ public class FirestoreService extends Service implements SensorEventListener {
 
                     stepIntent.putExtra("challenges_completed", completedChallenges);
                     stepIntent.putExtra("points", points);
-                    sendBroadcast(stepIntent);
 
                     fetchUserChallenges();
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
@@ -288,6 +244,7 @@ public class FirestoreService extends Service implements SensorEventListener {
                         remainingFriendChallenge = ((Long) friend_challenge.get("remaining")).intValue();
                         friendChallenger = friend_challenge.get("user_ref").toString();
                     }
+                    sendBroadcast(stepIntent);
                 }
             }
         });
@@ -310,7 +267,6 @@ public class FirestoreService extends Service implements SensorEventListener {
                         stepIntent.putExtra("steps", stepsToday);
                         stepIntent.putExtra("remaining", remainingMyChallenge);
                         stepIntent.putExtra("challengeTotal", totalMyChallenge);
-                        sendBroadcast(stepIntent);
                     }
                 }
             });
@@ -329,8 +285,6 @@ public class FirestoreService extends Service implements SensorEventListener {
                         stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
                         stepIntent.putExtra("friend_challenge_total", totalFriendChallenge);
                         stepIntent.putExtra("friend_challenger", friendChallenger);
-                        sendBroadcast(stepIntent);
-
                     }
                 }
             });
@@ -347,16 +301,23 @@ public class FirestoreService extends Service implements SensorEventListener {
         newChallenge.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot documentSnapshot = task.getResult();
-                myChallengeType = documentSnapshot.getString("type");
-                totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
-                remainingMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
-                self_challenge_map.put("challenge_ref", newChallenge);
-                self_challenge_map.put("remaining", totalMyChallenge);
-                data.put("current_challenge_self", self_challenge_map);
-                db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
-                stepIntent.putExtra("challengeTotal", totalMyChallenge);
-                sendBroadcast(stepIntent);
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+
+                    myChallengeType = documentSnapshot.getString("type");
+                    totalMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
+                    remainingMyChallenge = documentSnapshot.getLong(myChallengeType).intValue();
+
+                    self_challenge_map.put("challenge_ref", newChallenge);
+                    self_challenge_map.put("remaining", totalMyChallenge);
+
+                    data.put("current_challenge_self", self_challenge_map);
+                    db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
+
+                    stepIntent.putExtra("challengeTotal", totalMyChallenge);
+                    stepIntent.putExtra("remaining", remainingMyChallenge);
+                    sendBroadcast(stepIntent);
+                }
             }
         });
     }

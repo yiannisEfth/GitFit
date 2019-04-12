@@ -46,7 +46,6 @@ public class FriendsFragment extends Fragment {
     private List<String> friendsList;
     private List<String> userList;
     private Button friendReqBtn;
-    private String friendToAdd;
 
     @Nullable
     @Override
@@ -117,7 +116,7 @@ public class FriendsFragment extends Fragment {
             @Override
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                if (direction == ItemTouchHelper.LEFT) {
+                if (direction == ItemTouchHelper.RIGHT) {
                     db.collection("Users").document(friendReqsList.get(position)).update("friends", FieldValue.arrayUnion(currentUser.getDisplayName()));
                     userRef.update("friends", FieldValue.arrayUnion(friendReqsList.get(position)));
                     userRef.update("friend_requests", FieldValue.arrayRemove(friendReqsList.get(position)));
@@ -125,7 +124,7 @@ public class FriendsFragment extends Fragment {
                     friendReqsAdapter.notifyItemRemoved(position);
                     friendReqsAdapter.notifyItemRangeChanged(position, friendReqsAdapter.getItemCount());
                     Toast.makeText(getContext(), "Friend Request Accepted", Toast.LENGTH_SHORT).show();
-                } else if (direction == ItemTouchHelper.RIGHT) {
+                } else if (direction == ItemTouchHelper.LEFT) {
                     userRef.update("friends", FieldValue.arrayUnion(friendReqsList.get(position)));
                     userRef.update("friend_requests", FieldValue.arrayRemove(friendReqsList.get(position)));
                     friendReqsList.remove(position);

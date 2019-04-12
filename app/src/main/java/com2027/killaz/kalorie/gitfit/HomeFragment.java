@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -24,19 +26,24 @@ import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -45,13 +52,16 @@ public class HomeFragment extends Fragment {
     private TextView challengeStepsText;
     private TextView challengeDesc;
     private ProgressBar challengeBar;
-    private StepBroadcastReceiver br;
+    private StepBroadcastReceiver stepBroadcastReceiver;
     private DatabaseHelper dbHelper;
     private String username;
     private int steps;
     private FirebaseAuth mAuth;
     private BarChart chart;
     private boolean viewingToday = true;
+    private DailyAlarmReceiver alarmReceiver;
+    int challengeTotal;
+    int challengeRemaining;
 
     @Nullable
     @Override
@@ -59,24 +69,48 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.home_fragment, container, false);
     }
 
+    // Fetch stuff to update UI if returning from other fragment.
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        steps = dbHelper.getSteps(username, Calendar.getInstance().getTime());
+        stepText.setText(String.valueOf(steps));
+
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        challengeTotal = sharedPref.getInt(username + "total", 0);
+        challengeRemaining = sharedPref.getInt(username + "remaining", 0);
+        int soFar = challengeTotal - challengeRemaining;
+
+        if (challengeTotal > 0 && challengeRemaining < challengeTotal) {
+            challengeDesc.setText(getResources().getString(R.string.challenge_desc, challengeTotal));
+            challengeStepsText.setText(getResources().getString(R.string.your_progress, soFar, challengeTotal));
+            int progress = (int) ((soFar * 100.0f) / challengeTotal);
+
+            ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, 0, progress);
+            animate.setDuration(1000);
+            challengeBar.startAnimation(animate);
+        }
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        setRetainInstance(true);
         final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
         final Button thisWeekBtn = (Button) getView().findViewById(R.id.homeBtn2);
         final Button thisMonthBtn = (Button) getView().findViewById(R.id.homeBtn3);
+        todayBtn.setBackgroundResource(R.drawable.home_btn_pressed);
+
         stepText = (TextView) getView().findViewById(R.id.stepTextView);
         timeText = (TextView) getView().findViewById(R.id.timeTextView);
         challengeBar = (ProgressBar) getView().findViewById(R.id.challenge_bar);
         challengeStepsText = (TextView) getView().findViewById(R.id.challengeStepsText);
         challengeDesc = (TextView) getView().findViewById(R.id.challenge_desc);
-        mAuth = FirebaseAuth.getInstance();
-        br = new StepBroadcastReceiver();
-        dbHelper = DatabaseHelper.getInstance(getContext());
-        todayBtn.setBackgroundColor(0xBBB2FF59);
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
+        dbHelper = DatabaseHelper.getInstance(getContext());
+
+        stepBroadcastReceiver = new StepBroadcastReceiver();
+        alarmReceiver = new DailyAlarmReceiver();
 
         graphInit();
         drawGraph();
@@ -95,9 +129,9 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 stepText.setText(String.valueOf(steps));
                 timeText.setText(R.string.button_1);
-                todayBtn.setBackgroundColor(0xBBB2FF59);
-                thisWeekBtn.setBackgroundResource(android.R.drawable.btn_default);
-                thisMonthBtn.setBackgroundResource(android.R.drawable.btn_default);
+                todayBtn.setBackgroundResource(R.drawable.home_btn_pressed);
+                thisWeekBtn.setBackgroundResource(R.drawable.home_btn_default);
+                thisMonthBtn.setBackgroundResource(R.drawable.home_btn_default);
                 viewingToday = true;
             }
         });
@@ -123,9 +157,9 @@ public class HomeFragment extends Fragment {
                 stepText.setText(String.valueOf(total));
                 timeText.setText(R.string.button_2);
 
-                thisWeekBtn.setBackgroundColor(0xBBB2FF59);
-                todayBtn.setBackgroundResource(android.R.drawable.btn_default);
-                thisMonthBtn.setBackgroundResource(android.R.drawable.btn_default);
+                thisWeekBtn.setBackgroundResource(R.drawable.home_btn_pressed);
+                todayBtn.setBackgroundResource(R.drawable.home_btn_default);
+                thisMonthBtn.setBackgroundResource(R.drawable.home_btn_default);
                 viewingToday = false;
             }
         });
@@ -156,9 +190,9 @@ public class HomeFragment extends Fragment {
                 stepText.setText(String.valueOf(total));
                 timeText.setText(R.string.button_3);
 
-                thisMonthBtn.setBackgroundColor(0xBBB2FF59);
-                todayBtn.setBackgroundResource(android.R.drawable.btn_default);
-                thisWeekBtn.setBackgroundResource(android.R.drawable.btn_default);
+                thisMonthBtn.setBackgroundResource(R.drawable.home_btn_pressed);
+                todayBtn.setBackgroundResource(R.drawable.home_btn_default);
+                thisWeekBtn.setBackgroundResource(R.drawable.home_btn_default);
                 viewingToday = false;
             }
         });
@@ -186,6 +220,8 @@ public class HomeFragment extends Fragment {
                 stepText.setText(String.valueOf(Integer.parseInt(stepText.getText().toString()) + 1));
             }
 
+            stepAnim();
+
             Log.d("Total", String.valueOf(total));
             Log.d("Remaining", String.valueOf(remaining));
 
@@ -194,7 +230,6 @@ public class HomeFragment extends Fragment {
                 int stepsSoFar = total - remaining;
                 if (stepsSoFar < 0) {
                     stepsSoFar = 0;
-                    // Just wait for the service to realise a new challenge is needed?
                 }
 
                 challengeDesc.setText(getResources().getString(R.string.challenge_desc, total));
@@ -213,7 +248,9 @@ public class HomeFragment extends Fragment {
 
                 Log.d("CHALLENGE_PROGRESS", String.valueOf(progress));
 
-                challengeBar.setProgress(progress);
+                //challengeBar.setProgress(progress);
+                challengeTotal = total;
+                challengeRemaining = remaining;
             }
         }
     }
@@ -245,6 +282,37 @@ public class HomeFragment extends Fragment {
         chart.setBackgroundColor(0x88FFFFFF);
         chart.setNoDataText("No step data saved, try again later.");
         chart.getDescription().setEnabled(false);
+
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int dayOfWeek = (int) e.getX();
+                Calendar cal = Calendar.getInstance();
+                cal.setFirstDayOfWeek(Calendar.MONDAY);
+                cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+                cal.add(Calendar.DATE, dayOfWeek);
+                Date date = cal.getTime();
+                DateFormat df = new SimpleDateFormat("EEEE, dd MMM yyyy", Locale.getDefault());
+                String dateString = df.format(date);
+
+                // Build the dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(dateString);
+                builder.setMessage("You walked " + dbHelper.getSteps(username, date) + " steps! Keep it up!");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                // Create and show the dialog
+                builder.create().show();
+            }
+
+            @Override
+            public void onNothingSelected() {}
+        });
+
         chart.invalidate();
     }
 
@@ -274,30 +342,70 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Function called when application resumes. Registers StepBroadcastReceiver to update UI.
+     * Triggers the on receive method at midnight.
+     */
+    private class DailyAlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+
+            // Initialise new daily step record.
+            dbHelper.newRecord(username, cal.getTime(), 0);
+
+            // Save steps from yesterday into database.
+            cal.add(Calendar.DATE, -1);
+            dbHelper.updateRecordSteps(username, cal.getTime(), steps);
+
+            // Reset variables.
+            steps = 0;
+            stepText.setText(String.valueOf(0));
+            Toast.makeText(context, "It's midnight! Your daily step count has been reset.", Toast.LENGTH_LONG).show();
+            Log.i("RESET", "COMPLETE");
+        }
+    }
+
+    /**
+     * Function called when fragment resumes.
+     * Registers receivers for steps and alarms.
      */
     @Override
     public void onResume() {
         super.onResume();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
-        getActivity().registerReceiver(br, intentFilter);
-        Log.d("Broadcast Receiver", "Receiver Registered.");
+        getActivity().registerReceiver(stepBroadcastReceiver, intentFilter);
+        Log.d("StepBroadcastReceiver", "Receiver Registered.");
 
-        // Fragment resumes - need to retrieve steps again.
-        // TODO get data from firebase
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("com2027.killaz.kalorie.gitfit.DAILY_RESET");
+        getActivity().registerReceiver(alarmReceiver, intentFilter);
+        Log.d("DailyAlarmReceiver", "Receiver Registered.");
     }
 
+    /**
+     * Triggers when the fragment stops being visible.
+     */
     @Override
     public void onStop() {
         super.onStop();
-        getActivity().unregisterReceiver(br);
-        Log.d("Broadcast Receiver", "Receiver Unregistered.");
+        getActivity().unregisterReceiver(stepBroadcastReceiver);
+        Log.d("StepBroadcastReceiver", "Receiver Unregistered.");
 
+        getActivity().unregisterReceiver(alarmReceiver);
+        Log.d("AlarmReceiver", "Receiver Unregistered.");
+
+        // Store users steps so far today in database
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        // Store users steps so far today in database
         dbHelper.updateRecordSteps(username, calendar.getTime(), steps);
+
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(username + "total", challengeTotal);
+        editor.putInt(username + "remaining", challengeRemaining);
+        editor.apply();
     }
 
     // A method to manually insert steps into the database
@@ -330,6 +438,35 @@ public class HomeFragment extends Fragment {
 
         // Create and show the dialog
         builder.create().show();
+    }
+
+    public void stepAnim() {
+        float pivotX = stepText.getMeasuredWidth() / 2f;
+        float pivotY = stepText.getMeasuredHeight() / 2f;
+        final ScaleAnimation growAnim = new ScaleAnimation(1.0f, 1.15f, 1.0f, 1.15f, pivotX, pivotY);
+        final ScaleAnimation shrinkAnim = new ScaleAnimation(1.15f, 1.0f, 1.15f, 1.0f, pivotX, pivotY);
+
+        growAnim.setDuration(225);
+        shrinkAnim.setDuration(225);
+
+        stepText.setAnimation(growAnim);
+        growAnim.start();
+
+        growAnim.setAnimationListener(new Animation.AnimationListener()
+        {
+            @Override
+            public void onAnimationStart(Animation animation){}
+
+            @Override
+            public void onAnimationRepeat(Animation animation){}
+
+            @Override
+            public void onAnimationEnd(Animation animation)
+            {
+                stepText.setAnimation(shrinkAnim);
+                shrinkAnim.start();
+            }
+        });
     }
 
 }
