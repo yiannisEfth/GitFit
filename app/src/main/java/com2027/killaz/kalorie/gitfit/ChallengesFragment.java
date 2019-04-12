@@ -38,7 +38,7 @@ public class ChallengesFragment extends Fragment {
 
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getFragmentManager());
-        adapter.addFragment(new Tab1Fragment(), "Daily");
+        adapter.addFragment(new Tab1Fragment(), "Personal");
         adapter.addFragment(new Tab2Fragment(), "Friends");
         adapter.addFragment(new Tab3Fragment(), "Challenge");
         viewPager.setAdapter(adapter);

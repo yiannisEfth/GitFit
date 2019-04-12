@@ -1,54 +1,112 @@
 package com2027.killaz.kalorie.gitfit;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
-/**
- * Created by User on 2/28/2017.
- */
+import java.util.Map;
 
 public class Tab1Fragment extends Fragment {
     View v;
-    private RecyclerView myrecyclerview;
-    private List<Tab1> lstTab1;
-    public Tab1Fragment(){
-
-    }
+    private ProgressBar challengeBar;
+    private int challengeTotal;
+    private int challengeRemaining;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser currentUser;
+    private DocumentReference userRef;
+    private TextView infoText, progressBarTxt;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        v = inflater.inflate(R.layout.tab1_head,container,false);
-        myrecyclerview = v.findViewById(R.id.tab1_recycler_view);
-        RVA_Tab1 recyclerAdapter = new RVA_Tab1(getContext(),lstTab1);
-        myrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
-        myrecyclerview.setAdapter(recyclerAdapter);
+        v = inflater.inflate(R.layout.tab1_head, container, false);
         return v;
 
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        challengeBar = (ProgressBar) getView().findViewById(R.id.challenges_persona_progress_bar);
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        userRef = db.collection("Users").document(currentUser.getDisplayName());
+        infoText = getView().findViewById(R.id.challenges_personal_challenge_info);
+        progressBarTxt = getView().findViewById(R.id.challenges_personal_fetching_view);
+        fetchUserChallenge();
+    }
 
-        lstTab1 = new ArrayList<>();
-        lstTab1.add(new Tab1( "Run 5km from the swamp monster"));
-        lstTab1.add(new Tab1( "Lay 5 traps on different stop points"));
-        lstTab1.add(new Tab1( "Unmask 3 villains"));
-        lstTab1.add(new Tab1("Kick ass for 10 minutes straight"));
-        lstTab1.add(new Tab1("Find 1 hidden Scooby-Snacks box"));
+    private void fetchUserChallenge() {
+        userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (documentSnapshot != null) {
+                    Map<String, Object> challenge_self = (Map<String, Object>) documentSnapshot.get("current_challenge_self");
+                    challengeRemaining = Integer.parseInt(challenge_self.get("remaining").toString());
+                    DocumentReference challengeRef = (DocumentReference) challenge_self.get("challenge_ref");
+                    fetchChallengeName(challengeRef);
+                }
+            }
+        });
+    }
 
+    private void fetchChallengeName(DocumentReference theChallenge) {
+        theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                             @Override
+                                             public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                                                 String challenge_type = documentSnapshot.getString("type");
+                                                 if (challenge_type.equals("distance")) {
+                                                     challengeTotal = documentSnapshot.getLong("distance").intValue();
+                                                     infoText.setText("Travel a distance of " + challengeTotal + " metres!");
+                                                 } else {
+                                                     challengeTotal = documentSnapshot.getLong("steps").intValue();
+                                                     infoText.setText("Travel a distance of " + challengeTotal + " steps!");
+                                                 }
+                                             }
+                                         }
+        );
+//        db.collection(theChallenge).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                for (DocumentSnapshot documentSnapshot : task.getResult()) {
+//                    String challenge_type = documentSnapshot.getString("type");
+//                    if (challenge_type.equals("distance")) {
+//                        challengeTotal = documentSnapshot.getLong("distance").intValue();
+//                        infoText.setText("Travel a distance of " + challengeTotal + " metres!");
+//                    } else {
+//                        challengeTotal = documentSnapshot.getLong("steps").intValue();
+//                        infoText.setText("Travel a distance of " + challengeTotal + " steps!");
+//                    }
+//                }
+//            }
+//        });
+        updateProgressBar();
+    }
+
+    private void updateProgressBar() {
+        int soFar = challengeTotal - challengeRemaining;
+        if (challengeTotal > 0 && challengeRemaining < challengeTotal) {
+            progressBarTxt.setText(getResources().getString(R.string.your_progress, soFar, challengeTotal));
+            int progress = (int) ((soFar * 100.0f) / challengeTotal);
+            ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, 0, progress);
+            animate.setDuration(1000);
+            challengeBar.startAnimation(animate);
+        }
     }
 }
 

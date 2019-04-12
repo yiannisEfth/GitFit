@@ -1,17 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/tab1_recycler_view"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="10.0sp">
+    <TextView
+        android:id="@+id/challenges_personal_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Your Current Personal Challenge Is"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <ProgressBar
+        android:id="@+id/challenges_persona_progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="314dp"
+        android:layout_height="27dp"
+        android:layout_marginBottom="278dp"
+        android:progressDrawable="@drawable/progress_bar_gradient"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    </android.support.v7.widget.RecyclerView>
+    <TextView
+        android:id="@+id/challenges_personal_progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="19dp"
+        android:text="Challenge Progress"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/challenges_persona_progress_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/challenges_personal_fetching_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fetching Challenge Progress..."
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/challenges_persona_progress_bar" />
+
+    <TextView
+        android:id="@+id/challenges_personal_challenge_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="37dp"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/challenges_personal_textview" />
+</android.support.constraint.ConstraintLayout>
