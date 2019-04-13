@@ -41,7 +41,8 @@ public class Tab1Fragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         challengeBar = (ProgressBar) getView().findViewById(R.id.challenges_persona_progress_bar);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -49,6 +50,11 @@ public class Tab1Fragment extends Fragment {
         infoText = getView().findViewById(R.id.challenges_personal_challenge_info);
         progressBarTxt = getView().findViewById(R.id.challenges_personal_fetching_view);
         fetchUserChallenge();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
     }
 
     private void fetchUserChallenge() {
@@ -60,6 +66,7 @@ public class Tab1Fragment extends Fragment {
                     challengeRemaining = Integer.parseInt(challenge_self.get("remaining").toString());
                     DocumentReference challengeRef = (DocumentReference) challenge_self.get("challenge_ref");
                     fetchChallengeName(challengeRef);
+                    updateProgressBar();
                 }
             }
         });
@@ -80,22 +87,6 @@ public class Tab1Fragment extends Fragment {
                                              }
                                          }
         );
-//        db.collection(theChallenge).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                for (DocumentSnapshot documentSnapshot : task.getResult()) {
-//                    String challenge_type = documentSnapshot.getString("type");
-//                    if (challenge_type.equals("distance")) {
-//                        challengeTotal = documentSnapshot.getLong("distance").intValue();
-//                        infoText.setText("Travel a distance of " + challengeTotal + " metres!");
-//                    } else {
-//                        challengeTotal = documentSnapshot.getLong("steps").intValue();
-//                        infoText.setText("Travel a distance of " + challengeTotal + " steps!");
-//                    }
-//                }
-//            }
-//        });
-        updateProgressBar();
     }
 
     private void updateProgressBar() {
