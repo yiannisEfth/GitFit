@@ -1,90 +1,75 @@
 package com2027.killaz.kalorie.gitfit;
 
 import android.content.Context;
-import android.database.DataSetObserver;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
-class LeaderboardsAdapter implements ListAdapter {
+public class LeaderboardsAdapter extends ArrayAdapter<LeaderboardsUser> {
 
-    ArrayList<LeaderboardsData> arrayList;
-    Context context;
-    public LeaderboardsAdapter(Context context, ArrayList<LeaderboardsData> arrayList) {
-        this.arrayList = arrayList;
-        this.context = context;
-    }
+    private ArrayList<LeaderboardsUser> userList;
+    private Context mContext;
 
-    @Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }
-    @Override
-    public boolean isEnabled(int position) {
-        return true;
-    }
-    @Override
-    public void registerDataSetObserver(DataSetObserver observer) {
-    }
-    @Override
-    public void unregisterDataSetObserver(DataSetObserver observer) {
-    }
-    @Override
-    public int getCount() {
-        return arrayList.size();
-    }
-    @Override
-    public Object getItem(int position) {
-        return position;
-    }
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-    @Override
-    public boolean hasStableIds() {
-        return false;
+    private static class ViewHolder {
+        TextView userRank;
+        TextView userName;
+        TextView userPoints;
+        TextView userCalories;
+        TextView userChallenges;
+        TextView userDistance;
     }
 
+    public LeaderboardsAdapter(ArrayList<LeaderboardsUser> userList, Context context) {
+        super(context, R.layout.leaderboards_row_item, userList);
+        this.userList = userList;
+        this.mContext = context;
+    }
+
+    @NonNull
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        LeaderboardsData leaderboardsData = arrayList.get(i);
-        if(view == null) {
-            LayoutInflater layoutInflater = LayoutInflater.from(context);
-            view=layoutInflater.inflate(R.layout.leaderboards_list_layout, null);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                }
-            });
-            TextView leaderboardsRank = view.findViewById(R.id.leaderboards_ranking);
-            TextView leaderboardsName = view.findViewById(R.id.leaderboards_name);
-            TextView leaderboardsPoints = view.findViewById(R.id.leaderboards_points);
-            leaderboardsName.setText(leaderboardsData.leaderboardsName);
-            leaderboardsPoints.setText(leaderboardsData.leaderboardsPoints);
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
+        // Get the data item for this position
+        LeaderboardsUser aUser = getItem(position);
+
+        // Check if an existing view is being reused, otherwise inflate the view
+        ViewHolder viewHolder;// view lookup cache stored in tag
+
+        final View result;
+
+        if (convertView == null) {
+            viewHolder = new ViewHolder();
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            convertView = inflater.inflate(R.layout.leaderboards_row_item, parent, false);
+
+            viewHolder.userRank = (TextView) convertView.findViewById(R.id.leaderboards_rank);
+            viewHolder.userName = (TextView) convertView.findViewById(R.id.leaderboards_name);
+            viewHolder.userCalories = (TextView) convertView.findViewById(R.id.leaderboards_calories);
+            viewHolder.userChallenges = (TextView) convertView.findViewById(R.id.leaderboards_challenges);
+            viewHolder.userDistance = (TextView) convertView.findViewById(R.id.leaderboards_distance);
+            viewHolder.userPoints = (TextView) convertView.findViewById(R.id.leaderboards_points);
+
+            result = convertView;
+
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+            result = convertView;
         }
-        return view;
-    }
 
-    @Override
-    public int getItemViewType(int i) {
-        return i;
-    }
+        viewHolder.userRank.setText(String.valueOf(position+1));
+        viewHolder.userName.setText(aUser.getName());
+        viewHolder.userCalories.setText(String.valueOf(aUser.getCaloriesBurned()));
+        viewHolder.userChallenges.setText(String.valueOf(aUser.getChallengesCompleted()));
+        viewHolder.userDistance.setText(String.valueOf(aUser.getDistanceTraveled()));
+        viewHolder.userPoints.setText(String.valueOf(aUser.getPoints()));
 
-    @Override
-    public int getViewTypeCount() {
-        return 1;
+        return result;
     }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
 }
