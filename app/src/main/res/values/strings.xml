@@ -28,4 +28,7 @@
     <string name="friends_swipe_instruction_req"><![CDATA[Swipe <- left to accept | Swipe right -> to delete]]></string>
     <string name="enter_steps">Enter Steps</string>
     <string name="your_progress">Your progress: %1$d / %2$d</string>
+    <string name="leaderboards_name">Name</string>
+    <string name="leaderboards_score">Score</string>
+    <string name="leaderboards_rank">Rank</string>
 </resources>

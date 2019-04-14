@@ -55,7 +55,7 @@ public class LeaderboardsFragment extends Fragment {
                         String user_name = doc.getDocument().getId();
                         String user_points = doc.getDocument().get("points").toString();
                         user.setLeaderboardsName(user_name);
-                        user.setLeaderboardsPoints(user_points);
+                        user.setLeaderboardsScore(user_points);
                     }
                 }
             }
@@ -66,7 +66,6 @@ public class LeaderboardsFragment extends Fragment {
 
         return view;
     }
-
 
 
 }

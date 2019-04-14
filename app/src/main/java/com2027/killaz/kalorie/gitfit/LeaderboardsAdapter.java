@@ -2,6 +2,8 @@ package com2027.killaz.kalorie.gitfit;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,17 +59,18 @@ class LeaderboardsAdapter implements ListAdapter {
         LeaderboardsData leaderboardsData = arrayList.get(i);
         if(view == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(context);
-            view=layoutInflater.inflate(R.layout.leaderboards_list_layout, null);
+            view=layoutInflater.inflate(R.layout.leaderboards_fragment, null);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                 }
             });
-            TextView leaderboardsRank = view.findViewById(R.id.leaderboards_ranking);
-            TextView leaderboardsName = view.findViewById(R.id.leaderboards_name);
-            TextView leaderboardsPoints = view.findViewById(R.id.leaderboards_points);
+            TextView leaderboardsRank = view.findViewById(R.id.txt_rank);
+            TextView leaderboardsName = view.findViewById(R.id.txt_name);
+            TextView leaderboardsScore = view.findViewById(R.id.txt_score);
             leaderboardsName.setText(leaderboardsData.leaderboardsName);
-            leaderboardsPoints.setText(leaderboardsData.leaderboardsPoints);
+            leaderboardsScore.setText(leaderboardsData.leaderboardsScore);
+            leaderboardsRank.setText(leaderboardsData.leaderboardsRank);
         }
         return view;
     }
