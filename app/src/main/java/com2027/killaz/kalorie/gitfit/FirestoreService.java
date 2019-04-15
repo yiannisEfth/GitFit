@@ -194,8 +194,6 @@ public class FirestoreService extends Service implements SensorEventListener {
             data.put("current_challenge_friend", friend_challenge_map);
             data.put("challenges_completed", completedChallenges);
             friendChallengeReference = null;
-
-            //TODO Friend challenge finished...let user know. Front end stuff.
         }
         self_challenge_map.put("remaining", remainingMyChallenge);
         points = (int) (stepCounter * 0.65 + 300 + (completedChallenges * 1.35));

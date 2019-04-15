@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bluewall"
+    tools:context=".ChallengesFragment">
+
+
+    <TextView
+        android:id="@+id/challenges_friends_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="161dp"
+        android:text="@string/challenges_friend_underline"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <ProgressBar
+        android:id="@+id/challenges_friend_progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="314dp"
+        android:layout_height="27dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="247dp"
+        android:progressDrawable="@drawable/progress_bar_gradient" />
+
+    <TextView
+        android:id="@+id/challenges_friend_fetching_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/challenges_friend_progress_bar"
+        android:layout_centerHorizontal="true"
+        android:text="Fetching Challenge Progress..."
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/challenges_friend_challenge_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="195dp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/challenges_personal_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="47dp"
+        android:text="@string/challenges_personal_underline"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <ProgressBar
+        android:id="@+id/challenges_persona_progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="314dp"
+        android:layout_height="27dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="113dp"
+        android:progressDrawable="@drawable/progress_bar_gradient" />
+
+    <TextView
+        android:id="@+id/challenges_personal_progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/challenges_personal_challenge_info"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-37dp"
+        android:text="Challenges Progress"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/challenges_personal_fetching_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/challenges_persona_progress_bar"
+        android:layout_centerHorizontal="true"
+        android:text="Fetching Challenge Progress..."
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/challenges_personal_challenge_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="81dp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <ListView
+        android:id="@+id/challenge_reqs_list"
+        android:layout_width="match_parent"
+        android:layout_height="213dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/challenges_challenge_btn"
+        android:layout_width="227dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="258dp"
+        android:background="@drawable/leaderboards_btn_shape"
+        android:text="Challenge A Friend" />
+
+    <TextView
+        android:id="@+id/ignore_challenges_list_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="226dp"
+        android:text="@string/challenges_reqs_from_friends"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/challenges_ohnoes"
+        android:layout_width="253dp"
+        android:layout_height="169dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Oh no! You don't have any challenge requests from friends :( If you do get some, they will be displayed here"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:visibility="gone" />
+</RelativeLayout>
