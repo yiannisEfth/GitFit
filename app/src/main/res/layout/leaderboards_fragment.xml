@@ -5,35 +5,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/holo_blue_dark">
 
-    <Button
-        android:id="@+id/leaderboards_button_distance"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/ignore_leaderboards_sort"
-        android:layout_marginEnd="14dp"
-        android:text="Distance"
-        android:textAlignment="center" />
-
-    <Button
-        android:id="@+id/leaderboards_button_challenges"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_below="@+id/ignore_leaderboards_sort"
-        android:layout_toStartOf="@+id/leaderboards_button_distance"
-        android:text="Challenges"
-        android:textAlignment="center" />
-
-    <Button
-        android:id="@+id/leaderboards_button_points"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/ignore_leaderboards_sort"
-        android:layout_marginStart="14dp"
-        android:text="Points"
-        android:textAlignment="center" />
-
     <TextView
         android:id="@+id/ignore_leaderboards_title"
         android:layout_width="wrap_content"
@@ -60,24 +31,15 @@
         app:srcCompat="@drawable/on_board_act_pic3" />
 
     <TextView
-        android:id="@+id/ignore_leaderboards_sort"
+        android:id="@+id/leaderboards_sorted_rank"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/leaderboards_trophy"
         android:layout_centerHorizontal="true"
-        android:text="Sort By:"
+        android:text="You rank at 47 for calories burned"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
-
-    <Button
-        android:id="@+id/leaderboards_button_calories"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_below="@+id/ignore_leaderboards_sort"
-        android:layout_toEndOf="@+id/leaderboards_button_points"
-        android:text="Calories"
-        android:textAlignment="center" />
 
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -156,6 +118,26 @@
 
 
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/leaderboards_sorting_button"
+        android:layout_width="154dp"
+        android:layout_height="36dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/leaderboards_sorted_rank"
+        android:layout_marginStart="49dp"
+        android:background="@drawable/leaderboards_btn_shape"
+        android:text="Choose Sorting" />
+
+    <Button
+        android:id="@+id/leaderboards_btn_gotome"
+        android:layout_width="154dp"
+        android:layout_height="36dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/leaderboards_sorting_button"
+        android:layout_marginEnd="46dp"
+        android:background="@drawable/leaderboards_btn_shape"
+        android:text="Scroll to My Rank" />
 
 
 </RelativeLayout>

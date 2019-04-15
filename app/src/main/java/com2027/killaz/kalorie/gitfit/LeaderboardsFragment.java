@@ -1,16 +1,22 @@
 package com2027.killaz.kalorie.gitfit;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -28,10 +34,14 @@ public class LeaderboardsFragment extends Fragment {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersCollection;
     private ListView leaderboardsList;
-    private Button byPointsBtn, byCaloriesBtn, byDistanceBtn, byChallengesBtn;
+    private Button sortingBtn, goToMeBtn;
+    private FirebaseUser currentUser;
     private ArrayList<LeaderboardsUser> usersList;
     private static LeaderboardsAdapter listAdapter;
     private ListenerRegistration pointsListener, caloriesListener, distanceListener, challengesListener;
+    private TextView personalSortInfo;
+    private String userName;
+    private int userPosition;
 
     @Nullable
     @Override
@@ -43,15 +53,18 @@ public class LeaderboardsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         usersCollection = db.collection("Users");
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        userName = currentUser.getDisplayName();
 
+        personalSortInfo = (TextView) getView().findViewById(R.id.leaderboards_sorted_rank);
         leaderboardsList = (ListView) getView().findViewById(R.id.leaderboards_list_view);
-        byPointsBtn = (Button) getView().findViewById(R.id.leaderboards_button_points);
-        byCaloriesBtn = (Button) getView().findViewById(R.id.leaderboards_button_calories);
-        byDistanceBtn = (Button) getView().findViewById(R.id.leaderboards_button_distance);
-        byChallengesBtn = (Button) getView().findViewById(R.id.leaderboards_button_challenges);
+        sortingBtn = (Button) getView().findViewById(R.id.leaderboards_sorting_button);
+        goToMeBtn = (Button) getView().findViewById(R.id.leaderboards_btn_gotome);
+
         usersList = new ArrayList<>();
 
-        setupButtonListeners();
+        setupButtons();
         fetchByPoints();
     }
 
@@ -64,7 +77,11 @@ public class LeaderboardsFragment extends Fragment {
                     LeaderboardsUser user = new LeaderboardsUser(doc.getId(), doc.getDouble("points").intValue(), doc.getDouble("calories").intValue(),
                             doc.getDouble("challenges_completed").intValue(), doc.getDouble("total_distance_covered").intValue());
                     usersList.add(user);
-                    Log.i("USER LIST LENGTH", String.valueOf(usersList.size()));
+                    if (user.getName().equals(userName)) {
+                        String toSet = "You rank at #" + usersList.size() + " for points collected!";
+                        userPosition = usersList.size();
+                        personalSortInfo.setText(toSet);
+                    }
                 }
                 listAdapter = new LeaderboardsAdapter(usersList, getContext());
                 leaderboardsList.setAdapter(listAdapter);
@@ -82,7 +99,11 @@ public class LeaderboardsFragment extends Fragment {
                     LeaderboardsUser user = new LeaderboardsUser(doc.getId(), doc.getDouble("points").intValue(), doc.getDouble("calories").intValue(),
                             doc.getDouble("challenges_completed").intValue(), doc.getDouble("total_distance_covered").intValue());
                     usersList.add(user);
-                    Log.i("USER LIST LENGTH", String.valueOf(usersList.size()));
+                    if (user.getName().equals(userName)) {
+                        String toSet = "You rank at #" + usersList.size() + " for calories burned!";
+                        userPosition = usersList.size();
+                        personalSortInfo.setText(toSet);
+                    }
                 }
                 listAdapter = new LeaderboardsAdapter(usersList, getContext());
                 leaderboardsList.setAdapter(listAdapter);
@@ -100,7 +121,11 @@ public class LeaderboardsFragment extends Fragment {
                     LeaderboardsUser user = new LeaderboardsUser(doc.getId(), doc.getDouble("points").intValue(), doc.getDouble("calories").intValue(),
                             doc.getDouble("challenges_completed").intValue(), doc.getDouble("total_distance_covered").intValue());
                     usersList.add(user);
-                    Log.i("USER LIST LENGTH", String.valueOf(usersList.size()));
+                    if (user.getName().equals(userName)) {
+                        String toSet = "You rank at #" + usersList.size() + " for steps taken!";
+                        userPosition = usersList.size();
+                        personalSortInfo.setText(toSet);
+                    }
                 }
                 listAdapter = new LeaderboardsAdapter(usersList, getContext());
                 leaderboardsList.setAdapter(listAdapter);
@@ -118,7 +143,11 @@ public class LeaderboardsFragment extends Fragment {
                     LeaderboardsUser user = new LeaderboardsUser(doc.getId(), doc.getDouble("points").intValue(), doc.getDouble("calories").intValue(),
                             doc.getDouble("challenges_completed").intValue(), doc.getDouble("total_distance_covered").intValue());
                     usersList.add(user);
-                    Log.i("USER LIST LENGTH", String.valueOf(usersList.size()));
+                    if (user.getName().equals(userName)) {
+                        String toSet = "You rank at #" + usersList.size() + " for challenges completed!";
+                        userPosition = usersList.size();
+                        personalSortInfo.setText(toSet);
+                    }
                 }
                 listAdapter = new LeaderboardsAdapter(usersList, getContext());
                 leaderboardsList.setAdapter(listAdapter);
@@ -127,80 +156,108 @@ public class LeaderboardsFragment extends Fragment {
         });
     }
 
-    private void setupButtonListeners() {
-        byPointsBtn.setOnClickListener(new View.OnClickListener() {
+    private void setupButtons() {
+        sortingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (distanceListener != null) {
-                    distanceListener.remove();
-                }
-                if (challengesListener != null) {
-                    challengesListener.remove();
-                }
-                if (caloriesListener != null) {
-                    caloriesListener.remove();
-                }
-                fetchByPoints();
+                String[] options = {"By Points", "By Calories Burned", "By Steps Taken", "By Challenges Completed"};
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+                dialog.setTitle("Select Sorting")
+                        .setItems(options, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (i == 0) {
+                                    sortByPoints();
+                                } else if (i == 1) {
+                                    sortByCalories();
+                                } else if (i == 2) {
+                                    sortBySteps();
+                                } else {
+                                    sortByChallenges();
+                                }
+                            }
+                        });
+
+                dialog.create().show();
             }
         });
 
-        byCaloriesBtn.setOnClickListener(new View.OnClickListener() {
+        goToMeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (distanceListener != null) {
-                    distanceListener.remove();
-                    distanceListener = null;
-                }
-                if (pointsListener != null) {
-                    pointsListener.remove();
-                    pointsListener = null;
-                }
-                if (challengesListener != null) {
-                    challengesListener.remove();
-                    challengesListener = null;
-                }
-                fetchByCalories();
+                leaderboardsList.smoothScrollToPosition(userPosition - 1);
+                //Handler to allow time for the item to be displayed in the UI. Else error since view is null.
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        leaderboardsList.getChildAt((userPosition-1)-leaderboardsList.getFirstVisiblePosition()).setBackgroundColor(Color.CYAN);
+
+                    }
+                }, 500);
             }
         });
-
-        byDistanceBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (challengesListener != null) {
-                    challengesListener.remove();
-                    challengesListener = null;
-                }
-                if (pointsListener != null) {
-                    pointsListener.remove();
-                    pointsListener = null;
-                }
-                if (caloriesListener != null) {
-                    caloriesListener.remove();
-                    caloriesListener = null;
-                }
-                fetchBySteps();
-            }
-        });
-
-        byChallengesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (distanceListener != null) {
-                    distanceListener.remove();
-                    distanceListener = null;
-                }
-                if (pointsListener != null) {
-                    pointsListener.remove();
-                    pointsListener = null;
-                }
-                if (caloriesListener != null) {
-                    caloriesListener.remove();
-                    caloriesListener = null;
-                }
-                fetchByChallenges();
-            }
-        });
-
     }
+
+    private void sortByPoints() {
+        if (distanceListener != null) {
+            distanceListener.remove();
+        }
+        if (challengesListener != null) {
+            challengesListener.remove();
+        }
+        if (caloriesListener != null) {
+            caloriesListener.remove();
+        }
+        fetchByPoints();
+    }
+
+    private void sortByCalories() {
+        if (distanceListener != null) {
+            distanceListener.remove();
+            distanceListener = null;
+        }
+        if (pointsListener != null) {
+            pointsListener.remove();
+            pointsListener = null;
+        }
+        if (challengesListener != null) {
+            challengesListener.remove();
+            challengesListener = null;
+        }
+        fetchByCalories();
+    }
+
+    private void sortBySteps() {
+        if (challengesListener != null) {
+            challengesListener.remove();
+            challengesListener = null;
+        }
+        if (pointsListener != null) {
+            pointsListener.remove();
+            pointsListener = null;
+        }
+        if (caloriesListener != null) {
+            caloriesListener.remove();
+            caloriesListener = null;
+        }
+        fetchBySteps();
+    }
+
+    private void sortByChallenges() {
+        if (distanceListener != null) {
+            distanceListener.remove();
+            distanceListener = null;
+        }
+        if (pointsListener != null) {
+            pointsListener.remove();
+            pointsListener = null;
+        }
+        if (caloriesListener != null) {
+            caloriesListener.remove();
+            caloriesListener = null;
+        }
+        fetchByChallenges();
+    }
+
 }
