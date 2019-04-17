@@ -123,9 +123,11 @@ public class ChallengesFragment extends Fragment {
                                                  if (challenge_type.equals("distance")) {
                                                      personalChallengeTotal = documentSnapshot.getLong("distance").intValue();
                                                      personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " metres!");
+                                                     updatePersonalProgressBar();
                                                  } else {
                                                      personalChallengeTotal = documentSnapshot.getLong("steps").intValue();
                                                      personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " steps!");
+                                                     updatePersonalProgressBar();
                                                  }
                                              }
                                          }

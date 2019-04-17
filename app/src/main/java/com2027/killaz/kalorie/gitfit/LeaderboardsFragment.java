@@ -2,7 +2,9 @@ package com2027.killaz.kalorie.gitfit;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -185,14 +187,14 @@ public class LeaderboardsFragment extends Fragment {
             public void onClick(View view) {
                 leaderboardsList.smoothScrollToPosition(userPosition - 1);
                 //Handler to allow time for the item to be displayed in the UI. Else error since view is null.
-//                Handler handler = new Handler();
-//                handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        leaderboardsList.getChildAt((userPosition-1)-leaderboardsList.getFirstVisiblePosition()).setBackgroundColor(Color.CYAN);
-//
-//                    }
-//                }, 500);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        leaderboardsList.getChildAt((userPosition - 1) - leaderboardsList.getFirstVisiblePosition()).setBackgroundColor(Color.CYAN);
+
+                    }
+                }, 500);
             }
         });
     }
@@ -261,7 +263,7 @@ public class LeaderboardsFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        Log.i("ON STOP CALLED","here");
+        Log.i("ON STOP CALLED", "here");
         if (distanceListener != null) {
             distanceListener.remove();
             distanceListener = null;
