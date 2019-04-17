@@ -236,8 +236,8 @@ public class FirestoreService extends Service implements SensorEventListener {
                     stepIntent.putExtra("challenges_completed", completedChallenges);
                     stepIntent.putExtra("points", points);
 
-                    fetchUserChallenges();
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
+                    fetchUserChallenges();
                     if (friendChallengeReference != null) {
                         remainingFriendChallenge = ((Long) friend_challenge.get("remaining")).intValue();
                         friendChallenger = friend_challenge.get("user_ref").toString();
@@ -287,6 +287,8 @@ public class FirestoreService extends Service implements SensorEventListener {
                 }
             });
         }
+
+        sendBroadcast(stepIntent);
     }
 
     /**

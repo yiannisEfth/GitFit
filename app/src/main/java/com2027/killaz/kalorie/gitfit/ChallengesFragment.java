@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -231,12 +232,15 @@ public class ChallengesFragment extends Fragment {
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
                                     List<String> currentsChallengeReqs = (List<String>) task.getResult().get("challenge_requests");
-
-                                    if (currentsChallengeReqs.contains(currentUser.getDisplayName())) {
-                                        Toast.makeText(getContext(), "Challenge Request Failed! You already have a pending challenge request to " + toChallenge, Toast.LENGTH_SHORT).show();
+                                    if (currentsChallengeReqs != null) {
+                                        if (currentsChallengeReqs.contains(currentUser.getDisplayName())) {
+                                            Toast.makeText(getContext(), "Challenge Request Failed! You already have a pending challenge request to " + toChallenge, Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            sendChallengeRequest(toChallenge);
+                                            Toast.makeText(getContext(), "Successfully sent a challenge request to " + toChallenge, Toast.LENGTH_SHORT).show();
+                                        }
                                     } else {
-                                        sendChallengeRequest(toChallenge);
-                                        Toast.makeText(getContext(), "Successfully sent a challenge request to " + toChallenge, Toast.LENGTH_SHORT).show();
+                                        Log.i("currentChallengeReqs", "NULL");
                                     }
                                 }
                             }
@@ -257,14 +261,18 @@ public class ChallengesFragment extends Fragment {
             @Override
             public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
                 challengerNames = (List<String>) documentSnapshot.get("challenge_requests");
-                if (challengerNames.isEmpty()) {
-                    noChallengesText.setVisibility(View.VISIBLE);
+                if (challengerNames != null) {
+                    if (challengerNames.isEmpty()) {
+                        noChallengesText.setVisibility(View.VISIBLE);
+                    } else {
+                        noChallengesText.setVisibility(View.GONE);
+                    }
+                    adapter = new ArrayAdapter<String>(mContext, R.layout.challenge_requests_row, challengerNames);
+                    challengeRequests.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
                 } else {
-                    noChallengesText.setVisibility(View.GONE);
+                    Log.i("challengerNames", "NULL");
                 }
-                adapter = new ArrayAdapter<String>(mContext, R.layout.challenge_requests_row, challengerNames);
-                challengeRequests.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
             }
         });
     }
