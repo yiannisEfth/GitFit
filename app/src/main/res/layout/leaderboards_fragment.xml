@@ -1,15 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/holo_blue_dark">
 
     <TextView
+        android:id="@+id/ignore_leaderboards_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Leaderboards fragment"
-        android:textSize="30sp"
-        android:layout_centerInParent="true"
-        />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Leaderboards"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+
+    <ListView
+        android:id="@+id/leaderboards_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="411dp"
+        android:layout_below="@id/leaderboards_rel_layout"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:id="@+id/leaderboards_trophy"
+        android:layout_width="60dp"
+        android:layout_height="57dp"
+        android:layout_below="@+id/ignore_leaderboards_title"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@drawable/on_board_act_pic3" />
+
+    <TextView
+        android:id="@+id/leaderboards_sorted_rank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/leaderboards_trophy"
+        android:layout_centerHorizontal="true"
+        android:text="You rank at 47 for calories burned"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:id="@+id/leaderboards_rel_layout"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/leaderboards_sorting_button"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/ignore_leaderboards_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="35dp"
+            android:text="Name"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black" />
+
+
+        <TextView
+            android:id="@+id/ignore_leaderboards_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="147dp"
+            android:text="Steps"
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/ignore_leaderboards_calories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="48dp"
+            android:text="Calories"
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/ignore_leaderboards_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="#"
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/ignore_leaderboards_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="Points"
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/ignore_leaderboards_challenges"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="110dp"
+            android:text="Challenges"
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
+
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/leaderboards_sorting_button"
+        android:layout_width="154dp"
+        android:layout_height="36dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/leaderboards_sorted_rank"
+        android:layout_marginStart="49dp"
+        android:background="@drawable/leaderboards_btn_shape"
+        android:text="Choose Sorting" />
+
+    <Button
+        android:id="@+id/leaderboards_btn_gotome"
+        android:layout_width="154dp"
+        android:layout_height="36dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/leaderboards_sorting_button"
+        android:layout_marginEnd="46dp"
+        android:background="@drawable/leaderboards_btn_shape"
+        android:text="Scroll to My Rank" />
+
 
 </RelativeLayout>

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -76,7 +77,7 @@ public class HomeFragment extends Fragment {
         steps = dbHelper.getSteps(username, Calendar.getInstance().getTime());
         stepText.setText(String.valueOf(steps));
 
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         challengeTotal = sharedPref.getInt(username + "total", 0);
         challengeRemaining = sharedPref.getInt(username + "remaining", 0);
         int soFar = challengeTotal - challengeRemaining;
@@ -401,7 +402,7 @@ public class HomeFragment extends Fragment {
         calendar.setTimeInMillis(System.currentTimeMillis());
         dbHelper.updateRecordSteps(username, calendar.getTime(), steps);
 
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(username + "total", challengeTotal);
         editor.putInt(username + "remaining", challengeRemaining);
