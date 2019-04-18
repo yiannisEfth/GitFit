@@ -70,29 +70,6 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.home_fragment, container, false);
     }
 
-    // Fetch stuff to update UI if returning from other fragment.
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        steps = dbHelper.getSteps(username, Calendar.getInstance().getTime());
-        stepText.setText(String.valueOf(steps));
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        challengeTotal = sharedPref.getInt(username + "total", 0);
-        challengeRemaining = sharedPref.getInt(username + "remaining", 0);
-        int soFar = challengeTotal - challengeRemaining;
-
-        if (challengeTotal > 0 && challengeRemaining < challengeTotal) {
-            challengeDesc.setText(getResources().getString(R.string.challenge_desc, challengeTotal));
-            challengeStepsText.setText(getResources().getString(R.string.your_progress, soFar, challengeTotal));
-            int progress = (int) ((soFar * 100.0f) / challengeTotal);
-
-            ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, 0, progress);
-            animate.setDuration(1000);
-            challengeBar.startAnimation(animate);
-        }
-    }
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         final Button todayBtn = (Button) getView().findViewById(R.id.homeBtn1);
@@ -112,6 +89,24 @@ public class HomeFragment extends Fragment {
 
         stepBroadcastReceiver = new StepBroadcastReceiver();
         alarmReceiver = new DailyAlarmReceiver();
+
+        steps = dbHelper.getSteps(username, Calendar.getInstance().getTime());
+        stepText.setText(String.valueOf(steps));
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        challengeTotal = sharedPref.getInt(username + "total", 0);
+        challengeRemaining = sharedPref.getInt(username + "remaining", 0);
+        int soFar = challengeTotal - challengeRemaining;
+
+        if (challengeTotal > 0 && challengeRemaining < challengeTotal) {
+            challengeDesc.setText(getResources().getString(R.string.challenge_desc, challengeTotal));
+            challengeStepsText.setText(getResources().getString(R.string.your_progress, soFar, challengeTotal));
+            int progress = (int) ((soFar * 100.0f) / challengeTotal);
+
+            ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, 0, progress);
+            animate.setDuration(1000);
+            challengeBar.startAnimation(animate);
+        }
 
         graphInit();
         drawGraph();

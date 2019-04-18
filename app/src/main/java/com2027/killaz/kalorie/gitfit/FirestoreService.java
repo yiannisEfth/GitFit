@@ -237,6 +237,8 @@ public class FirestoreService extends Service implements SensorEventListener {
                     stepIntent.putExtra("points", points);
 
                     remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
+                    stepIntent.putExtra("remaining", remainingMyChallenge);
+
                     fetchUserChallenges();
                     if (friendChallengeReference != null) {
                         remainingFriendChallenge = ((Long) friend_challenge.get("remaining")).intValue();
@@ -263,8 +265,8 @@ public class FirestoreService extends Service implements SensorEventListener {
 
                         // Send broadcast so home fragment UI can be updated with new value.
                         stepIntent.putExtra("steps", stepsToday);
-                        stepIntent.putExtra("remaining", remainingMyChallenge);
                         stepIntent.putExtra("challengeTotal", totalMyChallenge);
+                        sendBroadcast(stepIntent);
                     }
                 }
             });
@@ -283,12 +285,12 @@ public class FirestoreService extends Service implements SensorEventListener {
                         stepIntent.putExtra("friend_remaining", remainingFriendChallenge);
                         stepIntent.putExtra("friend_challenge_total", totalFriendChallenge);
                         stepIntent.putExtra("friend_challenger", friendChallenger);
+                        sendBroadcast(stepIntent);
                     }
                 }
             });
         }
 
-        sendBroadcast(stepIntent);
     }
 
     /**
