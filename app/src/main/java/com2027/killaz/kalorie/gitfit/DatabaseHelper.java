@@ -30,6 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String USER_BMI = "user_bmi";
     private static final String USER_WEIGHT = "user_weight";
     private static final String USER_HEIGHT = "user_height";
+    private static final String USER_GENDER = "user_gender";
 
     private static final String GET_USER_ROWS = "SELECT count(*) FROM " + USER_RECORDS +
             " WHERE " + USER_NAME + " = ? ORDER BY " + USER_RECORD_DATE;
@@ -73,6 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 USER_NAME + " VARCHAR(30) NOT NULL, " +
                 USER_WEIGHT + " REAL, " +
                 USER_HEIGHT + " REAL, " +
+                USER_GENDER + " BIT, " +
                 "PRIMARY KEY (" + USER_NAME + "))";
 
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE1);
@@ -234,7 +236,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param weight The input weight of the user
      * @param height The input height of the user
      */
-    public void saveRecordsBMI(String user, float weight, float height){
+    public void saveRecordsBMI(String user, float weight, float height, int gender){
 
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT " + USER_NAME + " FROM " + USER_BMI + " WHERE " + USER_NAME + " =?";
@@ -245,7 +247,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.getCount() > 0){
             values.put(USER_WEIGHT, weight);
             values.put(USER_HEIGHT, height);
-
+            if(gender == 1 || gender == 0) {
+                values.put(USER_GENDER, gender);
+            }
             int rowsAffected = -1;
             try {
                 rowsAffected = db.update(USER_BMI, values, USER_NAME + " = " + user, null);
@@ -260,8 +264,98 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(USER_NAME, user);
             values.put(USER_WEIGHT, weight);
             values.put(USER_HEIGHT, height);
+            if(gender == 1 || gender == 0) {
+                values.put(USER_GENDER, gender);
+            }
+            else{
+                gender = 0;
+            }
             long newID = db.insert(USER_BMI, null, values);
         }
         cursor.close();
     }
+
+    public int getUserWeight(String user) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + USER_BMI +
+                " WHERE " + USER_NAME + " = ?";
+
+        int result = 0;
+        try {
+            Cursor cursor = db.rawQuery(query, new String[]{user});
+
+            // Check cursor is not empty
+            if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                result = cursor.getInt(cursor.getColumnIndex(USER_WEIGHT));
+            }
+
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public int getUserHeight(String user) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + USER_BMI +
+                " WHERE " + USER_NAME + " = ?";
+
+        int result = 0;
+        try {
+            Cursor cursor = db.rawQuery(query, new String[]{user});
+
+            // Check cursor is not empty
+            if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                result = cursor.getInt(cursor.getColumnIndex(USER_HEIGHT));
+            }
+
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public int getUserBMI(String user) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + USER_BMI +
+                " WHERE " + USER_NAME + " = ?";
+
+        int result = 0;
+        try {
+            Cursor cursor = db.rawQuery(query, new String[]{user});
+
+            // Check cursor is not empty
+            if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                result = cursor.getInt(cursor.getColumnIndex(USER_BMI));
+            }
+
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public int getUserGender(String user) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + USER_BMI +
+                " WHERE " + USER_NAME + " = ?";
+
+        int result = 0;
+        try {
+            Cursor cursor = db.rawQuery(query, new String[]{user});
+
+            // Check cursor is not empty
+            if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                result = cursor.getInt(cursor.getColumnIndex(USER_GENDER));
+            }
+
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
 }
