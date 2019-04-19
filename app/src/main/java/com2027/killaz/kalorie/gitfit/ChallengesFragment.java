@@ -156,9 +156,11 @@ public class ChallengesFragment extends Fragment {
                                                      if (challenge_type.equals("distance")) {
                                                          friendChallengeTotal = documentSnapshot.getLong("distance").intValue();
                                                          friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " metres!");
+                                                         updateFriendProgressBar();
                                                      } else {
                                                          friendChallengeTotal = documentSnapshot.getLong("steps").intValue();
                                                          friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " steps!");
+                                                        updateFriendProgressBar();
                                                      }
                                                  }
                                              }
