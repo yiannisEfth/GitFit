@@ -21,14 +21,19 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,9 +82,12 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private int completedChallenges;
     private PolylineOptions polylineOptions;
     private Polyline routePolyline;
+    private DatabaseHelper dbHelper;
+    private ShareActionProvider shareActionProvider;
+    private FloatingActionButton fab;
 
-    private int userWeightKg;
-    private int userHeightM;
+    private double userWeightKg;
+    private double userHeightM;
 
     @Nullable
     @Override
@@ -105,6 +113,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         pointsText = getView().findViewById(R.id.tracker_points);
         paceText = getView().findViewById(R.id.tracker_pace);
         caloriesText = getView().findViewById(R.id.tracker_calories);
+        fab = (FloatingActionButton) getView().findViewById(R.id.fab);
 
         polylineOptions = new PolylineOptions().width(3).color(Color.RED);
         roundKms = new DecimalFormat("#.###");
@@ -126,6 +135,36 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         setButtonListeners();
         isLocationEnabled();
         setFirebaseFetch();
+
+        dbHelper = DatabaseHelper.getInstance(getContext());
+        try {
+            userHeightM = dbHelper.getUserHeight(currentUser.getDisplayName());
+            userWeightKg = dbHelper.getUserWeight(currentUser.getDisplayName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            userHeightM = 1.75;
+            userWeightKg = 70;
+            Log.d("USER BMI VALUES", "NOT FOUND. USING DEFAULT.");
+        }
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Could change this to just share a screenshot of the tracker later...
+                // ... to show the stats plus the route
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                String body = "I just completed a run with GitFit! Here are my stats:\n" +
+                        "Distance Travelled: " + distanceTraveledText.getText().toString() + "\n" +
+                        "Calories Burned: " + caloriesText.getText().toString() + "\n" +
+                        "Steps Taken: " + stepsTakenText.getText().toString() + "\n" +
+                        "Points Collected: " + pointsText.getText().toString();
+                String subject = "My run with GitFit";
+                shareIntent.putExtra(Intent.EXTRA_TEXT, body);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                startActivity(Intent.createChooser(shareIntent, "Share to:"));
+            }
+        });
     }
 
 
@@ -137,6 +176,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             Toast.makeText(getContext(), "Map cannot be used unless location permissions are granted.", Toast.LENGTH_SHORT).show();
             return;
         }
+        mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
         mGoogleMap.setMyLocationEnabled(true);
     }
 
@@ -240,11 +280,10 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                     if (averagePace < 20) {
                         float paceInMps = averagePace / 3.6f;
 
-                        // My weight and height for testing: 70kg, 1.7m tall
                         // formula = 0.035 * weight[kg] + (pace^2 / height[m]) * 0.29 * weight[kg]
                         // formula is for per minute so needs to multiply by fraction of minute elapsed since last update
 
-                        burnedCalories += ((0.035 * 70) + ((paceInMps * paceInMps) / 1.7f) * 0.029 * 70) * (elapsedTime / 60);
+                        burnedCalories += ((0.035 * userWeightKg) + ((paceInMps * paceInMps) / userHeightM) * 0.029 * userWeightKg) * (elapsedTime / 60);
                         caloriesText.setText(String.valueOf(roundCal.format(burnedCalories)));
                     } else {
                         Toast.makeText(getContext(), "Too fast - calories will not be counted.", Toast.LENGTH_LONG).show();

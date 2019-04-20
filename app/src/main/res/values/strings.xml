@@ -34,4 +34,5 @@
     <string name="challenges_friend_underline"><u>Your Current Friend Challenge Is</u></string>
     <string name="challenges_personal_underline"><u>Your Current Personal Challenge Is</u></string>
     <string name="challenges_reqs_from_friends"><u>Challenge Requests From Friends</u></string>
+    <string name="action_share">SHARE</string>
 </resources>
