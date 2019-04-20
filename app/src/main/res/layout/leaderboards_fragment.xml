@@ -20,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="411dp"
         android:layout_below="@id/leaderboards_rel_layout"
+        android:scrollingCache="false"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true" />
 

@@ -1,6 +1,7 @@
 package com2027.killaz.kalorie.gitfit;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -9,12 +10,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 
 public class LeaderboardsAdapter extends ArrayAdapter<LeaderboardsUser> {
 
     private ArrayList<LeaderboardsUser> userList;
     private Context mContext;
+    private FirebaseUser currentUser;
 
     private static class ViewHolder {
         TextView userRank;
@@ -29,6 +34,8 @@ public class LeaderboardsAdapter extends ArrayAdapter<LeaderboardsUser> {
         super(context, R.layout.leaderboards_row_item, userList);
         this.userList = userList;
         this.mContext = context;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
     }
 
     @NonNull
@@ -69,7 +76,12 @@ public class LeaderboardsAdapter extends ArrayAdapter<LeaderboardsUser> {
         viewHolder.userChallenges.setText(String.valueOf(aUser.getChallengesCompleted()));
         viewHolder.userDistance.setText(String.valueOf(aUser.getDistanceTraveled()));
         viewHolder.userPoints.setText(String.valueOf(aUser.getPoints()));
-
+        if (currentUser.getDisplayName().equals(aUser.getName())){
+            result.setBackgroundColor(Color.CYAN);
+        }
+        else {
+            result.setBackgroundColor(Color.TRANSPARENT);
+        }
         return result;
     }
 }

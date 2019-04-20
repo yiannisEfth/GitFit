@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -186,15 +187,6 @@ public class LeaderboardsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 leaderboardsList.smoothScrollToPosition(userPosition - 1);
-                //Handler to allow time for the item to be displayed in the UI. Else error since view is null.
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        leaderboardsList.getChildAt((userPosition - 1) - leaderboardsList.getFirstVisiblePosition()).setBackgroundColor(Color.CYAN);
-
-                    }
-                }, 500);
             }
         });
     }
