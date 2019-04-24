@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -87,7 +88,7 @@ public class HomeFragment extends Fragment {
         username = mAuth.getCurrentUser().getDisplayName();
         dbHelper = DatabaseHelper.getInstance(getContext());
 
-        stepBroadcastReceiver = new StepBroadcastReceiver();
+        // Step broadcast receiver is created in onResume() now.
         alarmReceiver = new DailyAlarmReceiver();
 
         steps = dbHelper.getSteps(username, Calendar.getInstance().getTime());
@@ -98,7 +99,7 @@ public class HomeFragment extends Fragment {
         challengeRemaining = sharedPref.getInt(username + "remaining", 0);
         int soFar = challengeTotal - challengeRemaining;
 
-        if (challengeTotal > 0 && challengeRemaining < challengeTotal) {
+        if (challengeTotal > 0 && challengeRemaining <= challengeTotal) {
             challengeDesc.setText(getResources().getString(R.string.challenge_desc, challengeTotal));
             challengeStepsText.setText(getResources().getString(R.string.your_progress, soFar, challengeTotal));
             int progress = (int) ((soFar * 100.0f) / challengeTotal);
@@ -235,7 +236,21 @@ public class HomeFragment extends Fragment {
 
                 if (progress >= 100) {
                     progress = 100;
-                    Toast.makeText(getContext(), "Challenge complete!", Toast.LENGTH_LONG).show();
+                    Snackbar.make(getView(), "Challenge complete!", Snackbar.LENGTH_LONG)
+                            .setAction("SHARE", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                                    shareIntent.setType("text/plain");
+                                    String body = "I just completed the challenge '" +
+                                            challengeDesc.getText().toString() + "' with GitFit! Sign up now to challenge me!";
+                                    String subject = "My GitFit Challenge";
+                                    shareIntent.putExtra(Intent.EXTRA_TEXT, body);
+                                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                                    startActivity(Intent.createChooser(shareIntent, "Share to:"));
+                                }
+                            })
+                            .show();
                 } else {
                     ProgressBarAnimation animate = new ProgressBarAnimation(challengeBar, challengeBar.getProgress(), progress);
                     animate.setDuration(1000);
@@ -369,6 +384,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        stepBroadcastReceiver = new StepBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com2027.killaz.kalorie.gitfit.STEP_TAKEN");
         getActivity().registerReceiver(stepBroadcastReceiver, intentFilter);
