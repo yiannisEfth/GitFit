@@ -239,9 +239,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void saveRecordsBMI(String user, float weight, float height, int gender){
 
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT " + USER_NAME + " FROM " + USER_BMI + " WHERE " + USER_NAME + " =?";
+        String query = "SELECT * FROM " + USER_BMI + " WHERE " + USER_NAME + " =?";
         Cursor cursor = db.rawQuery(query, new String[]{user});
         ContentValues values = new ContentValues();
+
 
         //edit existing row if user is already in table
         if (cursor.getCount() > 0){
@@ -268,7 +269,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 values.put(USER_GENDER, gender);
             }
             else{
-                gender = 0;
+                values.put(USER_GENDER, 0);
             }
             long newID = db.insert(USER_BMI, null, values);
         }

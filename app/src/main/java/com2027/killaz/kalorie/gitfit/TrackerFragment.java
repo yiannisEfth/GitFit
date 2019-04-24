@@ -136,6 +136,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         isLocationEnabled();
         setFirebaseFetch();
 
+        //fetch data from local database if it is saved otherwise use default values
         dbHelper = DatabaseHelper.getInstance(getContext());
         try {
             userHeightM = dbHelper.getUserHeight(currentUser.getDisplayName());

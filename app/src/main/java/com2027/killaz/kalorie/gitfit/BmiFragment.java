@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +40,8 @@ public class BmiFragment extends Fragment {
     private List<String> list1;
     private List<String> list2;
     private Button mSubmit;
+    private DatabaseHelper dbHelper;
+    private FirebaseUser currentUser;
 
     //Display
     private TextView mBMI;
@@ -106,6 +112,19 @@ public class BmiFragment extends Fragment {
             }
         });
 
+        //Get the current user from the Firebase
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        //fetch data from local database if it is saved otherwise use default values
+        dbHelper = DatabaseHelper.getInstance(getContext());
+        try {
+            mHeightInput.setText(dbHelper.getUserHeight(currentUser.getDisplayName()));
+            mWeightInput.setText(dbHelper.getUserWeight(currentUser.getDisplayName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("USER BMI VALUES", "NOT FOUND. USING DEFAULT.");
+        }
+
     }
 
     public void calculateBMI() {
@@ -127,6 +146,15 @@ public class BmiFragment extends Fragment {
         bmi = Math.round(weight / ((height / 100) * (height / 100)) * 10) / 10.0;
         mBMI.setVisibility(View.VISIBLE);
         startCountAnimation(bmi);
+
+        dbHelper = DatabaseHelper.getInstance(getContext());
+        try {
+            dbHelper.saveRecordsBMI(currentUser.getDisplayName(),(float)weight,(float)height,0);
+            Log.d("USER BMI VALUES", "SAVE SUCCESSFULLY");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("USER BMI VALUES", "FAILED TO SAVE");
+        }
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
