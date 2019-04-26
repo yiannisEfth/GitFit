@@ -74,7 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 USER_NAME + " VARCHAR(30) NOT NULL, " +
                 USER_WEIGHT + " REAL, " +
                 USER_HEIGHT + " REAL, " +
-                USER_GENDER + " BIT, " +
+                USER_GENDER + " INTEGER, " +
                 "PRIMARY KEY (" + USER_NAME + "))";
 
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE1);
