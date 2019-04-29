@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_red_dark">
+    android:background="@android:color/holo_blue_light">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -13,7 +13,6 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#93ed93"
             android:gravity="center"
             android:orientation="vertical"
             tools:context="com2027.killaz.kalorie.gitfit.OnBoardingActivity">
@@ -140,6 +139,7 @@
             <Button
                 android:id="@+id/change_password_btn"
                 android:layout_width="208dp"
+                android:background="@drawable/leaderboards_btn_shape"
                 android:layout_height="40dp"
                 android:layout_marginBottom="7dp"
                 android:text="@string/profile_change_password" />
@@ -148,8 +148,17 @@
                 android:id="@+id/delete_acc_btn"
                 android:layout_width="208dp"
                 android:layout_height="40dp"
+                android:background="@drawable/leaderboards_btn_shape"
                 android:layout_marginBottom="5dp"
                 android:text="@string/profile_delete_account" />
+
+            <Button
+                android:id="@+id/reset_shared_prefs_btn"
+                android:layout_width="208dp"
+                android:background="@drawable/leaderboards_btn_shape"
+                android:layout_height="40dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/settings_reset_intros" />
 
 
         </LinearLayout>

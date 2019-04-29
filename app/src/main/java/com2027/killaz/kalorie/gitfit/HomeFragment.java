@@ -95,6 +95,10 @@ public class HomeFragment extends Fragment {
         stepText.setText(String.valueOf(steps));
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        if(sharedPref.getBoolean("firstRun2",true)){
+            sharedPref.edit().putBoolean("firstRun2", false).apply();
+            introDialog1();
+        }
         challengeTotal = sharedPref.getInt(username + "total", 0);
         challengeRemaining = sharedPref.getInt(username + "remaining", 0);
         int soFar = challengeTotal - challengeRemaining;
@@ -479,6 +483,75 @@ public class HomeFragment extends Fragment {
                 shrinkAnim.start();
             }
         });
+    }
+
+    private void introDialog1(){
+        new AlertDialog.Builder(getContext())
+                .setTitle("Welcome")
+                .setMessage("Welcome to GitFit! Your way to a healthier lifestyle!")
+                .setPositiveButton("Tell me more!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        introDialog2();
+                    }
+                })
+                .show();
+    }
+
+    private void introDialog2(){
+        new AlertDialog.Builder(getContext())
+                .setTitle("Track Runs")
+                .setMessage("From the tracker tab, you can track a run with the path you took, distance covered, calories burned, and more!")
+                .setPositiveButton("Sounds awesome! What else?", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        introDialog3();
+                    }
+                })
+                .show();
+    }
+
+    private void introDialog3(){
+        new AlertDialog.Builder(getContext())
+                .setTitle("Complete challenges!Climb the leaderboards!")
+                .setMessage("You have personal challenges all the time to complete. If you feel competitive, challenge your friends as well! Look how you rank up on the world leaderboards!")
+                .setPositiveButton("Will do!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        introDialog4();
+                    }
+                })
+                .show();
+    }
+
+    private void introDialog4(){
+        new AlertDialog.Builder(getContext())
+                .setTitle("Chart Info!")
+                .setMessage("The home fragment shows the steps you've taken today, this week, and this month. A chart also shows your daily number of steps taken!")
+                .setPositiveButton("Wow!!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        introDialog5();
+                    }
+                })
+                .show();
+    }
+
+    private void introDialog5(){
+        new AlertDialog.Builder(getContext())
+                .setTitle("Many more!")
+                .setMessage("Add friends to your friend's list. Compare your points to them and send them challenge requests! Reach the top of the leaderboards! To view the introduction again, click the 'Show Intros' button from the User Settings tab. Have Fun!")
+                .setPositiveButton("Thanks! I sure will!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .show();
     }
 
 }

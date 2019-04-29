@@ -3,7 +3,9 @@ package com2027.killaz.kalorie.gitfit;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -29,8 +31,9 @@ public class SettingsFragment extends Fragment {
 
     private FirebaseUser currentUser;
     private TextView mPoints, mEmail, mNickname, mChallengesCompleted;
-    private Button mChangePass, mDeleteAccount;
+    private Button mChangePass, mDeleteAccount, mResetPrefs;
     private FirebaseFirestore db;
+    private SharedPreferences sharedPref;
 
     @Nullable
     @Override
@@ -50,9 +53,11 @@ public class SettingsFragment extends Fragment {
         mChallengesCompleted = (TextView) getView().findViewById(R.id.challenges_field);
         mChangePass = (Button) getView().findViewById(R.id.change_password_btn);
         mDeleteAccount = (Button) getView().findViewById(R.id.delete_acc_btn);
+        mResetPrefs = (Button) getView().findViewById(R.id.reset_shared_prefs_btn);
         db = FirebaseFirestore.getInstance();
         mEmail.setText(currentUser.getEmail());
         mNickname.setText(currentUser.getDisplayName());
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         setupButtons();
         setValues();
     }
@@ -145,6 +150,16 @@ public class SettingsFragment extends Fragment {
                     }
                 });
                 builder.show();
+            }
+        });
+
+
+        mResetPrefs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sharedPref.edit().putBoolean("firstRun2", true).apply();
+                sharedPref.edit().putBoolean("firstRun", true).apply();
+                Toast.makeText(getContext(), "Both introductions will be displayed again", Toast.LENGTH_SHORT).show();
             }
         });
 
