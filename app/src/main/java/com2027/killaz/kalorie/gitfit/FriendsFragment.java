@@ -53,6 +53,9 @@ public class FriendsFragment extends Fragment {
         return inflater.inflate(R.layout.friends_fragment, container, false);
     }
 
+    /**
+     * Initialise both recycler views for friends and friend requests, get the user current user and setup the front-end appropriately by fetching all list items from the database.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         friendReqsRecycler = getView().findViewById(R.id.friends_req_recycler_view);
@@ -77,6 +80,9 @@ public class FriendsFragment extends Fragment {
         setupFriendReqs();
     }
 
+    /**
+     * Fetches the user's friend requests from the database and display their names in the appropriate recycler view
+     */
     private void fetchFriendReqs() {
         userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -91,6 +97,9 @@ public class FriendsFragment extends Fragment {
         });
     }
 
+    /**
+     * Fetches the user's friend names from the database and display their names in the appropriate recycler view.
+     */
     private void fetchFriends() {
         userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -105,6 +114,11 @@ public class FriendsFragment extends Fragment {
         });
     }
 
+    /**
+     * Setup recycler view actions for both friend requests and friends. Friend requests allow the acceptance/decline of requests and
+     * Friends allow the deletion and viewing of information for that friend.
+     * Both operate using swipe left/right implementations
+     */
     private void setupRecyclerActions() {
 
         ItemTouchHelper.SimpleCallback callBackReqs = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {

@@ -75,18 +75,23 @@ public class ChallengesFragment extends Fragment {
         challengeRequests = (ListView) getView().findViewById(R.id.challenge_reqs_list);
         noChallengesText = (TextView) getView().findViewById(R.id.challenges_ohnoes);
 
+        //Get current firebase user
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         userRef = db.collection("Users").document(currentUser.getDisplayName());
 
         challengerNames = new ArrayList<>();
 
+        //Call necessary methods
         fetchUserChallenges();
         fetchChallengeRequests();
         setupChallengeBtn();
         setupChallengeAcceptance();
     }
 
+    /**
+     * Methods to initiate a snapshot listener to fetch both user challenges.
+     */
     private void fetchUserChallenges() {
         userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -115,6 +120,10 @@ public class ChallengesFragment extends Fragment {
         });
     }
 
+    /**
+     * Fetches the name of the personal challenge using a snapshop listener
+     * @param theChallenge the reference of the challenge to be fetched from the challenges collection
+     */
     private void fetchPersonalChallengeName(DocumentReference theChallenge) {
         theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                              @Override
@@ -134,6 +143,9 @@ public class ChallengesFragment extends Fragment {
         );
     }
 
+    /**
+     * Updates the personal challenge progress bar accordingly
+     */
     private void updatePersonalProgressBar() {
         int soFar = personalChallengeTotal - personalChallengeRemaining;
         if (personalChallengeTotal > 0 && personalChallengeRemaining < personalChallengeTotal) {
@@ -145,6 +157,10 @@ public class ChallengesFragment extends Fragment {
         }
     }
 
+    /**
+     * Fetches the name of the friend's challenge
+     * @param theChallenge the reference of the challenge to be fetched from the challenges collection
+     */
     private void fetchFriendChallengeName(DocumentReference theChallenge) {
         if (theChallenge == null) {
             friendInfoTxt.setText("You don't have a challenge from a friend currently active :(");
@@ -168,6 +184,9 @@ public class ChallengesFragment extends Fragment {
         }
     }
 
+    /**
+     * Updates the friend challenge progress bar accordingly
+     */
     private void updateFriendProgressBar() {
         int soFar = friendChallengeTotal - friendChallengeRemaining;
         if (friendChallengeTotal > 0 && friendChallengeRemaining < friendChallengeTotal) {
@@ -179,6 +198,9 @@ public class ChallengesFragment extends Fragment {
         }
     }
 
+    /**
+     * Method to setup the challenge button that allows the user to challenge their friends from a list
+     */
     private void setupChallengeBtn() {
         challengeFriendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,6 +221,10 @@ public class ChallengesFragment extends Fragment {
         });
     }
 
+    /**
+     * Helper method to iniate the alert dialog that contains the names of all friends to challenge.
+     * @param cs The character sequence of friends to be inserted and displayed in the dialog
+     */
     private void initiateDialog(CharSequence[] cs) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle("Select A Friend To Challenge!")
@@ -218,6 +244,11 @@ public class ChallengesFragment extends Fragment {
         dialog.create().show();
     }
 
+    /**
+     * Method to check if a challenge request from user already exists for the chosen friend. If it does exist a toast message alerts the user and a new one is not send.
+     * If challenge does not currently exist from user. Then a challenge request is successfully sent to the challenged friend.
+     * @param toChallenge
+     */
     private void validateChallengeReq(final String toChallenge) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle("Challenge Request")
@@ -256,10 +287,17 @@ public class ChallengesFragment extends Fragment {
 
     }
 
+    /**
+     * Helper method to send a challeng request
+     * @param toChallenge Name of user to challenge
+     */
     private void sendChallengeRequest(String toChallenge) {
         db.collection("Users").document(toChallenge).update("challenge_requests", FieldValue.arrayUnion(currentUser.getDisplayName()));
     }
 
+    /**
+     * Method that fetches challenge requests and displays them in a list
+     */
     private void fetchChallengeRequests() {
         userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -281,6 +319,9 @@ public class ChallengesFragment extends Fragment {
         });
     }
 
+    /**
+     * Helper method to setup acceptance a challenge from a friend.
+     */
     private void setupChallengeAcceptance() {
         challengeRequests.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -290,6 +331,10 @@ public class ChallengesFragment extends Fragment {
         });
     }
 
+    /**
+     * Dialog to confirm challenge acceptance from a friend
+     * @param challenger The person who challenged the user
+     */
     private void acceptanceDialog(final String challenger) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle("Accept Or Remove Challenge Request")
@@ -315,6 +360,12 @@ public class ChallengesFragment extends Fragment {
         dialog.show();
     }
 
+    /**
+     * Used to update the database and front-end appropriately when a friend challenge is accepted.
+     * Removes the challenge from the challenge_requests collection
+     * Adds challenge to the current_challenge_friend collection
+     * @param challenger
+     */
     private void setupAcceptedChallenge(final String challenger) {
         userRef.update("challenge_requests", FieldValue.arrayRemove(challenger));
 
@@ -346,6 +397,9 @@ public class ChallengesFragment extends Fragment {
         });
     }
 
+    /**
+     * Re-attach the fragment after it had previously been detached from the UI.
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

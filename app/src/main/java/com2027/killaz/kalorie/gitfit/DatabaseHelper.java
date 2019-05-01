@@ -276,6 +276,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    /**
+     * Used to get the users weight from the local database
+     * @param user The current user
+     * @return the weight of the user stored in the db
+     */
     public int getUserWeight(String user) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + USER_BMI +
@@ -296,6 +301,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return result;
     }
+
+    /**
+     * Used to get the users height from the local database
+     * @param user The current user
+     * @return the height of the user stored in the db
+     */
     public int getUserHeight(String user) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + USER_BMI +
@@ -316,6 +327,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return result;
     }
+
+    /**
+     * Used to get the users BMI from the local database
+     * @param user The current user
+     * @return the BMI of the user stored in the db
+     */
     public int getUserBMI(String user) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + USER_BMI +
@@ -337,6 +354,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+
+    /**
+     * Used to get the users gender from the local database
+     * @param user The current user
+     * @return the gender of the user stored in the db
+     */
     public int getUserGender(String user) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + USER_BMI +

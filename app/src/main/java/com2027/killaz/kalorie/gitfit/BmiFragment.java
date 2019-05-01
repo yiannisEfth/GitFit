@@ -47,6 +47,10 @@ public class BmiFragment extends Fragment {
     private TextView mBMI;
     private TextView mMessage;
 
+    /**
+     * Method to initiate the number animation for the bmi value
+     * @param value the bmi value
+     */
     private void startCountAnimation(double value) {
         ValueAnimator animator = ValueAnimator.ofFloat((float) Double.parseDouble(mBMI.getText().toString()), (float) value);
         animator.setDuration(5000);
@@ -70,7 +74,7 @@ public class BmiFragment extends Fragment {
         //Display
         mBMI = (TextView) getView().findViewById(R.id.bmi_value);
         mMessage = (TextView) getView().findViewById(R.id.bmi_message);
-        //D
+
         mBMI.setVisibility(View.GONE);
         mBMI.setText("0.0");
 
@@ -82,6 +86,7 @@ public class BmiFragment extends Fragment {
         list2.add("kg");
         list2.add("lbs");
 
+        // Setup spinner values
         ArrayAdapter<String> adapt1 = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, list1);
         adapt1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -92,6 +97,7 @@ public class BmiFragment extends Fragment {
         adapt2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mWeightMeasure.setAdapter(adapt2);
 
+        //Listener for calculate bmi value button
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,6 +133,10 @@ public class BmiFragment extends Fragment {
 
     }
 
+    /**
+     * Method to calculate BMI value given the necessary input values
+     * Output also included a comment based on the calculate BMI value
+     */
     public void calculateBMI() {
 
         double height;

@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+/**
+ * List adapter for the friend requests list found in the FriendsFragment. Used to display the names of each user that has sent the current user a friend request.
+ */
 public class FriendRequestsListAdapter extends RecyclerView.Adapter<FriendRequestsListAdapter.FriendRequestsViewHolder> {
 
     private List<String> friendReqs;
@@ -40,7 +43,7 @@ public class FriendRequestsListAdapter extends RecyclerView.Adapter<FriendReques
         return friendReqs.size();
     }
 
-
+    // Simply display the name of the person who sent the friend request
     class FriendRequestsViewHolder extends RecyclerView.ViewHolder {
 
         TextView userName;
