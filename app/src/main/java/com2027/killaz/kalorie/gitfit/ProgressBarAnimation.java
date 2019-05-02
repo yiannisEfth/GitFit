@@ -10,6 +10,9 @@ import android.widget.ProgressBar;
 
 public class ProgressBarAnimation extends Animation {
 
+    /**
+     * Simple animation for the progress bars found throughout the app.
+     */
     private ProgressBar progressBar;
     private float from;
     private float  to;

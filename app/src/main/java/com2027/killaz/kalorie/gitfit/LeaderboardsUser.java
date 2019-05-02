@@ -8,6 +8,14 @@ public class LeaderboardsUser {
     private int challengesCompleted;
     private int distanceTraveled;
 
+    /**
+     * User object used to initialise and display users in the leaderboards fragment list.
+     * @param name of user
+     * @param points of user
+     * @param caloriesBurned of user
+     * @param challengesCompleted of user
+     * @param distanceTraveled of user
+     */
     public LeaderboardsUser(String name, int points, int caloriesBurned, int challengesCompleted, int distanceTraveled) {
         this.name = name;
         this.points = points;

@@ -18,6 +18,9 @@ public class SplashScreen extends Activity {
     private Thread splashThread;
     private SharedPreferences prefs = null;
 
+    /**
+     * The splash screen of the app.
+     */
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -33,6 +36,9 @@ public class SplashScreen extends Activity {
         startAnimation();
     }
 
+    /**
+     * An image is displayed using animations and the user is then sent to the login screen or to the OnBoarding introductory activity if its their first launch of the app.
+     */
     private void startAnimation() {
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
         anim.reset();

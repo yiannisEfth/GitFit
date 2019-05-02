@@ -29,6 +29,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class SettingsFragment extends Fragment {
 
+    /**
+     * Fragment that contains all the user information. Along with options to delete the account, change password, and reset introductory tutorials(display them again).
+     */
     private FirebaseUser currentUser;
     private TextView mPoints, mEmail, mNickname, mChallengesCompleted;
     private Button mChangePass, mDeleteAccount, mResetPrefs;
@@ -62,6 +65,9 @@ public class SettingsFragment extends Fragment {
         setValues();
     }
 
+    /**
+     * Sets a listener to fetch display the user's information from the firestore.
+     */
     private void setValues() {
         db.collection("Users").document(currentUser.getDisplayName()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -76,6 +82,13 @@ public class SettingsFragment extends Fragment {
         });
     }
 
+    /**
+     * Setup the buttons found in the fragment with the appropriate actions.
+     * Delete user: Deletes the use from the database, along with all their information. Their email and credentials are also erased for security purposes.
+     * Change Password: Changes the user's password. Upon next login, the new one must be used.
+     * Reset Intros: The OnBoarding screen, shown when the app is first launched, and the information alert dialogs shown when the user logs in for the first time,
+     * are displayed again.
+     */
     private void setupButtons() {
         mChangePass.setOnClickListener(new View.OnClickListener() {
             @Override

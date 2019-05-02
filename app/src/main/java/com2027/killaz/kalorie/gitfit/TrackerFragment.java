@@ -83,7 +83,6 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private PolylineOptions polylineOptions;
     private Polyline routePolyline;
     private DatabaseHelper dbHelper;
-    private ShareActionProvider shareActionProvider;
     private FloatingActionButton fab;
 
     private double userWeightKg;
@@ -99,6 +98,9 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     }
 
 
+    /**
+     * Declare and initialise views. Get the current user. Provide criteria for the location listener to have the best possible location accuracy. Setup a share button for sharing runs.
+     */
     @SuppressLint("MissingPermission")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -169,6 +171,9 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     }
 
 
+    /**
+     * Make sure we have location permissions prior to using the map.
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
@@ -181,6 +186,9 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         mGoogleMap.setMyLocationEnabled(true);
     }
 
+    /**
+     * Track and display user steps and points. Update them accordingly when sensor detects a step.
+     */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         Sensor sensor = sensorEvent.sensor;
@@ -194,8 +202,6 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
             isLocationEnabled();
             steps++;
-            float elapsedSeconds = (int) ((SystemClock.elapsedRealtime() - timer.getBase()) / 1000);
-            float elapsedHours = elapsedSeconds / 3600;
             collectedPoints = (int) (steps * 0.65 + 300 + (completedChallenges * 1.35));
             pointsText.setText(String.valueOf(collectedPoints));
             stepsTakenText.setText(String.valueOf(steps));
@@ -207,6 +213,10 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
 
     }
 
+    /**
+     * Setup the button listeners for the fragment. One starts the timer and updates the displayed information accordingly.
+     * The other is used to reset all text fields and the timer.
+     */
     private void setButtonListeners() {
         startStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -237,6 +247,8 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                 stepsTakenText.setText("0");
                 pointsText.setText("0");
                 String set0km = "0 km";
+                String set0kmh = "0 km/h";
+                paceText.setText(set0kmh);
                 distanceTraveledText.setText(set0km);
                 polylineOptions.getPoints().clear();
                 routePolyline.remove();
@@ -244,6 +256,10 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         });
     }
 
+    /**
+     * Set upo the location listener to track the user's running speed and location.
+     * Appropriate anti-cheating is included by making sure the user is indeed using his/her feet and not a vehicle while on a run.
+     */
     private void setupLocationListener() {
         locListener = new LocationListener() {
 
@@ -303,6 +319,9 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         };
     }
 
+    /**
+     * Verify that the app has location permissions. If not, open the permissions screen to allow use to enable them.
+     */
     private void isLocationEnabled() {
         if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
@@ -325,6 +344,9 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
 
     }
 
+    /**
+     * Fetches the number of completed challenges from the database in order to be used for the points collected formula.
+     */
     private void setFirebaseFetch() {
         userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override

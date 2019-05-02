@@ -205,6 +205,10 @@ public class FriendsFragment extends Fragment {
 
     }
 
+    /**
+     * Displays friend information on a pop up dialog. Including name, challenges completed, points and steps taken.
+     * @param theFriend to show information about.
+     */
     private void showUserInfoPopup(final String theFriend) {
         DocumentReference friendRef = db.collection("Users").document(theFriend);
         final Dialog infoDialog;
@@ -244,6 +248,9 @@ public class FriendsFragment extends Fragment {
         infoDialog.show();
     }
 
+    /**
+     * Initialise button listener for friend requests. Allowing user to send requests to other users.
+     */
     private void setupFriendReqs() {
         friendReqBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -272,6 +279,9 @@ public class FriendsFragment extends Fragment {
         });
     }
 
+    /**
+     * Fetches all current users and adds them to a list. Friend requests check find if user exists from said list.
+     */
     private void fetchUsers() {
         db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -283,6 +293,10 @@ public class FriendsFragment extends Fragment {
         });
     }
 
+    /**
+     * Check if user trying to add as friend exists. If so, send request, if not, let user know.
+     * @param friendToAdd self-explanatory
+     */
     private void addFriend(String friendToAdd) {
         if (userList.contains(friendToAdd)) {
             db.collection("Users").document(friendToAdd).update("friend_requests", FieldValue.arrayUnion(currentUser.getDisplayName()));

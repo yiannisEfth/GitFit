@@ -21,11 +21,12 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
     private String notifText= "";
 
+    /**
+     * Used to display motivational messages as notifications to the user.
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         final Context finalContext = context;
-
-        Log.i("NotifAlarmReceiver", "Broadcast received");
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference notifRef = db.collection("Notifications").document("WeeklyMessages");
@@ -53,12 +54,6 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
                         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(finalContext);
                         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
-
-                        Log.i("NotifAlarmReceiver", "Notification sent");
-
-                    }
-                    else {
-                        Log.i("NotifAlarmReceiver", "Failed to get notifText");
                     }
                 }
             }

@@ -41,6 +41,9 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
     private int challengeRemaining;
     private SharedPreferences sharedPref;
 
+    /**
+     * Main menu of the application.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +83,11 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
         challengeRemaining = sharedPref.getInt(username + "remaining", total);
     }
 
+    /**
+     * Navigate to the appropriate fragment depending on user selection or to log out.
+     * @param menuItem chosen to be displayed.
+     * @return the chosen menuItem fragment or exit the app.
+     */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         // Save the steps in the db so that they are available for the next fragment.
@@ -190,6 +198,9 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
         // Do nothing
     }
 
+    /**
+     * Track today's steps.
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
         stepsToday++;

@@ -69,6 +69,9 @@ public class LeaderboardsFragment extends Fragment {
         fetchByPoints();
     }
 
+    /**
+     * Sorts and displays all users by the number of points they have in descending order. Server side calculation performed(sorting)
+     */
     private void fetchByPoints() {
         pointsListener = usersCollection.orderBy("points", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -91,6 +94,9 @@ public class LeaderboardsFragment extends Fragment {
         });
     }
 
+    /**
+     * Sorts and displays all users by the amount of calories burned in descending order. Server side calculation performed(sorting)
+     */
     private void fetchByCalories() {
         caloriesListener = usersCollection.orderBy("calories", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -113,6 +119,9 @@ public class LeaderboardsFragment extends Fragment {
         });
     }
 
+    /**
+     * Sorts and displays all users by the number of steps taken in descending order. Server side calculation performed(sorting)
+     */
     private void fetchBySteps() {
         distanceListener = usersCollection.orderBy("total_distance_covered", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -135,6 +144,9 @@ public class LeaderboardsFragment extends Fragment {
         });
     }
 
+    /**
+     * Sorts and displays all users by the number of challenges completed in descending order. Server side calculation performed(sorting)
+     */
     private void fetchByChallenges() {
         challengesListener = usersCollection.orderBy("challenges_completed", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -157,6 +169,9 @@ public class LeaderboardsFragment extends Fragment {
         });
     }
 
+    /**
+     * Setup button listeners for the fragment.
+     */
     private void setupButtons() {
         sortingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,6 +206,9 @@ public class LeaderboardsFragment extends Fragment {
         });
     }
 
+    /**
+     * Removes other listeners to use sortByPoints listener.
+     */
     private void sortByPoints() {
         if (distanceListener != null) {
             distanceListener.remove();
@@ -204,6 +222,9 @@ public class LeaderboardsFragment extends Fragment {
         fetchByPoints();
     }
 
+    /**
+     * Removes other listeners to use sortByCalories listener.
+     */
     private void sortByCalories() {
         if (distanceListener != null) {
             distanceListener.remove();
@@ -220,6 +241,9 @@ public class LeaderboardsFragment extends Fragment {
         fetchByCalories();
     }
 
+    /**
+     * Removes other listeners to use sortBySteps listener.
+     */
     private void sortBySteps() {
         if (challengesListener != null) {
             challengesListener.remove();
@@ -236,6 +260,9 @@ public class LeaderboardsFragment extends Fragment {
         fetchBySteps();
     }
 
+    /**
+     * Removes other listeners to use sortByChallenges listener.
+     */
     private void sortByChallenges() {
         if (distanceListener != null) {
             distanceListener.remove();
@@ -252,10 +279,12 @@ public class LeaderboardsFragment extends Fragment {
         fetchByChallenges();
     }
 
+    /**
+     * Removes all listeners when leaving the fragment.
+     */
     @Override
     public void onStop() {
         super.onStop();
-        Log.i("ON STOP CALLED", "here");
         if (distanceListener != null) {
             distanceListener.remove();
             distanceListener = null;

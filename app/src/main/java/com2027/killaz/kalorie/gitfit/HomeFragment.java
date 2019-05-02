@@ -95,7 +95,7 @@ public class HomeFragment extends Fragment {
         stepText.setText(String.valueOf(steps));
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        if(sharedPref.getBoolean("firstRun2",true)){
+        if (sharedPref.getBoolean("firstRun2", true)) {
             sharedPref.edit().putBoolean("firstRun2", false).apply();
             introDialog1();
         }
@@ -216,8 +216,7 @@ public class HomeFragment extends Fragment {
             // This stops errors when taking steps while looking at weekly/monthly values
             if (viewingToday) {
                 stepText.setText(String.valueOf(steps));
-            }
-            else if (!stepText.getText().toString().equals(getString(R.string.steps_loading))) {
+            } else if (!stepText.getText().toString().equals(getString(R.string.steps_loading))) {
                 stepText.setText(String.valueOf(Integer.parseInt(stepText.getText().toString()) + 1));
             }
 
@@ -314,7 +313,7 @@ public class HomeFragment extends Fragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle(dateString);
                 builder.setMessage("You walked " + dbHelper.getSteps(username, date) + " steps! Keep it up!");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -325,7 +324,8 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onNothingSelected() {}
+            public void onNothingSelected() {
+            }
         });
 
         chart.invalidate();
@@ -424,8 +424,9 @@ public class HomeFragment extends Fragment {
         editor.apply();
     }
 
-    // A method to manually insert steps into the database
-    // For testing purposes only
+    /**
+     * A method to manually insert steps into the database
+     */
     private void showInsertStepDialog() {
         LayoutInflater inflater = (LayoutInflater) getLayoutInflater();
         View customView = inflater.inflate(R.layout.insert_steps_dialog, null);
@@ -436,7 +437,7 @@ public class HomeFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(customView); // Set the view of the dialog to your custom layout
         builder.setTitle("Add steps");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int year = datePicker.getYear();
@@ -450,12 +451,16 @@ public class HomeFragment extends Fragment {
                 dbHelper.updateRecordSteps(username, cal.getTime(), steps);
                 drawGraph();
                 dialog.dismiss();
-            }});
+            }
+        });
 
         // Create and show the dialog
         builder.create().show();
     }
 
+    /**
+     * Animation to update the steps taken text
+     */
     public void stepAnim() {
         float pivotX = stepText.getMeasuredWidth() / 2f;
         float pivotY = stepText.getMeasuredHeight() / 2f;
@@ -468,24 +473,27 @@ public class HomeFragment extends Fragment {
         stepText.setAnimation(growAnim);
         growAnim.start();
 
-        growAnim.setAnimationListener(new Animation.AnimationListener()
-        {
+        growAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation){}
+            public void onAnimationStart(Animation animation) {
+            }
 
             @Override
-            public void onAnimationRepeat(Animation animation){}
+            public void onAnimationRepeat(Animation animation) {
+            }
 
             @Override
-            public void onAnimationEnd(Animation animation)
-            {
+            public void onAnimationEnd(Animation animation) {
                 stepText.setAnimation(shrinkAnim);
                 shrinkAnim.start();
             }
         });
     }
 
-    private void introDialog1(){
+    /**
+     * Introductory Dialogs for first time use of the app.
+     */
+    private void introDialog1() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Welcome")
                 .setMessage("Welcome to GitFit! Your way to a healthier lifestyle!")
@@ -499,7 +507,7 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
-    private void introDialog2(){
+    private void introDialog2() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Track Runs")
                 .setMessage("From the tracker tab, you can track a run with the path you took, distance covered, calories burned, and more!")
@@ -513,7 +521,7 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
-    private void introDialog3(){
+    private void introDialog3() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Complete challenges!Climb the leaderboards!")
                 .setMessage("You have personal challenges all the time to complete. If you feel competitive, challenge your friends as well! Look how you rank up on the world leaderboards!")
@@ -527,7 +535,7 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
-    private void introDialog4(){
+    private void introDialog4() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Chart Info!")
                 .setMessage("The home fragment shows the steps you've taken today, this week, and this month. A chart also shows your daily number of steps taken!")
@@ -541,7 +549,7 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
-    private void introDialog5(){
+    private void introDialog5() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Many more!")
                 .setMessage("Add friends to your friend's list. Compare your points to them and send them challenge requests! Reach the top of the leaderboards! To view the introduction again, click the 'Show Intros' button from the User Settings tab. Have Fun!")

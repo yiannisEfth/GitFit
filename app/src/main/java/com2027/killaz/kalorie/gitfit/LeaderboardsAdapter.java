@@ -15,6 +15,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
+/**
+ * Adapter for the leaderboards fragment list.
+ */
 public class LeaderboardsAdapter extends ArrayAdapter<LeaderboardsUser> {
 
     private ArrayList<LeaderboardsUser> userList;
@@ -38,6 +41,9 @@ public class LeaderboardsAdapter extends ArrayAdapter<LeaderboardsUser> {
         currentUser = mAuth.getCurrentUser();
     }
 
+    /**
+     * Setup each list view row appropriately.
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
