@@ -17,6 +17,7 @@ public class SplashScreen extends Activity {
 
     private Thread splashThread;
     private SharedPreferences prefs = null;
+    private ImageView bg;
 
     /**
      * The splash screen of the app.
@@ -33,6 +34,9 @@ public class SplashScreen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        bg = (ImageView) findViewById(R.id.splash_screen_img);
+        bg.setAdjustViewBounds(true);
+        bg.setScaleType(ImageView.ScaleType.CENTER_CROP);
         startAnimation();
     }
 
