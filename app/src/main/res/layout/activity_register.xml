@@ -19,24 +19,16 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="240dp"
-                android:layout_height="115dp"
+                android:scaleType="fitXY"
+                android:id="@+id/login_img"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="0dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="0dp"
                 android:adjustViewBounds="false"
                 android:cropToPadding="false"
-                android:src="@drawable/login_logo" />
-
-            <TextView
-                android:id="@+id/scavengerHuntText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="GitFit"
-                android:textAlignment="center"
-                android:textColor="@android:color/holo_orange_light"
-                android:textSize="30sp"
-                android:textStyle="bold" />
+                android:src="@drawable/ic_splash" />
 
             <ProgressBar
                 android:id="@+id/loginProgressBar"
@@ -55,7 +47,7 @@
                 android:drawablePadding="12dp"
                 android:drawableStart="@drawable/ic_person_white_24dp"
                 android:ems="10"
-                android:hint="Email"
+                android:hint="@string/email"
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
                 android:padding="8dp"
@@ -75,7 +67,7 @@
                 android:drawablePadding="12dp"
                 android:drawableStart="@drawable/ic_lock_white_24dp"
                 android:ems="10"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:inputType="textPassword"
                 android:maxLines="1"
                 android:padding="8dp"
@@ -96,8 +88,7 @@
                 android:drawablePadding="12dp"
                 android:drawableStart="@drawable/ic_face_white"
                 android:ems="10"
-                android:hint="Nickname"
-                android:inputType="textPassword"
+                android:hint="@string/nickname"
                 android:maxLines="1"
                 android:padding="8dp"
                 android:textColorHint="#fff" />
@@ -105,7 +96,8 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#f9d7db" />
+                android:background="#f9d7db"
+                android:layout_marginBottom="10dp"/>
 
             <Button
                 android:id="@+id/createAccBtn"

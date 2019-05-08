@@ -36,4 +36,11 @@
     <string name="challenges_reqs_from_friends"><u>Challenge Requests From Friends</u></string>
     <string name="action_share">SHARE</string>
     <string name="settings_reset_intros">Reset Intros</string>
+    <string name="sign_up_txt">Don\'t have an account? Sign up</string>
+    <string name="forgot_your_password">Forgot your Password?</string>
+    <string name="nickname">Nickname</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="remember_me">Remember me</string>
+    <string name="log_in">Log in</string>
 </resources>

@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
             mEditTextPassword.setText(rememberedPassword);
             mRememberCheckBox.setChecked(true);
         }
+        ImageView img = (ImageView) findViewById(R.id.login_img);
         createNotificationChannel();
         userLogin();
         forgotPasswordDialog();
