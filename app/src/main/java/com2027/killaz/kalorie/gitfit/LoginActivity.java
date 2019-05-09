@@ -138,7 +138,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
-
     }
 
 
@@ -202,6 +201,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void createNotificationChannel() {
         // Create the NotificationChannel, for API 26+ only
+        // Older versions do not require this function
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);

@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,11 +53,12 @@ public class BmiFragment extends Fragment {
      * @param value the bmi value
      */
     private void startCountAnimation(double value) {
+       final DecimalFormat df = new DecimalFormat("#.###");
         ValueAnimator animator = ValueAnimator.ofFloat((float) Double.parseDouble(mBMI.getText().toString()), (float) value);
         animator.setDuration(5000);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
-                mBMI.setText(animation.getAnimatedValue().toString());
+                mBMI.setText(df.format(animation.getAnimatedValue()));
             }
         });
         animator.start();
@@ -101,19 +103,27 @@ public class BmiFragment extends Fragment {
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                double weight;
+                double height;
+                double age;
 
                 if (mAgeInput.getText().toString().isEmpty()|| mWeightInput.getText().toString().isEmpty() || mHeightInput.getText().toString().isEmpty()) {
                     Toast.makeText(getActivity(), "Please fill in the blanks", Toast.LENGTH_SHORT).show();
                 }
-                else if(Integer.parseInt(mWeightInput.getText().toString())>1000 || Integer.parseInt(mWeightInput.getText().toString())<20 || Integer.parseInt(mHeightInput.getText().toString())>300 || Integer.parseInt(mHeightInput.getText().toString())<100){
-                    Toast.makeText(getActivity(), "Invalid values entered please retry", Toast.LENGTH_SHORT).show();
-                }
                 else {
-                    int age = Integer.parseInt(mAgeInput.getText().toString());
-                    if (age < 13 || age > 65)
-                        Toast.makeText(getActivity(),  "You are not in the age range for BMI measurement", Toast.LENGTH_SHORT).show();
-                    else
-                        calculateBMI();
+                   weight = Double.parseDouble(mWeightInput.getText().toString());
+                   height = Double.parseDouble(mHeightInput.getText().toString());
+                   age = Double.parseDouble(mAgeInput.getText().toString());
+
+                    if(weight > 800 || weight < 20 || height > 250 || height < 20){
+                        Toast.makeText(getActivity(), "Invalid values entered please retry", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        if (age < 13 || age > 65)
+                            Toast.makeText(getActivity(),  "You are not in the age range for BMI measurement", Toast.LENGTH_SHORT).show();
+                        else
+                            calculateBMI(height, weight);
+                    }
                 }
             }
         });
@@ -137,21 +147,17 @@ public class BmiFragment extends Fragment {
      * Method to calculate BMI value given the necessary input values
      * Output also included a comment based on the calculate BMI value
      */
-    public void calculateBMI() {
+    public void calculateBMI(double height, double weight) {
 
-        double height;
-        double weight;
         final double bmi;
 
-        if (mHeightMeasure.getSelectedItem() == "cm")
-            height = Double.parseDouble(mHeightInput.getText().toString());
-        else
+        if (mHeightMeasure.getSelectedItem() != "cm") {
             height = Double.parseDouble(mHeightInput.getText().toString()) * 2.54;
+        }
 
-        if (mWeightMeasure.getSelectedItem() == "kg")
-            weight = Double.parseDouble(mWeightInput.getText().toString());
-        else
+        if (mWeightMeasure.getSelectedItem() != "kg") {
             weight = Double.parseDouble(mWeightInput.getText().toString()) * 0.45;
+        }
 
         bmi = Math.round(weight / ((height / 100) * (height / 100)) * 10) / 10.0;
         mBMI.setVisibility(View.VISIBLE);
@@ -159,7 +165,7 @@ public class BmiFragment extends Fragment {
 
         dbHelper = DatabaseHelper.getInstance(getContext());
         try {
-            dbHelper.saveRecordsBMI(currentUser.getDisplayName(),(float)weight,(float)height,0);
+            dbHelper.saveRecordsBMI(currentUser.getDisplayName(),(float) weight,(float) height,0);
             Log.d("USER BMI VALUES", "SAVE SUCCESSFULLY");
         } catch (Exception e) {
             e.printStackTrace();
