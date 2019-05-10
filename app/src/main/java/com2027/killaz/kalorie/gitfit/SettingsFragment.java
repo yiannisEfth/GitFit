@@ -37,6 +37,7 @@ public class SettingsFragment extends Fragment {
     private Button mChangePass, mDeleteAccount, mResetPrefs;
     private FirebaseFirestore db;
     private SharedPreferences sharedPref;
+    private boolean accountDeleted = false;
 
     @Nullable
     @Override
@@ -69,17 +70,19 @@ public class SettingsFragment extends Fragment {
      * Sets a listener to fetch display the user's information from the firestore.
      */
     private void setValues() {
-        db.collection("Users").document(currentUser.getDisplayName()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (documentSnapshot != null) {
-                    int points = documentSnapshot.getLong("points").intValue();
-                    int challengesCompleted = documentSnapshot.getLong("challenges_completed").intValue();
-                    mPoints.setText(String.valueOf(points));
-                    mChallengesCompleted.setText(String.valueOf(challengesCompleted));
+        if (currentUser != null && !accountDeleted) {
+            db.collection("Users").document(currentUser.getDisplayName()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    if (documentSnapshot != null) {
+                        int points = documentSnapshot.getLong("points").intValue();
+                        int challengesCompleted = documentSnapshot.getLong("challenges_completed").intValue();
+                        mPoints.setText(String.valueOf(points));
+                        mChallengesCompleted.setText(String.valueOf(challengesCompleted));
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -134,13 +137,17 @@ public class SettingsFragment extends Fragment {
         mDeleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
+                // TODO delete all locally stored data
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Delete Account?");
                 builder.setMessage("Are you sure? You cannot undo this action");
                 builder.setPositiveButton("Yes, I am sure", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        db.collection("Users").document(currentUser.getDisplayName()).delete();
+                        accountDeleted = true;
+                        //db.collection("Users").document(currentUser.getDisplayName()).delete();
                         currentUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {

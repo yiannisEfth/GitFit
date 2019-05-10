@@ -192,7 +192,7 @@ public class ChallengesFragment extends Fragment {
         if (friendChallengeTotal > 0 && friendChallengeRemaining < friendChallengeTotal) {
             friendProgressBarTxt.setText(getResources().getString(R.string.your_progress, soFar, friendChallengeTotal));
             int progress = (int) ((soFar * 100.0f) / friendChallengeTotal);
-            ProgressBarAnimation animate = new ProgressBarAnimation(friendChallengeBar, 0, progress);
+            ProgressBarAnimation animate = new ProgressBarAnimation(friendChallengeBar, friendChallengeBar.getProgress(), progress);
             animate.setDuration(1000);
             friendChallengeBar.startAnimation(animate);
         }

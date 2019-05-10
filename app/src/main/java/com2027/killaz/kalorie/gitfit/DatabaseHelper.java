@@ -381,5 +381,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    public boolean deleteUser(String user) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + USER_RECORDS + " WHERE " + USER_NAME + " = ?";
+
+        int result = 0;
+        try {
+            Cursor cursor = db.rawQuery(query, new String[]{user});
+
+            // Delete all user records
+            while(cursor.moveToNext()) {
+                String dateString = cursor.getString(cursor.getColumnIndex(USER_RECORD_DATE));
+                Date date = new SimpleDateFormat("dd-MM-yyyy", Locale.UK).parse(dateString);
+                Log.d("Deleting: ", date.toString());
+                deleteRecord(user, date);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
 
 }
