@@ -48,5 +48,8 @@
     <string name="healthy">You are healthy. Keep it up!</string>
     <string name="overweight">You are overweight.</string>
     <string name="obese">You are obese.</string>
+    <string name="challenges_progress">Challenges Progress</string>
+    <string name="challenge_ohno">Oh no! You don\'t have any challenge requests from friends :( If you do get some, they will be displayed here</string>
+    <string name="challenge_a_friend">Challenge A Friend</string>
 
 </resources>

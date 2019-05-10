@@ -65,7 +65,7 @@ public class ChallengesFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        personalChallengeBar = (ProgressBar) getView().findViewById(R.id.challenges_persona_progress_bar);
+        personalChallengeBar = (ProgressBar) getView().findViewById(R.id.challenges_personal_progress_bar);
         friendChallengeBar = (ProgressBar) getView().findViewById(R.id.challenges_friend_progress_bar);
         personalInfoTxt = (TextView) getView().findViewById(R.id.challenges_personal_challenge_info);
         personalProgressBarTxt = (TextView) getView().findViewById(R.id.challenges_personal_fetching_view);
@@ -126,20 +126,20 @@ public class ChallengesFragment extends Fragment {
      */
     private void fetchPersonalChallengeName(DocumentReference theChallenge) {
         theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                                             @Override
-                                             public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                                                 String challenge_type = documentSnapshot.getString("type");
-                                                 if (challenge_type.equals("distance")) {
-                                                     personalChallengeTotal = documentSnapshot.getLong("distance").intValue();
-                                                     personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " metres!");
-                                                     updatePersonalProgressBar();
-                                                 } else {
-                                                     personalChallengeTotal = documentSnapshot.getLong("steps").intValue();
-                                                     personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " steps!");
-                                                     updatePersonalProgressBar();
-                                                 }
-                                             }
-                                         }
+             @Override
+             public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                 String challenge_type = documentSnapshot.getString("type");
+                 if (challenge_type.equals("distance")) {
+                     personalChallengeTotal = documentSnapshot.getLong("distance").intValue();
+                     personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " metres!");
+                     updatePersonalProgressBar();
+                 } else {
+                     personalChallengeTotal = documentSnapshot.getLong("steps").intValue();
+                     personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " steps!");
+                     updatePersonalProgressBar();
+                 }
+             }
+         }
         );
     }
 

@@ -1,13 +1,67 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<LinearLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@drawable/bluewall"
-    tools:context=".ChallengesFragment"
-    tools:layout_editor_absoluteY="81dp">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <TextView
+        android:id="@+id/challenges_personal_progress_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/challenges_progress"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/challenges_personal_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/challenges_personal_underline"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp"/>
+
+    <RelativeLayout
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ProgressBar
+            android:id="@+id/challenges_personal_progress_bar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_height="27dp"
+            android:layout_gravity="center_horizontal"
+            android:progressDrawable="@drawable/progress_bar_gradient" />
+
+        <TextView
+            android:id="@+id/challenges_personal_fetching_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fetching_challenge_progress"
+            android:textAlignment="center"
+            android:layout_alignTop="@+id/challenges_personal_progress_bar"
+            android:layout_alignBottom="@+id/challenges_personal_progress_bar"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/challenges_personal_challenge_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/challenges_friends_textview"
@@ -17,167 +71,78 @@
         android:text="@string/challenges_friend_underline"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/challenges_friend_fetching_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challenges_personal_challenge_info" />
+        android:textSize="18sp" />
 
-    <ProgressBar
-        android:id="@+id/challenges_friend_progress_bar"
-        style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_width="314dp"
-        android:layout_height="27dp"
-        android:layout_marginBottom="117dp"
-        android:layout_marginTop="117dp"
-        android:progressDrawable="@drawable/progress_bar_gradient"
-        app:layout_constraintBottom_toBottomOf="@+id/challenges_challenge_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challenges_personal_textview" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/challenges_friend_fetching_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fetching Challenge Progress..."
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/challenges_friend_challenge_info"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challenges_friends_textview" />
+        <ProgressBar
+            android:id="@+id/challenges_friend_progress_bar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_height="27dp"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:progressDrawable="@drawable/progress_bar_gradient" />
+
+        <TextView
+            android:id="@+id/challenges_friend_fetching_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fetching_challenge_progress"
+            android:layout_alignTop="@+id/challenges_friend_progress_bar"
+            android:layout_alignBottom="@+id/challenges_friend_progress_bar"
+            android:textAlignment="center" />
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/challenges_friend_challenge_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="43dp"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/challenges_challenge_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challenges_friend_fetching_view" />
-
-    <TextView
-        android:id="@+id/challenges_personal_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:layout_marginTop="53dp"
-        android:text="@string/challenges_personal_underline"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/challenges_personal_fetching_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/challenges_persona_progress_bar"
-        style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_width="314dp"
-        android:layout_height="27dp"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="36dp"
-        android:progressDrawable="@drawable/progress_bar_gradient"
-        app:layout_constraintBottom_toTopOf="@+id/challenges_friends_textview"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/challenges_personal_textview" />
-
-    <TextView
-        android:id="@+id/challenges_personal_progress_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Challenges Progress"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/challenges_personal_fetching_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fetching Challenge Progress..."
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/challenges_personal_challenge_info"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challenges_personal_textview" />
-
-    <TextView
-        android:id="@+id/challenges_personal_challenge_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/challenges_friends_textview"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challenges_personal_fetching_view" />
-
-    <ListView
-        android:id="@+id/challenge_reqs_list"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="1dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ignore_challenges_list_info" />
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/challenges_challenge_btn"
-        android:layout_width="227dp"
+        android:layout_width="250sp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="center_horizontal"
         android:background="@drawable/leaderboards_btn_shape"
-        android:text="Challenge A Friend"
-        app:layout_constraintBottom_toTopOf="@+id/ignore_challenges_list_info"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challenges_friend_challenge_info" />
+        android:text="@string/challenge_a_friend" />
 
     <TextView
         android:id="@+id/ignore_challenges_list_info"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="35dp"
+        android:layout_marginBottom="25dp"
         android:text="@string/challenges_reqs_from_friends"
         android:textAlignment="center"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/challenges_ohnoes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/challenges_challenge_btn" />
+        android:textSize="18sp" />
+
+    <ListView
+        android:id="@+id/challenge_reqs_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="-5dp" />
 
     <TextView
         android:id="@+id/challenges_ohnoes"
-        android:layout_width="253dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="101dp"
-        android:text="Oh no! You don't have any challenge requests from friends :( If you do get some, they will be displayed here"
+        android:layout_width="match_parent"
+        android:layout_marginRight="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="@string/challenge_ohno"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ignore_challenges_list_info" />
-</android.support.constraint.ConstraintLayout>
+        android:visibility="visible" />
+
+</LinearLayout>
