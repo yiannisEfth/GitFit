@@ -151,7 +151,7 @@ public class ChallengesFragment extends Fragment {
         if (personalChallengeTotal > 0 && personalChallengeRemaining < personalChallengeTotal) {
             personalProgressBarTxt.setText( "Your Progress:" + soFar + " / " + personalChallengeTotal);
             int progress = (int) ((soFar * 100.0f) / personalChallengeTotal);
-            ProgressBarAnimation animate = new ProgressBarAnimation(personalChallengeBar, 0, progress);
+            ProgressBarAnimation animate = new ProgressBarAnimation(personalChallengeBar, personalChallengeBar.getProgress(), progress);
             animate.setDuration(1000);
             personalChallengeBar.startAnimation(animate);
         }

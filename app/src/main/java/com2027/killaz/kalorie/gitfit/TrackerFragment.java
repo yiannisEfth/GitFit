@@ -250,8 +250,13 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                 String set0kmh = "0 km/h";
                 paceText.setText(set0kmh);
                 distanceTraveledText.setText(set0km);
-                polylineOptions.getPoints().clear();
-                routePolyline.remove();
+                if (polylineOptions != null) {
+                    polylineOptions.getPoints().clear();
+                }
+                if (routePolyline != null) {
+                    routePolyline.remove();
+                }
+
             }
         });
     }

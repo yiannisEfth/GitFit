@@ -11,6 +11,8 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="430dp"
+        android:layout_alignTop="@+id/tracker_calories"
+        android:layout_marginTop="25sp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_marginBottom="73dp"

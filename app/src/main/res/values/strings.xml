@@ -45,7 +45,8 @@
     <string name="log_in">Log in</string>
     <string name="very_underweight">You are alarmingly underweight.</string>
     <string name="underweight">You are underweight.</string>
-    <string name="healthy">You are healthy. Keep it up.</string>
+    <string name="healthy">You are healthy. Keep it up!</string>
     <string name="overweight">You are overweight.</string>
     <string name="obese">You are obese.</string>
+
 </resources>

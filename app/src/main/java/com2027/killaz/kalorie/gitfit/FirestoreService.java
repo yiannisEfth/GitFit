@@ -129,7 +129,9 @@ public class FirestoreService extends Service implements SensorEventListener {
                 AlarmManager.INTERVAL_DAY, alarmIntentDaily);
 
         // Weekly on an unspecified day at noon
+        // Initial set up must be in the future or else the notification will trigger instantly
         calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DATE, 7);
         calendar.set(Calendar.HOUR_OF_DAY, 12);
         calendar.set(Calendar.MINUTE, 0);
 
@@ -204,7 +206,6 @@ public class FirestoreService extends Service implements SensorEventListener {
         data.put("current_challenge_self", self_challenge_map);
         db.collection("Users").document(currentUser.getDisplayName()).set(data, SetOptions.merge());
 
-        //TODO Change steps data sent to change depending on option selected in homeFragment (daily/weekly/monthly)
         // currently send daily for testing purposes
         stepIntent.putExtra("steps", stepsToday);
         stepIntent.putExtra("remaining", remainingMyChallenge);
@@ -213,7 +214,7 @@ public class FirestoreService extends Service implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        // Do nothing
     }
 
     /**
