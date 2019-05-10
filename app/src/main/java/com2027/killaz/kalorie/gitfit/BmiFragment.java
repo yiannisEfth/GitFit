@@ -53,9 +53,9 @@ public class BmiFragment extends Fragment {
      * @param value the bmi value
      */
     private void startCountAnimation(double value) {
-       final DecimalFormat df = new DecimalFormat("#.###");
+       final DecimalFormat df = new DecimalFormat("#.##");
         ValueAnimator animator = ValueAnimator.ofFloat((float) Double.parseDouble(mBMI.getText().toString()), (float) value);
-        animator.setDuration(5000);
+        animator.setDuration(3500);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
                 mBMI.setText(df.format(animation.getAnimatedValue()));
@@ -177,15 +177,15 @@ public class BmiFragment extends Fragment {
             @Override
             public void run() {
                 if (bmi < 15.0)
-                    mMessage.setText("You are alarmingly underweight.");
+                    mMessage.setText(getString(R.string.very_underweight));
                 else if (bmi < 18.5)
-                    mMessage.setText("You are underweight.");
+                    mMessage.setText(getString(R.string.underweight));
                 else if (bmi < 25.0)
-                    mMessage.setText("You are healthy. Keep it up.");
+                    mMessage.setText(getString(R.string.healthy));
                 else if (bmi < 30.0)
-                    mMessage.setText("You are overweight.");
+                    mMessage.setText(getString(R.string.overweight));
                 else
-                    mMessage.setText("You are obese.");
+                    mMessage.setText(getString(R.string.obese));
             }
         }, 6000);
 

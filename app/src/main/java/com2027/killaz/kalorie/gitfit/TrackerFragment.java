@@ -202,7 +202,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
             isLocationEnabled();
             steps++;
-            collectedPoints = (int) (steps * 0.65 + 300 + (completedChallenges * 1.35));
+            collectedPoints = (int) (steps * 0.65 + 10 + (completedChallenges * 1.35));
             pointsText.setText(String.valueOf(collectedPoints));
             stepsTakenText.setText(String.valueOf(steps));
         }

@@ -305,27 +305,46 @@ public class HomeFragment extends Fragment {
                 cal.setFirstDayOfWeek(Calendar.MONDAY);
                 cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
                 cal.add(Calendar.DATE, dayOfWeek);
-                Date date = cal.getTime();
-                DateFormat df = new SimpleDateFormat("EEEE, dd MMM yyyy", Locale.getDefault());
-                String dateString = df.format(date);
 
-                // Build the dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(dateString);
-                builder.setMessage("You walked " + dbHelper.getSteps(username, date) + " steps! Keep it up!");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                if (cal.getTimeInMillis() < System.currentTimeMillis()) {
+                    Date date = cal.getTime();
+                    DateFormat df = new SimpleDateFormat("EEEE, dd MMM yyyy", Locale.getDefault());
+                    String dateString = df.format(date);
+                    int selectedDateSteps = dbHelper.getSteps(username, date);
+                    String msgText;
+
+                    if (selectedDateSteps > 10000) {
+                        msgText = "Incredible!";
+                    } else if (selectedDateSteps > 5000) {
+                        msgText = "Nice one!";
+                    } else if (selectedDateSteps > 1000) {
+                        msgText = "That's not bad.";
+                    } else if (selectedDateSteps > 100) {
+                        msgText = "You can do better than that!";
+                    } else {
+                        msgText = "Get up and go outside!";
                     }
-                });
-                // Create and show the dialog
-                builder.create().show();
+
+                    // Build the dialog
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle(dateString);
+                    builder.setMessage("You walked " + selectedDateSteps + " steps! " + msgText);
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    // Create and show the dialog
+                    builder.create().show();
+                }
             }
 
             @Override
             public void onNothingSelected() {
             }
+
         });
 
         chart.invalidate();
@@ -523,7 +542,7 @@ public class HomeFragment extends Fragment {
 
     private void introDialog3() {
         new AlertDialog.Builder(getContext())
-                .setTitle("Complete challenges!Climb the leaderboards!")
+                .setTitle("Complete challenges! Climb the leaderboards!")
                 .setMessage("You have personal challenges all the time to complete. If you feel competitive, challenge your friends as well! Look how you rank up on the world leaderboards!")
                 .setPositiveButton("Will do!", new DialogInterface.OnClickListener() {
                     @Override
