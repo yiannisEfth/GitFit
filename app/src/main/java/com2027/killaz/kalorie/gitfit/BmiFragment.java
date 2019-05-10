@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,9 @@ public class BmiFragment extends Fragment {
     private EditText mWeightInput;
     private Spinner mHeightMeasure;
     private Spinner mWeightMeasure;
+    private TextView mHeightInputText;
+    private TextView mWeightInputText;
+    private TextView mAgeInput_text;
     private EditText mAgeInput;
     private List<String> list1;
     private List<String> list2;
@@ -70,6 +75,9 @@ public class BmiFragment extends Fragment {
         mWeightInput = (EditText) getView().findViewById(R.id.weight_input);
         mHeightMeasure = (Spinner) getView().findViewById(R.id.height_measure);
         mWeightMeasure = (Spinner) getView().findViewById(R.id.weight_measure);
+        mHeightInputText = (TextView) getView().findViewById(R.id.height_input_text);
+        mWeightInputText = (TextView) getView().findViewById(R.id.weight_input_text);
+        mAgeInput_text = (TextView) getView().findViewById(R.id.age_input_text);
         mAgeInput = (EditText) getView().findViewById(R.id.age_input);
         mSubmit = (Button) getView().findViewById(R.id.submit_button);
 
@@ -161,6 +169,7 @@ public class BmiFragment extends Fragment {
 
         bmi = Math.round(weight / ((height / 100) * (height / 100)) * 10) / 10.0;
         mBMI.setVisibility(View.VISIBLE);
+        setVisabilityOfWidgets(false);
         startCountAnimation(bmi);
 
         dbHelper = DatabaseHelper.getInstance(getContext());
@@ -176,6 +185,7 @@ public class BmiFragment extends Fragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                setVisabilityOfWidgets(true);
                 if (bmi < 15.0)
                     mMessage.setText(getString(R.string.very_underweight));
                 else if (bmi < 18.5)
@@ -190,5 +200,33 @@ public class BmiFragment extends Fragment {
         }, 6000);
 
     }
+
+    public void setVisabilityOfWidgets(boolean visible){
+        if(visible){
+            mSubmit.setVisibility(View.VISIBLE);
+            mHeightInput.setVisibility(View.VISIBLE);
+            mWeightInput.setVisibility(View.VISIBLE);
+            mHeightMeasure.setVisibility(View.VISIBLE);
+            mWeightMeasure.setVisibility(View.VISIBLE);
+            mHeightInputText.setVisibility(View.VISIBLE);
+            mWeightInputText.setVisibility(View.VISIBLE);
+            mAgeInput_text.setVisibility(View.VISIBLE);
+            mAgeInput.setVisibility(View.VISIBLE);
+
+        }
+        else{
+            mSubmit.setVisibility(View.GONE);
+            mHeightInput.setVisibility(View.INVISIBLE);
+            mWeightInput.setVisibility(View.INVISIBLE);
+            mHeightMeasure.setVisibility(View.INVISIBLE);
+            mWeightMeasure.setVisibility(View.INVISIBLE);
+            mHeightInputText.setVisibility(View.INVISIBLE);
+            mWeightInputText.setVisibility(View.INVISIBLE);
+            mAgeInput_text.setVisibility(View.INVISIBLE);
+            mAgeInput.setVisibility(View.INVISIBLE);
+
+        }
+    }
+
 
 }
