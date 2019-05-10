@@ -236,44 +236,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param weight The input weight of the user
      * @param height The input height of the user
      */
-    public void saveRecordsBMI(String user, float weight, float height, int gender){
+    public boolean saveRecordsBMI(String user, float weight, float height, int gender){
+        boolean success = false;
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+        SQLiteDatabase dbWrite = this.getWritableDatabase();
+        String query = "SELECT * FROM " + USER_BMI + " WHERE " + USER_NAME + " = ?";
 
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + USER_BMI + " WHERE " + USER_NAME + " =?";
-        Cursor cursor = db.rawQuery(query, new String[]{user});
         ContentValues values = new ContentValues();
+        values.put(USER_WEIGHT, weight);
+        values.put(USER_HEIGHT, height);
+        if(gender == 1 || gender == 0) {
+            values.put(USER_GENDER, gender);
+        }
 
+        // Edit existing row if user is already in table
+        Cursor cursor = dbRead.rawQuery(query, new String[]{user});
 
-        //edit existing row if user is already in table
         if (cursor.getCount() > 0){
-            values.put(USER_WEIGHT, weight);
-            values.put(USER_HEIGHT, height);
-            if(gender == 1 || gender == 0) {
-                values.put(USER_GENDER, gender);
-            }
             int rowsAffected = -1;
             try {
-                rowsAffected = db.update(USER_BMI, values, USER_NAME + " = " + user, null);
+                String where = USER_NAME + " = ?";
+                String[] args = new String[]{user};
+                rowsAffected = dbWrite.update(USER_BMI, values, where, args);
                 Log.i("ROWS_UPDATED", String.valueOf(rowsAffected));
-            }
-            catch (Exception e) {
+                success = true;
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        // Add brand new row
         else{
-            values.put(USER_NAME, user);
-            values.put(USER_WEIGHT, weight);
-            values.put(USER_HEIGHT, height);
-            if(gender == 1 || gender == 0) {
-                values.put(USER_GENDER, gender);
+            try {
+                long newID = dbWrite.insert(USER_BMI, null, values);
+                success = true;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            else{
-                values.put(USER_GENDER, 0);
-            }
-            long newID = db.insert(USER_BMI, null, values);
         }
+
         cursor.close();
+        return success;
     }
 
     /**

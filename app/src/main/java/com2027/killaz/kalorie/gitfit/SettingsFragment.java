@@ -137,8 +137,6 @@ public class SettingsFragment extends Fragment {
         mDeleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
-                // TODO delete all locally stored data
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Delete Account?");
@@ -147,7 +145,19 @@ public class SettingsFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         accountDeleted = true;
-                        //db.collection("Users").document(currentUser.getDisplayName()).delete();
+
+                        // Delete database records
+                        DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
+                        dbHelper.deleteUser(currentUser.getDisplayName());
+
+                        // Delete user-specific sharedPrefs
+                        sharedPref.edit()
+                                .remove(currentUser.getDisplayName() + "total")
+                                .remove(currentUser.getDisplayName() + "remaining")
+                                .apply();
+
+                        db.collection("Users").document(currentUser.getDisplayName()).delete();
+
                         currentUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {

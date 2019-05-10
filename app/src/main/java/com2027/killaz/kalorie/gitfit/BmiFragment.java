@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -124,7 +125,7 @@ public class BmiFragment extends Fragment {
                    age = Double.parseDouble(mAgeInput.getText().toString());
 
                     if(weight > 800 || weight < 20 || height > 250 || height < 20){
-                        Toast.makeText(getActivity(), "Invalid values entered please retry", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Invalid values entered. Please retry", Toast.LENGTH_SHORT).show();
                     }
                     else {
                         if (age < 13 || age > 65)
@@ -172,14 +173,24 @@ public class BmiFragment extends Fragment {
         setVisabilityOfWidgets(false);
         startCountAnimation(bmi);
 
-        dbHelper = DatabaseHelper.getInstance(getContext());
-        try {
-            dbHelper.saveRecordsBMI(currentUser.getDisplayName(),(float) weight,(float) height,0);
-            Log.d("USER BMI VALUES", "SAVE SUCCESSFULLY");
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("USER BMI VALUES", "FAILED TO SAVE");
-        }
+        final double W = weight;
+        final double H = height;
+        Snackbar.make(getView(), "Save these values for calorie calculations?", Snackbar.LENGTH_LONG)
+                .setAction("Do it!", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dbHelper = DatabaseHelper.getInstance(getContext());
+                        boolean saved = dbHelper.saveRecordsBMI(currentUser.getDisplayName(),(float) W,(float) H,0);
+                        if (saved) {
+                            Log.d("USER BMI VALUES", "SAVE SUCCESSFULLY");
+                            Snackbar.make(getView(), "Saved!", Snackbar.LENGTH_LONG).show();
+                        }
+                        else {
+                            Log.d("USER BMI VALUES", "FAILED TO SAVE");
+                            Snackbar.make(getView(), "Values failed to save.", Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                }).show();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -197,7 +208,7 @@ public class BmiFragment extends Fragment {
                 else
                     mMessage.setText(getString(R.string.obese));
             }
-        }, 6000);
+        }, 5000);
 
     }
 
@@ -212,7 +223,6 @@ public class BmiFragment extends Fragment {
             mWeightInputText.setVisibility(View.VISIBLE);
             mAgeInput_text.setVisibility(View.VISIBLE);
             mAgeInput.setVisibility(View.VISIBLE);
-
         }
         else{
             mSubmit.setVisibility(View.GONE);
@@ -224,7 +234,6 @@ public class BmiFragment extends Fragment {
             mWeightInputText.setVisibility(View.INVISIBLE);
             mAgeInput_text.setVisibility(View.INVISIBLE);
             mAgeInput.setVisibility(View.INVISIBLE);
-
         }
     }
 
