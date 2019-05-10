@@ -207,6 +207,7 @@ public class FriendsFragment extends Fragment {
 
     /**
      * Displays friend information on a pop up dialog. Including name, challenges completed, points and steps taken.
+     *
      * @param theFriend to show information about.
      */
     private void showUserInfoPopup(final String theFriend) {
@@ -295,10 +296,13 @@ public class FriendsFragment extends Fragment {
 
     /**
      * Check if user trying to add as friend exists. If so, send request, if not, let user know.
+     *
      * @param friendToAdd self-explanatory
      */
     private void addFriend(String friendToAdd) {
-        if (userList.contains(friendToAdd)) {
+        if (friendToAdd.equals(currentUser.getDisplayName())) {
+            Toast.makeText(getContext(), "Are you that lonely?", Toast.LENGTH_SHORT).show();
+        } else if (userList.contains(friendToAdd)) {
             db.collection("Users").document(friendToAdd).update("friend_requests", FieldValue.arrayUnion(currentUser.getDisplayName()));
             Toast.makeText(getContext(), "Friend request sent to " + friendToAdd, Toast.LENGTH_SHORT).show();
         } else {
