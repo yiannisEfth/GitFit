@@ -32,7 +32,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="14dp"
         android:layout_marginTop="43dp"
-        android:text="Distance Traveled:"
+        android:text="@string/tracker_distance_traveled"
         android:textAlignment="center" />
 
     <TextView
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView2"
         android:layout_toEndOf="@+id/textView2"
-        android:text="0 km" />
+        android:text="@string/tracker_dist_travleled_default" />
 
     <TextView
         android:id="@+id/textView4"
@@ -50,7 +50,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/textView2"
         android:layout_marginTop="12dp"
-        android:text="Current Pace: "
+        android:text="@string/tracker_current_pace"
         android:textAlignment="center"
         android:textSize="18sp" />
 
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView4"
         android:layout_toEndOf="@+id/textView4"
-        android:text="0 km/h"
+        android:text="@string/tracker_pace_default"
         android:textSize="18sp" />
 
     <TextView
@@ -70,7 +70,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/textView2"
         android:layout_marginTop="70dp"
-        android:text="Calories Burned:" />
+        android:text="@string/tracker_calories_burned" />
 
     <TextView
         android:id="@+id/tracker_calories"
@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView6"
         android:layout_toEndOf="@+id/textView6"
-        android:text="0" />
+        android:text="@string/tracker_calories_default" />
 
     <TextView
         android:id="@+id/textView8"
@@ -87,7 +87,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/textView6"
         android:layout_marginEnd="63dp"
-        android:text="Points Collected:" />
+        android:text="@string/tracker_points_collected" />
 
     <TextView
         android:id="@+id/tracker_points"
@@ -96,7 +96,7 @@
         android:layout_alignTop="@+id/textView6"
         android:layout_marginStart="-63dp"
         android:layout_toEndOf="@+id/textView8"
-        android:text="0" />
+        android:text="@string/tracker_points_default" />
 
     <TextView
         android:id="@+id/textView10"
@@ -104,7 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/tracker_distance_traveled"
         android:layout_alignStart="@+id/textView8"
-        android:text="Steps Taken:" />
+        android:text="@string/tracker_steps_taken" />
 
     <TextView
         android:id="@+id/tracker_steps_counter"
@@ -112,7 +112,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/tracker_distance_traveled"
         android:layout_toEndOf="@+id/textView10"
-        android:text="0" />
+        android:text="@string/tracker_steps_counter_default" />
 
     <Button
         android:id="@+id/tracker_start_stop"
@@ -122,7 +122,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_marginBottom="11dp"
-        android:text="Start/Stop Time" />
+        android:text="@string/tracker_start_stop_time" />
 
     <Chronometer
         android:id="@+id/tracker_timer"
@@ -140,7 +140,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/tracker_start_stop"
         android:layout_alignParentEnd="true"
-        android:text="Reset all" />
+        android:text="@string/tracker_reset_all" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

@@ -23,10 +23,9 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:windowSoftInputMode="stateHidden"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".SplashScreen">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +37,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAj7f0IUHE5GkJf5bn2JK95p1fzNIXDGG8" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -50,10 +48,11 @@
 
         <receiver android:name=".NotificationAlarmReceiver">
             <intent-filter>
-                <action android:name="com2027.killaz.kalorie.gitfit.NOTIFICATION"/>
+                <action android:name="com2027.killaz.kalorie.gitfit.NOTIFICATION" />
             </intent-filter>
         </receiver>
 
+        <activity android:name=".TermsAndConditions"></activity>
     </application>
 
 </manifest>

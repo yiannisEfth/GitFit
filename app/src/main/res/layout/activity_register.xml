@@ -109,10 +109,18 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="16dp"
-                android:text="Create Account"
+                android:text="@string/register_create_account"
                 android:textAllCaps="false"
                 android:textColor="#fff"
                 android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tnc_register_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="By Registering in, you agree to the terms and conditions. Click here to read them."
+                android:textColor="@android:color/black"
+                android:textSize="12sp"/>
 
 
         </LinearLayout>

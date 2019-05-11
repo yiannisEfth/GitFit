@@ -42,7 +42,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
         android:fontFamily="sans-serif"
-        android:text="Friends"
+        android:text="@string/friends_fragment_friends"
         android:textAlignment="center"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/friends_recycler_view"
         android:layout_centerHorizontal="true"
-        android:text="Friend Requests"
+        android:text="@string/friends_fragment_friend_requests"
         android:textAlignment="center"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -75,7 +75,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:background="@drawable/friend_req_btn_shape"
-        android:text="Add Friend"
+        android:text="@string/friends_fragment_add_friend"
         android:textColor="#FFFFFF"
         android:textSize="30sp" />
 </RelativeLayout>

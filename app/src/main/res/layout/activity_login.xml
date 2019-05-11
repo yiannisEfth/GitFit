@@ -131,6 +131,14 @@
                 android:textColor="#fff" />
 
 
+            <TextView
+                android:id="@+id/login_tnc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="By Logging in, you agree to the terms and conditions. Click here to read them."
+                android:textColor="@android:color/black"
+                android:textSize="12sp" />
+
         </LinearLayout>
     </ScrollView>
 

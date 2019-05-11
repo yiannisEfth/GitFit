@@ -9,4 +9,4 @@
     android:textAlignment="center"
     android:textColor="@android:color/black"
     android:textSize="16dip"
-    android:textStyle="bold"></TextView>
+    android:textStyle="bold" />

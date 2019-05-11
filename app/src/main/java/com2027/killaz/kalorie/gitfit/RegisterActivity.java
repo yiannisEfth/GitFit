@@ -1,5 +1,6 @@
 package com2027.killaz.kalorie.gitfit;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,6 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Button mSignUpButton;
+    private TextView tncText;
     private EditText mEditTextEmail;
     private EditText mEditTextPassword;
     private EditText mEditTextNickname;
@@ -56,9 +59,11 @@ public class RegisterActivity extends AppCompatActivity {
         mEditTextPassword = (EditText) findViewById(R.id.passwordField);
         mEditTextNickname = (EditText) findViewById(R.id.nicknameField);
         mProgressBar = (ProgressBar) findViewById(R.id.loginProgressBar);
+        tncText = (TextView) findViewById(R.id.tnc_register_text);
         takenNames = new ArrayList<>();
         fetchNames();
         createAccount();
+        termsAndConditions();
     }
 
 
@@ -193,6 +198,17 @@ public class RegisterActivity extends AppCompatActivity {
                 for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                     takenNames.add(document.getId());
                 }
+            }
+        });
+    }
+
+    // Setup listener for the terms and conditions text
+    private void termsAndConditions(){
+        tncText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent tncIntent = new Intent(RegisterActivity.this, TermsAndConditions.class);
+                startActivity(tncIntent);
             }
         });
     }

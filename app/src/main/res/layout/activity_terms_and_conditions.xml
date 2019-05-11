@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@drawable/friends_fragment_bg"
+    android:layout_height="match_parent"
+    tools:context=".TermsAndConditions">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/back_to_login_btn_tnc"
+        android:layout_marginBottom="11dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/tnc_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/terms_and_conditions_text"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:typeface="normal" />
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/back_to_login_btn_tnc"
+        android:layout_width="115dp"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/friend_req_btn_shape"
+        android:text="@string/terms_and_conditions_accept" />
+</RelativeLayout>

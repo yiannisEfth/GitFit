@@ -38,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Button mLoginButton;
     private Button mSignUpButton;
+    private TextView tncText;
     private TextView mForgotPassword;
     private EditText mEditTextEmail;
     private EditText mEditTextPassword;
@@ -55,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mLoginButton = (Button) findViewById(R.id.loginButton);
         mSignUpButton = (Button) findViewById(R.id.signUpButton);
+        tncText = (TextView) findViewById(R.id.login_tnc);
         mForgotPassword = (TextView) findViewById(R.id.forgotPassView);
         mEditTextEmail = (EditText) findViewById(R.id.emailField);
         mEditTextPassword = (EditText) findViewById(R.id.passwordField);
@@ -73,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         userLogin();
         forgotPasswordDialog();
         signUpActivity();
+        termsAndConditions();
     }
 
     /**
@@ -214,6 +217,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    // Check if application has location permission
     public void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -223,6 +227,17 @@ public class LoginActivity extends AppCompatActivity {
                     99);
         }
 
+    }
+
+    // Setup listener for the terms and conditions text
+    private void termsAndConditions(){
+        tncText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent tncIntent = new Intent(LoginActivity.this, TermsAndConditions.class);
+                startActivity(tncIntent);
+            }
+        });
     }
 
 }

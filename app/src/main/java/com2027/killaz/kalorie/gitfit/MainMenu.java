@@ -149,7 +149,7 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
             case R.id.menu_logout:
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(MainMenu.this);
                 builder1.setTitle("Log Out");
-                builder1.setMessage("Are you sure you wish to log out and exit the app?");
+                builder1.setMessage("Are you sure you wish to log out and go back to the login screen?");
                 builder1.setCancelable(true);
 
                 builder1.setPositiveButton(
@@ -157,6 +157,8 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 mAuth.signOut();
+                                Intent backToLogin = new Intent(getApplicationContext(), LoginActivity.class);
+                                startActivity(backToLogin);
                                 finish();
                             }
                         });
@@ -171,6 +173,34 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
 
                 AlertDialog logoutAlert = builder1.create();
                 logoutAlert.show();
+                break;
+
+            case R.id.menu_logout_exit:
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(MainMenu.this);
+                builder2.setTitle("Log Out");
+                builder2.setMessage("Are you sure you wish to log out and exit the app?");
+                builder2.setCancelable(true);
+
+                builder2.setPositiveButton(
+                        "Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                mAuth.signOut();
+                                finish();
+                            }
+                        });
+
+                builder2.setNegativeButton(
+                        "No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                AlertDialog logoutExitAlert = builder2.create();
+                logoutExitAlert.show();
+                break;
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;

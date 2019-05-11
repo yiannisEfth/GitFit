@@ -12,7 +12,6 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="44dp"
-        android:text="ViperYiannis"
         android:textAlignment="center"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/black" />
@@ -25,7 +24,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginEnd="190dp"
-        android:text="1024"
         android:textAlignment="center"
         android:textColor="@android:color/black" />
 
@@ -36,7 +34,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginEnd="55dp"
-        android:text="124050"
         android:textAlignment="center"
         android:textColor="@android:color/black" />
 
@@ -46,7 +43,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:text="405"
         android:textAlignment="center"
         android:textColor="@android:color/black" />
 
@@ -56,7 +52,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:text="978596"
         android:textAlignment="center"
         android:textColor="@android:color/black" />
 
@@ -67,7 +62,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginEnd="130dp"
-        android:text="890"
         android:textAlignment="center"
         android:textColor="@android:color/black" />
 

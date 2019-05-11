@@ -4,14 +4,15 @@
     tools:showIn = "navigation_view">
 
 <group android:checkableBehavior="single">
-    <item android:id="@+id/menu_home" android:title="Home" />
-    <item android:id="@+id/menu_tracker" android:title="Location Tracker" />
-    <item android:id="@+id/menu_friends" android:title="Friends" />
-    <item android:id="@+id/menu_challenges" android:title="Challenges" />
-    <item android:id="@+id/menu_bmicalc" android:title="BMI Calculator" />
-    <item android:id="@+id/menu_leaderboards" android:title="Leaderboards" />
-    <item android:id="@+id/menu_settings" android:title="User Settings" />
-    <item android:id="@+id/menu_logout" android:title="Log Out" />
+    <item android:id="@+id/menu_home" android:title="@string/fragment_menu_home" />
+    <item android:id="@+id/menu_tracker" android:title="@string/fragment_menu_location_tracker" />
+    <item android:id="@+id/menu_friends" android:title="@string/fragment_menu_friends" />
+    <item android:id="@+id/menu_challenges" android:title="@string/fragment_menu_challenges" />
+    <item android:id="@+id/menu_bmicalc" android:title="@string/fragment_menu_bmi_calculator" />
+    <item android:id="@+id/menu_leaderboards" android:title="@string/fragment_menu_leaderboards" />
+    <item android:id="@+id/menu_settings" android:title="@string/fragment_menu_user_settings" />
+    <item android:id="@+id/menu_logout" android:title="@string/fragment_menu_log_out" />
+    <item android:id="@+id/menu_logout_exit" android:title="@string/fragment_menu_log_out_and_exit" />
 
 </group>
 

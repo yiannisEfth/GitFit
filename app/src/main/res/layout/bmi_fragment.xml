@@ -23,7 +23,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="height"
+                android:text="@string/bmi_height"
                 android:textAlignment="center"
                 android:layout_weight="1"
                 android:id="@+id/height_input_text"/>
@@ -51,7 +51,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="weight"
+                android:text="@string/bmi_weight"
                 android:textAlignment="center"
                 android:layout_weight="1"
                 android:id="@+id/weight_input_text"/>
@@ -85,7 +85,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="insert age"
+                android:text="@string/bmi_insert_age"
                 android:id="@+id/age_input_text"
                 android:textAlignment="center"
                 android:layout_weight="1"/>
@@ -112,7 +112,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="90sp"
         android:textSize="25sp"
-        android:text="Your BMI is: "
+        android:text="@string/bmi_your_bmi_is"
         android:textAlignment="center" />
 
     <TextView
@@ -138,7 +138,7 @@
             android:id="@+id/submit_button"
             android:layout_width="match_parent"
             android:layout_gravity="center|bottom"
-            android:text="submit"
+            android:text="@string/bmi_submit"
             android:layout_height="60dp"
             android:layout_marginBottom="4dp"
             android:background="@drawable/bmi_btn_shape" />
