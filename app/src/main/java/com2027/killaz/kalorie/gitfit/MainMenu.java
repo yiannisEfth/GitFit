@@ -18,6 +18,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -235,6 +236,12 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
     public void onSensorChanged(SensorEvent event) {
         stepsToday++;
         challengeRemaining--;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAuth.signOut();
     }
 }
 

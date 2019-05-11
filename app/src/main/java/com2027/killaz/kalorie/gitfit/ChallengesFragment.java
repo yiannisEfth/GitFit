@@ -106,6 +106,11 @@ public class ChallengesFragment extends Fragment {
                     }
                     else {
                         hasFriendChallenge = false;
+                        String noChallengeText = "No Active Challenge From Friend";
+                        friendProgressBarTxt.setText(noChallengeText);
+                        ProgressBarAnimation animate = new ProgressBarAnimation(friendChallengeBar, friendChallengeBar.getProgress(), 0);
+                        animate.setDuration(1000);
+                        friendChallengeBar.startAnimation(animate);
                     }
                     DocumentReference friendChallengeRef = (DocumentReference) challenge_friend.get("challenge_ref");
                     fetchFriendChallengeName(friendChallengeRef);
