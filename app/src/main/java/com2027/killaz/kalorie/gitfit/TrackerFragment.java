@@ -291,13 +291,13 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                         elapsedTime = (location.getTime() - lastLocation.getTime()) / 1_000f; // Convert milliseconds to seconds
                         calculatedSpeed = addedDistance / elapsedTime;
                         distanceRan += (addedDistance / 1000); // Convert metres to km
-                        distanceTraveledText.setText(String.valueOf(roundKms.format(distanceRan)) + "km");
+                        distanceTraveledText.setText(roundKms.format(distanceRan) + "km");
                     }
                     this.lastLocation = location;
 
                     averagePace = location.hasSpeed() ? location.getSpeed() : calculatedSpeed;
                     averagePace *= 3.6; // Convert to km/h
-                    paceText.setText(String.valueOf(roundPace.format(averagePace)) + " km/h");
+                    paceText.setText(roundPace.format(averagePace) + " km/h");
 
                     if (averagePace < 20) {
                         float paceInMps = averagePace / 3.6f;
@@ -306,7 +306,9 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                         // formula is for per minute so needs to multiply by fraction of minute elapsed since last update
 
                         burnedCalories += ((0.035 * userWeightKg) + ((paceInMps * paceInMps) / userHeightM) * 0.029 * userWeightKg) * (elapsedTime / 60);
-                        caloriesText.setText(String.valueOf(roundCal.format(burnedCalories)));
+                        if (!Double.isNaN(burnedCalories)) {
+                            caloriesText.setText(roundCal.format(burnedCalories));
+                        }
                     } else {
                         Toast.makeText(getContext(), "Too fast - calories will not be counted.", Toast.LENGTH_LONG).show();
                     }

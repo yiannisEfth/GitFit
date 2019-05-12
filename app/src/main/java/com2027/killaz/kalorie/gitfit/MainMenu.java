@@ -237,11 +237,5 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
         stepsToday++;
         challengeRemaining--;
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mAuth.signOut();
-    }
 }
 

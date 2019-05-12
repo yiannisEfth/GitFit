@@ -29,6 +29,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
@@ -56,6 +57,10 @@ public class ChallengesFragment extends Fragment {
     private ArrayAdapter<String> adapter;
     private Context mContext;
     private boolean hasFriendChallenge;
+    private ListenerRegistration userListener;
+    private ListenerRegistration personalListener;
+    private ListenerRegistration friendListener;
+    private ListenerRegistration requestListener;
 
     @Nullable
     @Override
@@ -93,7 +98,7 @@ public class ChallengesFragment extends Fragment {
      * Methods to initiate a snapshot listener to fetch both user challenges.
      */
     private void fetchUserChallenges() {
-        userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        userListener = userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
                 if (documentSnapshot != null) {
@@ -130,7 +135,7 @@ public class ChallengesFragment extends Fragment {
      * @param theChallenge the reference of the challenge to be fetched from the challenges collection
      */
     private void fetchPersonalChallengeName(DocumentReference theChallenge) {
-        theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        personalListener = theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
              @Override
              public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
                  String challenge_type = documentSnapshot.getString("type");
@@ -168,24 +173,23 @@ public class ChallengesFragment extends Fragment {
      */
     private void fetchFriendChallengeName(DocumentReference theChallenge) {
         if (theChallenge == null) {
-            friendInfoTxt.setText("You don't have a challenge from a friend currently active :(");
+            friendInfoTxt.setText(R.string.no_friend_challenge);
         } else {
-            theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                                                 @Override
-                                                 public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                                                     String challenge_type = documentSnapshot.getString("type");
-                                                     if (challenge_type.equals("distance")) {
-                                                         friendChallengeTotal = documentSnapshot.getLong("distance").intValue();
-                                                         friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " metres!");
-                                                         updateFriendProgressBar();
-                                                     } else {
-                                                         friendChallengeTotal = documentSnapshot.getLong("steps").intValue();
-                                                         friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " steps!");
-                                                        updateFriendProgressBar();
-                                                     }
-                                                 }
-                                             }
-            );
+            friendListener = theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    String challenge_type = documentSnapshot.getString("type");
+                    if (challenge_type.equals("distance")) {
+                        friendChallengeTotal = documentSnapshot.getLong("distance").intValue();
+                        friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " metres!");
+                        updateFriendProgressBar();
+                    } else {
+                        friendChallengeTotal = documentSnapshot.getLong("steps").intValue();
+                        friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " steps!");
+                        updateFriendProgressBar();
+                    }
+                }
+            });
         }
     }
 
@@ -304,7 +308,7 @@ public class ChallengesFragment extends Fragment {
      * Method that fetches challenge requests and displays them in a list
      */
     private void fetchChallengeRequests() {
-        userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        requestListener = userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
                 challengerNames = (List<String>) documentSnapshot.get("challenge_requests");
@@ -409,5 +413,14 @@ public class ChallengesFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext =context;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        userListener.remove();
+        friendListener.remove();
+        personalListener.remove();
+        requestListener.remove();
     }
 }
