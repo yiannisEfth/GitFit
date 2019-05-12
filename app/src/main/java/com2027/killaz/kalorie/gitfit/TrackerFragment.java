@@ -132,7 +132,7 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         setupLocationListener();
         locManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         locProvider = locManager.getBestProvider(locCriteria, false);
-        locManager.requestLocationUpdates(locProvider, 1000, 5, locListener);
+        locManager.requestLocationUpdates(locProvider, 1000, 1, locListener);
 
         setButtonListeners();
         isLocationEnabled();
