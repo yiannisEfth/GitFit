@@ -22,6 +22,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -85,8 +86,8 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
     private DatabaseHelper dbHelper;
     private FloatingActionButton fab;
 
-    private double userWeightKg;
-    private double userHeightM;
+    private double userWeightKg = 1.75;
+    private double userHeightM = 70;
 
     @Nullable
     @Override
@@ -145,9 +146,13 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
             userWeightKg = dbHelper.getUserWeight(currentUser.getDisplayName());
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d("USER BMI VALUES", "NOT FOUND. USING DEFAULT.");
+        }
+
+        // If the DB sets either value to 0, just use the default.
+        if (userHeightM == 0 || userWeightKg == 0) {
             userHeightM = 1.75;
             userWeightKg = 70;
-            Log.d("USER BMI VALUES", "NOT FOUND. USING DEFAULT.");
         }
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -295,7 +300,13 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                     }
                     this.lastLocation = location;
 
-                    averagePace = location.hasSpeed() ? location.getSpeed() : calculatedSpeed;
+                    if (location.hasSpeed()) {
+                        averagePace = location.getSpeed();
+                    }
+                    if (averagePace == 0) {
+                        averagePace = calculatedSpeed;
+                    }
+
                     averagePace *= 3.6; // Convert to km/h
                     paceText.setText(roundPace.format(averagePace) + " km/h");
 
@@ -308,9 +319,17 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
                         burnedCalories += ((0.035 * userWeightKg) + ((paceInMps * paceInMps) / userHeightM) * 0.029 * userWeightKg) * (elapsedTime / 60);
                         if (!Double.isNaN(burnedCalories)) {
                             caloriesText.setText(roundCal.format(burnedCalories));
+                        } else {
+                            Toast.makeText(getContext(), "Error: Calories are NaN.", Toast.LENGTH_LONG).show();
                         }
                     } else {
-                        Toast.makeText(getContext(), "Too fast - calories will not be counted.", Toast.LENGTH_LONG).show();
+                        final Snackbar sb = Snackbar.make(getView(), "You are travelling too fast. Calories will not be counted.", Snackbar.LENGTH_INDEFINITE);
+                        sb.setAction("OK", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                sb.dismiss();
+                            }
+                        }).show();
                     }
                 }
             }

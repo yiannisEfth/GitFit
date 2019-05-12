@@ -282,18 +282,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param user The current user
      * @return the weight of the user stored in the db
      */
-    public int getUserWeight(String user) {
+    public double getUserWeight(String user) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + USER_BMI +
                 " WHERE " + USER_NAME + " = ?";
 
-        int result = 0;
+        double result = 0;
         try {
             Cursor cursor = db.rawQuery(query, new String[]{user});
 
             // Check cursor is not empty
             if (cursor.moveToFirst() && cursor.getCount() > 0) {
-                result = cursor.getInt(cursor.getColumnIndex(USER_WEIGHT));
+                result = cursor.getDouble(cursor.getColumnIndex(USER_WEIGHT));
             }
 
             cursor.close();
@@ -308,18 +308,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param user The current user
      * @return the height of the user stored in the db
      */
-    public int getUserHeight(String user) {
+    public double getUserHeight(String user) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + USER_BMI +
                 " WHERE " + USER_NAME + " = ?";
 
-        int result = 0;
+        double result = 0;
         try {
             Cursor cursor = db.rawQuery(query, new String[]{user});
 
             // Check cursor is not empty
             if (cursor.moveToFirst() && cursor.getCount() > 0) {
-                result = cursor.getInt(cursor.getColumnIndex(USER_HEIGHT));
+                result = cursor.getDouble(cursor.getColumnIndex(USER_HEIGHT));
             }
 
             cursor.close();
@@ -334,18 +334,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param user The current user
      * @return the BMI of the user stored in the db
      */
-    public int getUserBMI(String user) {
+    public double getUserBMI(String user) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + USER_BMI +
                 " WHERE " + USER_NAME + " = ?";
 
-        int result = 0;
+        double result = 0;
         try {
             Cursor cursor = db.rawQuery(query, new String[]{user});
 
             // Check cursor is not empty
             if (cursor.moveToFirst() && cursor.getCount() > 0) {
-                result = cursor.getInt(cursor.getColumnIndex(USER_BMI));
+                result = cursor.getDouble(cursor.getColumnIndex(USER_BMI));
             }
 
             cursor.close();
@@ -387,19 +387,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + USER_RECORDS + " WHERE " + USER_NAME + " = ?";
 
         int result = 0;
+        Cursor cursor = null;
         try {
-            Cursor cursor = db.rawQuery(query, new String[]{user});
+            cursor = db.rawQuery(query, new String[]{user});
 
             // Delete all user records
             while(cursor.moveToNext()) {
                 String dateString = cursor.getString(cursor.getColumnIndex(USER_RECORD_DATE));
-                Date date = new SimpleDateFormat("dd-MM-yyyy", Locale.UK).parse(dateString);
+                Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.UK).parse(dateString);
                 Log.d("Deleting: ", date.toString());
                 deleteRecord(user, date);
             }
         }
         catch (Exception e) {
             e.printStackTrace();
+        }
+        if (cursor != null) {
+            cursor.close();
         }
         return true;
     }

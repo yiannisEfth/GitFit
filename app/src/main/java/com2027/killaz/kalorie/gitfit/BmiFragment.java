@@ -143,8 +143,8 @@ public class BmiFragment extends Fragment {
         //fetch data from local database if it is saved otherwise use default values
         dbHelper = DatabaseHelper.getInstance(getContext());
         try {
-            mHeightInput.setText(dbHelper.getUserHeight(currentUser.getDisplayName()));
-            mWeightInput.setText(dbHelper.getUserWeight(currentUser.getDisplayName()));
+            mHeightInput.setText(String.valueOf(dbHelper.getUserHeight(currentUser.getDisplayName())));
+            mWeightInput.setText(String.valueOf(dbHelper.getUserWeight(currentUser.getDisplayName())));
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("USER BMI VALUES", "NOT FOUND. USING DEFAULT.");
