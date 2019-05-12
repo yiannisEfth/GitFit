@@ -245,6 +245,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(USER_WEIGHT, weight);
         values.put(USER_HEIGHT, height);
+        values.put(USER_NAME, user);
         if(gender == 1 || gender == 0) {
             values.put(USER_GENDER, gender);
         }
@@ -259,7 +260,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String[] args = new String[]{user};
                 rowsAffected = dbWrite.update(USER_BMI, values, where, args);
                 Log.i("ROWS_UPDATED", String.valueOf(rowsAffected));
-                success = true;
+                if (rowsAffected >= 0) {
+                    success = true;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -267,7 +270,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else{
             try {
                 long newID = dbWrite.insert(USER_BMI, null, values);
-                success = true;
+                if (newID != -1) {
+                    success = true;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

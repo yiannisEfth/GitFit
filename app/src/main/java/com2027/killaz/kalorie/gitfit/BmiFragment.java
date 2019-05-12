@@ -137,10 +137,10 @@ public class BmiFragment extends Fragment {
             }
         });
 
-        //Get the current user from the Firebase
+        // Get the current user from the Firebase
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        //fetch data from local database if it is saved otherwise use default values
+        // Fetch data from local database if it is saved, otherwise use default values
         dbHelper = DatabaseHelper.getInstance(getContext());
         try {
             mHeightInput.setText(String.valueOf(dbHelper.getUserHeight(currentUser.getDisplayName())));
