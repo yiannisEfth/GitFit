@@ -175,6 +175,11 @@ public class TrackerFragment extends Fragment implements OnMapReadyCallback, Sen
         });
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        locManager.removeUpdates(locListener);
+    }
 
     /**
      * Make sure we have location permissions prior to using the map.
