@@ -418,9 +418,17 @@ public class ChallengesFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        userListener.remove();
-        friendListener.remove();
-        personalListener.remove();
-        requestListener.remove();
+        if(userListener != null){
+            userListener.remove();
+        }
+        if(friendListener != null){
+            friendListener.remove();
+        }
+        if(personalListener != null){
+            personalListener.remove();
+        }
+        if(requestListener != null){
+            requestListener.remove();
+        }
     }
 }
