@@ -10,7 +10,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -20,11 +19,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FieldValue;
 
 import java.util.Calendar;
 
@@ -86,6 +82,7 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
 
     /**
      * Navigate to the appropriate fragment depending on user selection or to log out.
+     *
      * @param menuItem chosen to be displayed.
      * @return the chosen menuItem fragment or exit the app.
      */
@@ -236,6 +233,12 @@ public class MainMenu extends AppCompatActivity implements NavigationView.OnNavi
     public void onSensorChanged(SensorEvent event) {
         stepsToday++;
         challengeRemaining--;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAuth.signOut();
     }
 }
 
