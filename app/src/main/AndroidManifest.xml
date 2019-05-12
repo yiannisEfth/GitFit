@@ -43,8 +43,7 @@
 
         <service
             android:name=".FirestoreService"
-            android:enabled="true"
-            android:exported="true" />
+            android:enabled="true" />
 
         <receiver android:name=".NotificationAlarmReceiver">
             <intent-filter>
@@ -52,7 +51,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".TermsAndConditions"></activity>
+        <activity android:name=".TermsAndConditions" />
     </application>
 
 </manifest>
