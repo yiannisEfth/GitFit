@@ -17,22 +17,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:exported="false"
             android:name=".MainMenu"
             android:screenOrientation="portrait" />
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".RegisterActivity" android:exported="false"/>
         <activity
+            android:exported="false"
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".SplashScreen">
+        <activity android:name=".SplashScreen" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OnBoardingActivity" />
+        <activity android:name=".OnBoardingActivity" android:exported="false"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -43,15 +45,16 @@
 
         <service
             android:name=".FirestoreService"
+            android:exported="false"
             android:enabled="true" />
 
-        <receiver android:name=".NotificationAlarmReceiver">
+        <receiver android:name=".NotificationAlarmReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="com2027.killaz.kalorie.gitfit.NOTIFICATION" />
             </intent-filter>
         </receiver>
 
-        <activity android:name=".TermsAndConditions" />
+        <activity android:name=".TermsAndConditions" android:exported="false"/>
     </application>
 
 </manifest>
