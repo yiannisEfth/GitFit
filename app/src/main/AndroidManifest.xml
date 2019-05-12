@@ -17,24 +17,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:exported="false"
             android:name=".MainMenu"
             android:screenOrientation="portrait" />
-        <activity android:name=".RegisterActivity" android:exported="false"/>
+        <activity android:name=".RegisterActivity"/>
         <activity
-            android:exported="false"
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".SplashScreen" android:exported="false">
+        <activity android:name=".SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OnBoardingActivity" android:exported="false"/>
+        <activity android:name=".OnBoardingActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -48,13 +46,13 @@
             android:exported="false"
             android:enabled="true" />
 
-        <receiver android:name=".NotificationAlarmReceiver" android:exported="false">
+        <receiver android:name=".NotificationAlarmReceiver">
             <intent-filter>
                 <action android:name="com2027.killaz.kalorie.gitfit.NOTIFICATION" />
             </intent-filter>
         </receiver>
 
-        <activity android:name=".TermsAndConditions" android:exported="false"/>
+        <activity android:name=".TermsAndConditions"/>
     </application>
 
 </manifest>
