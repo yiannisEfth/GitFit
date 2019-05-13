@@ -139,7 +139,6 @@ public class FriendsFragment extends Fragment {
                     friendReqsAdapter.notifyItemRangeChanged(position, friendReqsAdapter.getItemCount());
                     Toast.makeText(getContext(), "Friend Request Accepted", Toast.LENGTH_SHORT).show();
                 } else if (direction == ItemTouchHelper.LEFT) {
-                    userRef.update("friends", FieldValue.arrayUnion(friendReqsList.get(position)));
                     userRef.update("friend_requests", FieldValue.arrayRemove(friendReqsList.get(position)));
                     friendReqsList.remove(position);
                     friendReqsAdapter.notifyItemRemoved(position);
