@@ -136,16 +136,15 @@ public class ChallengesFragment extends Fragment {
      */
     private void fetchPersonalChallengeName(DocumentReference theChallenge) {
         personalListener = theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                                                                @Override
-                                                                public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+            @Override
+            public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
-                                                                    personalChallengeTotal = documentSnapshot.getLong("steps").intValue();
-                                                                    personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " steps!");
-                                                                    updatePersonalProgressBar();
+                personalChallengeTotal = documentSnapshot.getLong("steps").intValue();
+                personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " steps!");
+                updatePersonalProgressBar();
 
-                                                                }
-                                                            }
-        );
+            }
+        });
     }
 
     /**
