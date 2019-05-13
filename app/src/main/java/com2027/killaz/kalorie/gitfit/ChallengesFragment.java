@@ -153,7 +153,7 @@ public class ChallengesFragment extends Fragment {
      */
     private void updatePersonalProgressBar() {
         int soFar = personalChallengeTotal - personalChallengeRemaining;
-        if (personalChallengeTotal >= 0 && personalChallengeRemaining <= personalChallengeTotal) {
+        if (personalChallengeTotal > 0 && personalChallengeRemaining < personalChallengeTotal) {
             personalProgressBarTxt.setText("Your Progress:" + soFar + " / " + personalChallengeTotal);
             int progress = (int) ((soFar * 100.0f) / personalChallengeTotal);
             ProgressBarAnimation animate = new ProgressBarAnimation(personalChallengeBar, personalChallengeBar.getProgress(), progress);
@@ -188,7 +188,7 @@ public class ChallengesFragment extends Fragment {
      */
     private void updateFriendProgressBar() {
         int soFar = friendChallengeTotal - friendChallengeRemaining;
-        if (friendChallengeTotal >= 0 && friendChallengeRemaining <= friendChallengeTotal) {
+        if (friendChallengeTotal > 0 && friendChallengeRemaining < friendChallengeTotal) {
             friendProgressBarTxt.setText(getResources().getString(R.string.your_progress, soFar, friendChallengeTotal));
             int progress = (int) ((soFar * 100.0f) / friendChallengeTotal);
             ProgressBarAnimation animate = new ProgressBarAnimation(friendChallengeBar, friendChallengeBar.getProgress(), progress);
