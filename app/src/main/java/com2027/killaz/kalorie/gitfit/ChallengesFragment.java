@@ -108,8 +108,7 @@ public class ChallengesFragment extends Fragment {
                     if (challenge_friend.get("challenge_ref") != null) {
                         friendChallengeRemaining = Integer.parseInt(challenge_friend.get("remaining").toString());
                         hasFriendChallenge = true;
-                    }
-                    else {
+                    } else {
                         hasFriendChallenge = false;
                         String noChallengeText = "No Active Challenge From Friend";
                         friendProgressBarTxt.setText(noChallengeText);
@@ -132,24 +131,20 @@ public class ChallengesFragment extends Fragment {
 
     /**
      * Fetches the name of the personal challenge using a snapshop listener
+     *
      * @param theChallenge the reference of the challenge to be fetched from the challenges collection
      */
     private void fetchPersonalChallengeName(DocumentReference theChallenge) {
         personalListener = theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-             @Override
-             public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                 String challenge_type = documentSnapshot.getString("type");
-                 if (challenge_type.equals("distance")) {
-                     personalChallengeTotal = documentSnapshot.getLong("distance").intValue();
-                     personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " metres!");
-                     updatePersonalProgressBar();
-                 } else {
-                     personalChallengeTotal = documentSnapshot.getLong("steps").intValue();
-                     personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " steps!");
-                     updatePersonalProgressBar();
-                 }
-             }
-         }
+                                                                @Override
+                                                                public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+
+                                                                    personalChallengeTotal = documentSnapshot.getLong("steps").intValue();
+                                                                    personalInfoTxt.setText("Travel a distance of " + personalChallengeTotal + " steps!");
+                                                                    updatePersonalProgressBar();
+
+                                                                }
+                                                            }
         );
     }
 
@@ -159,7 +154,7 @@ public class ChallengesFragment extends Fragment {
     private void updatePersonalProgressBar() {
         int soFar = personalChallengeTotal - personalChallengeRemaining;
         if (personalChallengeTotal > 0 && personalChallengeRemaining < personalChallengeTotal) {
-            personalProgressBarTxt.setText( "Your Progress:" + soFar + " / " + personalChallengeTotal);
+            personalProgressBarTxt.setText("Your Progress:" + soFar + " / " + personalChallengeTotal);
             int progress = (int) ((soFar * 100.0f) / personalChallengeTotal);
             ProgressBarAnimation animate = new ProgressBarAnimation(personalChallengeBar, personalChallengeBar.getProgress(), progress);
             animate.setDuration(1000);
@@ -169,6 +164,7 @@ public class ChallengesFragment extends Fragment {
 
     /**
      * Fetches the name of the friend's challenge
+     *
      * @param theChallenge the reference of the challenge to be fetched from the challenges collection
      */
     private void fetchFriendChallengeName(DocumentReference theChallenge) {
@@ -178,16 +174,10 @@ public class ChallengesFragment extends Fragment {
             friendListener = theChallenge.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                    String challenge_type = documentSnapshot.getString("type");
-                    if (challenge_type.equals("distance")) {
-                        friendChallengeTotal = documentSnapshot.getLong("distance").intValue();
-                        friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " metres!");
-                        updateFriendProgressBar();
-                    } else {
-                        friendChallengeTotal = documentSnapshot.getLong("steps").intValue();
-                        friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " steps!");
-                        updateFriendProgressBar();
-                    }
+                    friendChallengeTotal = documentSnapshot.getLong("steps").intValue();
+                    friendInfoTxt.setText("Challenged by " + challenge_friend.get("user_ref") + " to travel a distance of " + friendChallengeTotal + " steps!");
+                    updateFriendProgressBar();
+
                 }
             });
         }
@@ -232,6 +222,7 @@ public class ChallengesFragment extends Fragment {
 
     /**
      * Helper method to iniate the alert dialog that contains the names of all friends to challenge.
+     *
      * @param cs The character sequence of friends to be inserted and displayed in the dialog
      */
     private void initiateDialog(CharSequence[] cs) {
@@ -256,6 +247,7 @@ public class ChallengesFragment extends Fragment {
     /**
      * Method to check if a challenge request from user already exists for the chosen friend. If it does exist a toast message alerts the user and a new one is not send.
      * If challenge does not currently exist from user. Then a challenge request is successfully sent to the challenged friend.
+     *
      * @param toChallenge
      */
     private void validateChallengeReq(final String toChallenge) {
@@ -298,6 +290,7 @@ public class ChallengesFragment extends Fragment {
 
     /**
      * Helper method to send a challeng request
+     *
      * @param toChallenge Name of user to challenge
      */
     private void sendChallengeRequest(String toChallenge) {
@@ -342,6 +335,7 @@ public class ChallengesFragment extends Fragment {
 
     /**
      * Dialog to confirm challenge acceptance from a friend
+     *
      * @param challenger The person who challenged the user
      */
     private void acceptanceDialog(final String challenger) {
@@ -373,6 +367,7 @@ public class ChallengesFragment extends Fragment {
      * Used to update the database and front-end appropriately when a friend challenge is accepted.
      * Removes the challenge from the challenge_requests collection
      * Adds challenge to the current_challenge_friend collection
+     *
      * @param challenger
      */
     private void setupAcceptedChallenge(final String challenger) {
@@ -412,22 +407,22 @@ public class ChallengesFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mContext =context;
+        mContext = context;
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if(userListener != null){
+        if (userListener != null) {
             userListener.remove();
         }
-        if(friendListener != null){
+        if (friendListener != null) {
             friendListener.remove();
         }
-        if(personalListener != null){
+        if (personalListener != null) {
             personalListener.remove();
         }
-        if(requestListener != null){
+        if (requestListener != null) {
             requestListener.remove();
         }
     }
