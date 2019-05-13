@@ -19,13 +19,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import javax.annotation.Nullable;
 
 public class FirestoreService extends Service implements SensorEventListener {
     /**
@@ -221,32 +225,30 @@ public class FirestoreService extends Service implements SensorEventListener {
      * Method to fetch the user's data when the app is started.
      */
     private void fetchUserData() {
-        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    stepCounter = documentSnapshot.getLong("total_distance_covered").intValue();
-                    Map<String, Object> my_challenge = (Map<String, Object>) documentSnapshot.get("current_challenge_self");
-                    Map<String, Object> friend_challenge = (Map<String, Object>) documentSnapshot.get("current_challenge_friend");
-                    myChallengeReference = (DocumentReference) my_challenge.get("challenge_ref");
-                    friendChallengeReference = (DocumentReference) friend_challenge.get("challenge_ref");
-                    completedChallenges = documentSnapshot.getLong("challenges_completed").intValue();
-                    points = documentSnapshot.getLong("points").intValue();
+            public void onEvent(@Nullable DocumentSnapshot docshot, @Nullable FirebaseFirestoreException e) {
+                DocumentSnapshot documentSnapshot = docshot;
+                stepCounter = documentSnapshot.getLong("total_distance_covered").intValue();
+                Map<String, Object> my_challenge = (Map<String, Object>) documentSnapshot.get("current_challenge_self");
+                Map<String, Object> friend_challenge = (Map<String, Object>) documentSnapshot.get("current_challenge_friend");
+                myChallengeReference = (DocumentReference) my_challenge.get("challenge_ref");
+                friendChallengeReference = (DocumentReference) friend_challenge.get("challenge_ref");
+                completedChallenges = documentSnapshot.getLong("challenges_completed").intValue();
+                points = documentSnapshot.getLong("points").intValue();
 
-                    stepIntent.putExtra("challenges_completed", completedChallenges);
-                    stepIntent.putExtra("points", points);
+                stepIntent.putExtra("challenges_completed", completedChallenges);
+                stepIntent.putExtra("points", points);
 
-                    remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
-                    stepIntent.putExtra("remaining", remainingMyChallenge);
+                remainingMyChallenge = ((Long) my_challenge.get("remaining")).intValue();
+                stepIntent.putExtra("remaining", remainingMyChallenge);
 
-                    fetchUserChallenges();
-                    if (friendChallengeReference != null) {
-                        remainingFriendChallenge = ((Long) friend_challenge.get("remaining")).intValue();
-                        friendChallenger = friend_challenge.get("user_ref").toString();
-                    }
-                    sendBroadcast(stepIntent);
+                fetchUserChallenges();
+                if (friendChallengeReference != null) {
+                    remainingFriendChallenge = ((Long) friend_challenge.get("remaining")).intValue();
+                    friendChallenger = friend_challenge.get("user_ref").toString();
                 }
+                sendBroadcast(stepIntent);
             }
         });
     }
